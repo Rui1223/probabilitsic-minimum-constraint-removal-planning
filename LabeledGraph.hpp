@@ -6,6 +6,8 @@
   3. m_labelWeights : store the weight for each label
 
 */
+#ifndef LABELEDGRAPH_H
+#define LABELEDGRAPH_H
 
 #include <vector>
 
@@ -17,6 +19,7 @@ class LabeledGraph_t
 	std::vector<double> m_labelWeights;
 public:
 	// Constructor
+	LabeledGraph_t() {}
 	LabeledGraph_t(int n_nodes);
 
 	// function to load a graph (manually generate a graph)
@@ -37,3 +40,5 @@ public:
 	// Destructor
 	~LabeledGraph_t();
 };
+
+#endif
