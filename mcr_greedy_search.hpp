@@ -1,1 +1,0 @@
-/* This hpp file define the MCR problem and the greedy search algorithm applied to this problem */
