@@ -15,6 +15,7 @@ class PmcrGreedySolver_t
 	int m_goal; // the id of the goal node
 	std::priority_queue<PmcrNode_t> m_open;
 	std::vector<PmcrNode_t> m_closed;
+	std:vector<PmcrNode_t> path;
 
 public:
 	PmcrGreedySolver_t(LabeledGraph_t g, int start, int goal);

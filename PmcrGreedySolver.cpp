@@ -24,6 +24,10 @@ void PmcrGreedySolver_t::greedy_search()
 		PmcrNode_t current = m_open.top();
 		m_open.pop();
 		m_closed.push_back(current);
+		if (current.id = m_goal)
+			printf("goal found!")
+			// should return a path here
+			//backTrackPath();
 	}
 }
 
