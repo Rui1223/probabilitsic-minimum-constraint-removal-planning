@@ -47,3 +47,4 @@ bool operator<(const PmcrNode_t &n1, const PmcrNode_t &n2)
 	// on top of the priority queue
 	return n1.m_weights > n2.m_weights;
 }
+

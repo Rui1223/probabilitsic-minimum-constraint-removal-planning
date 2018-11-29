@@ -18,7 +18,8 @@ class PmcrGreedySolver_t
 
 public:
 	PmcrGreedySolver_t(LabeledGraph_t g, int start, int goal);
-
+	void greedy_search();
+	void printtest();
 };
 
 #endif

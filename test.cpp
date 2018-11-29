@@ -1,7 +1,6 @@
 /*This test file is for test purpose*/
 
 #include "LabeledGraph.hpp"
-#include "PmcrNode.hpp"
 #include "PmcrGreedySolver.hpp"
 
 
@@ -10,10 +9,14 @@
 
 int main()
 {
+	// Problem input
 	LabeledGraph_t g(3);
 	int start = 0;
 	int goal = 8;
+	// Call the search algorithm
 	PmcrGreedySolver_t pmcr_solver(g, start, goal);
+	pmcr_solver.greedy_search();
+	pmcr_solver.printtest();
 	return 0;
 }
 
