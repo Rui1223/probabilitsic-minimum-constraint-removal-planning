@@ -37,6 +37,11 @@ public:
 	// function for printing (test) purpose only
 	void graph_print();
 
+	// lots of getters
+	std::vector<std::vector<int>> getNodeNeighbors() { return m_nodeNeighbors; }
+	std::vector<std::vector<std::vector<int>>> getEdgeLabels() { return m_edgeLabels; } 
+	std::vector<double> getLabelWeights() { return m_labelWeights; }
+
 	// Destructor
 	~LabeledGraph_t();
 };

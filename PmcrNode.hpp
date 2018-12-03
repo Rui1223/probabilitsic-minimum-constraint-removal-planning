@@ -25,7 +25,7 @@ public:
 	std::vector<int> getLabels() { return m_labels; } 
 	int getCardinality() { return m_labelCardinality; } 
 	double getWeights() { return m_weights; } 
-	PmcrNode_t* getParent() { return m_parent;}
+	PmcrNode_t getParent() { return *m_parent;}
 
 	friend bool operator<(const PmcrNode_t &n1, const PmcrNode_t &n2);
 };

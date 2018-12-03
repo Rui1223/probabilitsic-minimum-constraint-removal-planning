@@ -3,7 +3,7 @@
 #include "LabeledGraph.hpp"
 #include "PmcrGreedySolver.hpp"
 
-
+#include <cstdio>
 #include <iostream>
 #include <queue>
 
@@ -16,8 +16,7 @@ int main()
 	// Call the search algorithm
 	PmcrGreedySolver_t pmcr_solver(g, start, goal);
 	pmcr_solver.greedy_search();
-	//pmcr_solver.printtest();
-	return 0;
+
 }
 
 /*for testing*/
