@@ -19,8 +19,10 @@ class PmcrGreedySolver_t
 
 public:
 	PmcrGreedySolver_t(LabeledGraph_t g, int start, int goal);
-	bool greedy_search();
+	void greedy_search();
 	void back_track_path();
+	std::vector<int> label_union(std::vector<int> s1, std::vector<int> s2);
+	bool check_prune(int neighborID, std::vector<int> labels);
 	void print_path();
 	void print_test();
 };

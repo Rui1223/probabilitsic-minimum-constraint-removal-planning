@@ -2,6 +2,7 @@
 #include <iostream>
 #include <cassert>
 #include <cstdio>
+#include <algorithm>
 
 #include "PmcrNode.hpp"
 #include "LabeledGraph.hpp"
@@ -18,7 +19,7 @@ PmcrGreedySolver_t::PmcrGreedySolver_t(LabeledGraph_t g, int start, int goal)
 	m_path = std::vector<int>();
 }
 
-bool PmcrGreedySolver_t::greedy_search()
+void PmcrGreedySolver_t::greedy_search()
 {
 	while(!m_open.empty())
 	{
@@ -32,8 +33,43 @@ bool PmcrGreedySolver_t::greedy_search()
 			back_track_path();
 		}
 		// look at each neighbor of the current node
-		std::vector<int> neigbhors = m_lgraph.getNodeNeighbors()[current.getID()];
+		std::vector<int> neighbors = m_lgraph.getNodeNeighbors()[current.getID()];
+		for (auto const &neighbor : neighbors)
+		{
+			// no need to come back to parent, since it will
+			// always prune that parent (superset will always be pruned without check)
+			if ( neighbor == current.getID() ) {continue;}
+			// check neighbor's label
+			std::vector<int> currentLabels = 
+				label_union(current.getLabels(), 
+					m_lgraph.getEdgeLabels()[current.getID()][neighbor]); 
+			bool isPrune = check_prune(neighbor, currentLabels)
+		}
 	}
+}
+
+bool check_prune(int neighborID, std::vector<int> labels)
+// This function checks whether any node in OPEN and CLOSED with the same id of the query node 
+// is necessary to be pruned (including the query node). If it is, return true. Otherwise false.
+{
+
+}
+
+std::vector<int> PmcrGreedySolver_t::label_union(std::vector<int> s1, std::vector<int> s2)
+{
+	// sort the sets first before applying union operation
+	std::sort(s1.begin(), s1.end());
+	std::sort(s2.begin(), s2.end());
+
+	// Declaring resultant vector for union
+	std::vector<int> v(s1.size()+s2.size());
+	// using function set_union() to compute union of 2
+	// containers v1 and v2 and store result in v
+	auto it = std::set_union(s1.begin(), s1.end(), s2.begin(), s2.end(), v.begin());
+
+	// resizing new container
+	v.resize(it - v.begin());
+	return v;
 }
 
 void PmcrGreedySolver_t::back_track_path()
