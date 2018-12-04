@@ -22,6 +22,7 @@ public:
 	void greedy_search();
 	void back_track_path();
 	std::vector<int> label_union(std::vector<int> s1, std::vector<int> s2);
+	double compute_weight(std::vector<int> labels);
 	bool check_prune(int neighborID, std::vector<int> labels);
 	void print_path();
 	void print_test();

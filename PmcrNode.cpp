@@ -5,24 +5,18 @@
 #include <cassert>
 
 PmcrNode_t::PmcrNode_t(int id, std::vector<int> labels, 
-	PmcrNode_t *parent, std::vector<double> labelWeights)
+	PmcrNode_t *parent, double weights)
 {
 	assert(id >= 0);
 	m_id = id;
 	m_labels = labels;
-	m_parent = parent;
 	m_labelCardinality = labels.size();
-	updateWeight(labelWeights);
+	m_weights = weights;
+	m_parent = parent;
+	
+	
 }
 
-void PmcrNode_t::updateWeight(std::vector<double> labelWeights)
-{
-	m_weights = 0.0;
-	for (auto const &label : m_labels)
-	{
-		m_weights += labelWeights[label]; 
-	}
-}
 
 void PmcrNode_t::print()
 {

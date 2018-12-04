@@ -15,7 +15,7 @@ PmcrGreedySolver_t::PmcrGreedySolver_t(LabeledGraph_t g, int start, int goal)
 	assert(goal >=0);
 	m_start = start;
 	m_goal = goal;
-	m_open.push(PmcrNode_t(start, {0}, nullptr, m_lgraph.getLabelWeights()));
+	m_open.push(PmcrNode_t(start, {0}, nullptr, compute_weight({0})));
 	m_path = std::vector<int>();
 }
 
@@ -42,16 +42,43 @@ void PmcrGreedySolver_t::greedy_search()
 			// check neighbor's label
 			std::vector<int> currentLabels = 
 				label_union(current.getLabels(), 
-					m_lgraph.getEdgeLabels()[current.getID()][neighbor]); 
-			bool isPrune = check_prune(neighbor, currentLabels)
+					m_lgraph.getEdgeLabels()[current.getID()][neighbor]);
+			double currentWeights = compute_weight(currentLabels);
+
+			bool isPrune = check_prune(neighbor, currentWeights)
 		}
 	}
 }
 
-bool check_prune(int neighborID, std::vector<int> labels)
+bool check_prune(int neighborID, double weights)
 // This function checks whether any node in OPEN and CLOSED with the same id of the query node 
 // is necessary to be pruned (including the query node). If it is, return true. Otherwise false.
 {
+	// check if there are nodes in CLOSED with the same neighborID
+	search_closedList(neighborID, weights);
+}
+
+bool search_closedList(int neighborID, double weights)
+{
+	isFind = false;
+	isPrune = false;
+	for (auto &node : m_closed)
+	{
+		if (node.getID() == neighborID):
+			if weights > node.m_weights:
+				break;
+	}
+}
+
+double PmcrGreedySolver_t::compute_weight(std::vector<int> currentLabels)
+{
+	double currentWeights = 0.0;
+	std::vector<double> labelWeights = m_lgraph.getLabelWeights();
+	for (auto const &label : currentLabels)
+	{
+		currentWeights += labelWeights[label]; 
+	}
+	return currentWeights;
 
 }
 

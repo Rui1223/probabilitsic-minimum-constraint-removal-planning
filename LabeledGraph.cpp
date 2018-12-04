@@ -44,18 +44,22 @@ void LabeledGraph_t::specify_neighbors()
 				// the node is in the bottom line of the grid graph
 				// only add the neighbor of its right
 				m_nodeNeighbors[iter].push_back(iter+1);
+				m_nodeNeighbors[iter+1].push_back(iter);
 			}
 			else if (i % m_gridSize != m_gridSize-1 and j % m_gridSize == m_gridSize-1)
 			{
 				// the node is in the rightmost line of the grid graph
 				// only add the neighbor of its bottom
 				m_nodeNeighbors[iter].push_back(iter+m_gridSize);
+				m_nodeNeighbors[iter+m_gridSize].push_back(iter);
 			}
 			else
 			{
 				// add the neighbor of its right and bottom
 				m_nodeNeighbors[iter].push_back(iter+1);
+				m_nodeNeighbors[iter+1].push_back(iter);
 				m_nodeNeighbors[iter].push_back(iter+m_gridSize);
+				m_nodeNeighbors[iter+m_gridSize].push_back(iter);
 			}
 			iter++;
 		}		

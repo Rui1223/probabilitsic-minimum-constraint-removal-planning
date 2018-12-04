@@ -5,6 +5,7 @@
 
 #include <vector>
 
+
 class PmcrNode_t
 {
 	int m_id; // id of the node
@@ -16,8 +17,7 @@ class PmcrNode_t
 public:
 	// constructor
 	PmcrNode_t(int id, std::vector<int> labels, PmcrNode_t *parent, 
-		std::vector<double> labelWeights);
-	void updateWeight(std::vector<double> labelWeights);
+		double weights);
 	void print();
 
 	/*getter*/
