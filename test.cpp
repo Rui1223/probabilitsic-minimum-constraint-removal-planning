@@ -18,6 +18,7 @@ int main()
 	// Call the search algorithm
 	PmcrGreedySolver_t pmcr_solver(g, start, goal);
 	pmcr_solver.greedy_search();
+	return 0;
 
 }
 

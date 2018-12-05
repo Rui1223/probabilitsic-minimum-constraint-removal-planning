@@ -15,6 +15,7 @@ class PmcrGreedySolver_t
 	int m_goal; // the id of the goal node
 	std::priority_queue<PmcrNode_t> m_open;
 	std::vector<PmcrNode_t> m_closed;
+	std::vector<PmcrNode_t> m_virtualOpen;
 	std::vector<int> m_path;
 
 public:
@@ -23,7 +24,10 @@ public:
 	void back_track_path();
 	std::vector<int> label_union(std::vector<int> s1, std::vector<int> s2);
 	double compute_weight(std::vector<int> labels);
-	bool check_prune(int neighborID, std::vector<int> labels);
+	bool check_prune(int neighborID, double weights);
+	bool search_closedList(int neighborID, double weights, bool isPrune);
+	bool search_openList(int neighborID, double weights, bool isPrune);
+	void push_virtualOpen();
 	void print_path();
 	void print_test();
 };

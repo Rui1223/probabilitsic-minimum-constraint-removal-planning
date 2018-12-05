@@ -15,6 +15,7 @@ LabeledGraph_t::LabeledGraph_t(int size = 3)
 	load_graph();
 	load_weights();
 	graph_print();
+	printf("-------------------------------\n");
 }
 
 void LabeledGraph_t::load_graph()
@@ -23,18 +24,26 @@ void LabeledGraph_t::load_graph()
 	specify_neighbors();
 	specify_labels();
 	printf("Finish building the graph\n");
+
 }
 
 void LabeledGraph_t::specify_neighbors()
 {
-	// we assume for each node, we have two neighbors by default
+	// we assume for each node, we have two neighbors to actively add by default
 	// The right one and the bottom one
-	int iter = 0;
 	for (int i=0; i < m_gridSize; i++)
 	{
 		for (int j=0; j < m_gridSize; j++)
 		{
 			m_nodeNeighbors.push_back(std::vector<int>());
+		}
+	}
+
+	int iter = 0;
+	for (int i=0; i < m_gridSize; i++)
+	{
+		for (int j=0; j < m_gridSize; j++)
+		{
 			if (i % m_gridSize == m_gridSize-1 and j % m_gridSize == m_gridSize-1)
 			{
 				// no neighbor to add since the node is at the right-bottom corner
@@ -132,6 +141,17 @@ void LabeledGraph_t::graph_print()
 			std::cout << "\t";
 		}
 		std::cout << std::endl;
+	}
+
+	printf("**********************************\n");
+
+	for (int k=0; k < m_nodeNeighbors.size(); k++)
+	{
+		for (auto const &e : m_nodeNeighbors[k])
+		{
+			std::cout << e << " ";
+		}
+		std::cout << "\n";
 	}
 	
 }

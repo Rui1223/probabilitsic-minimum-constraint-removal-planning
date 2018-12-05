@@ -16,6 +16,7 @@ class PmcrNode_t
 
 public:
 	// constructor
+	PmcrNode_t();
 	PmcrNode_t(int id, std::vector<int> labels, PmcrNode_t *parent, 
 		double weights);
 	void print();

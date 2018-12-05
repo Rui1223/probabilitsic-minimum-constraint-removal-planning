@@ -4,6 +4,8 @@
 #include <iostream>
 #include <cassert>
 
+PmcrNode_t::PmcrNode_t() {}
+
 PmcrNode_t::PmcrNode_t(int id, std::vector<int> labels, 
 	PmcrNode_t *parent, double weights)
 {
