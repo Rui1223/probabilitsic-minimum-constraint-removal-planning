@@ -16,7 +16,7 @@ PmcrGreedySolver_t::PmcrGreedySolver_t(LabeledGraph_t g, int start, int goal)
 	m_start = start;
 	m_goal = goal;
 	printf("start greedy search\n");
-	m_open.push(PmcrNode_t(m_start, {0}, nullptr, compute_weight({0})));
+	m_open.push(new PmcrNode_t(m_start, {0}, nullptr, compute_weight({0})));
 	m_path = std::vector<int>();
 }
 
@@ -25,11 +25,10 @@ void PmcrGreedySolver_t::greedy_search()
 
 	while(!m_open.empty())
 	{
-		PmcrNode_t current;
-		current = m_open.top();
+		PmcrNode_t *current = m_open.top();
 		m_open.pop();
 		m_closed.push_back(current);
-		if (current.getID() == m_goal)
+		if (current->getID() == m_goal)
 		{
 			printf("goal found!\n");
 			// should return a path here
@@ -37,16 +36,17 @@ void PmcrGreedySolver_t::greedy_search()
 			return;
 		}
 		// look at each neighbor of the current node
-		std::vector<int> neighbors = m_lgraph.getNodeNeighbors()[current.getID()];
+		std::vector<int> neighbors = m_lgraph.getNodeNeighbors()[current->getID()];
 		for (auto const &neighbor : neighbors)
 		{
 			// no need to come back to parent, since it will
 			// always prune that parent (superset will always be pruned without check)
-			if ( current.getID() != m_start and neighbor == current.getParent().getID()) {continue;}
+			if ( current->getID() != m_start and neighbor == current->getParent()->getID()) 
+				{continue;}
 			// check neighbor's label
 			std::vector<int> currentLabels = 
-				label_union(current.getLabels(), 
-					m_lgraph.getEdgeLabels()[current.getID()][neighbor]);
+				label_union(current->getLabels(), 
+					m_lgraph.getEdgeLabels()[current->getID()][neighbor]);
 			double currentWeights = compute_weight(currentLabels);
 
 			bool isPrune = check_prune(neighbor, currentWeights);
@@ -54,7 +54,7 @@ void PmcrGreedySolver_t::greedy_search()
 			{
 				// Congrats! This neighbor node stand up to all pruning tests
 				// Let's add it to the open list, welcome!
-				m_open.push(PmcrNode_t(neighbor, currentLabels, &current, currentWeights));
+				m_open.push(new PmcrNode_t(neighbor, currentLabels, current, currentWeights));
 
 			}
 		}
@@ -84,9 +84,9 @@ bool PmcrGreedySolver_t::search_closedList(int neighborID, double weights, bool 
 {
 	for (auto &node : m_closed)
 	{
-		if (node.getID() == neighborID)
+		if (node->getID() == neighborID)
 		{
-			if (weights >= node.getWeights())
+			if (weights >= node->getWeights())
 			{
 				isPrune = true;
 				return isPrune;
@@ -107,11 +107,11 @@ bool PmcrGreedySolver_t::search_openList(int neighborID, double weights, bool is
 	// the APIs for priority queue are not as rich as those provided for std::vector
 	while(!m_open.empty())
 	{
-		PmcrNode_t node = m_open.top();
+		PmcrNode_t *node = m_open.top();
 		m_open.pop(); // pop out that node so as to keep searching
-		if (node.getID() == neighborID)
+		if (node->getID() == neighborID)
 		{
-			if (weights >= node.getWeights())
+			if (weights >= node->getWeights())
 			{
 				isPrune = true;
 				m_open.push(node);
@@ -175,16 +175,16 @@ std::vector<int> PmcrGreedySolver_t::label_union(std::vector<int> s1, std::vecto
 void PmcrGreedySolver_t::back_track_path()
 {	
 	// start from the goal
-	PmcrNode_t current = m_closed[m_closed.size()-1];
-	std::cout << m_closed.size() << std::endl;
-	while (current.getID() != m_start)
+	print_test();
+	PmcrNode_t *current = m_closed[m_closed.size()-1];
+	while (current->getID() != m_start)
 	{
 		// keep backtracking the path until you reach the start
-		m_path.push_back(current.getID());
-		current = current.getParent();
+		m_path.push_back(current->getID());
+		current = current->getParent();
 	} 
 	// finally put the start into the path
-	m_path.push_back(current.getID());
+	m_path.push_back(current->getID());
 	print_path();
 }
 
@@ -203,10 +203,10 @@ void PmcrGreedySolver_t::print_test()
 	printf("Check whether there is something in the closed list\n");
 	for (auto &node : m_closed)
 	{
-		if(node.getID() != m_start)
+		if(node->getID() != m_start)
 		{
-			std::cout << node.getID() << "\t" << node.getWeights() << "\t"
-			<< node.getParent().getID();
+			std::cout << node->getID() << "\t" << node->getWeights() << "\t"
+				<< node->getParent()->getID();
 			std::cout << std::endl;	
 		}
 	

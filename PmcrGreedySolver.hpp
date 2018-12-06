@@ -7,15 +7,24 @@
 #include "LabeledGraph.hpp"
 #include "PmcrNode.hpp"
 
+struct PmcrNode_comparison
+{
+	bool operator()(const PmcrNode_t* a, const PmcrNode_t* b) 
+	{
+		return (a->getWeights()) > (b->getWeights());
+	}
+};
+
+
 class PmcrGreedySolver_t
 {
 	// Input that a greedy solver needs
 	LabeledGraph_t m_lgraph; 
 	int m_start; // the id of the start node
 	int m_goal; // the id of the goal node
-	std::priority_queue<PmcrNode_t> m_open;
-	std::vector<PmcrNode_t> m_closed;
-	std::vector<PmcrNode_t> m_virtualOpen;
+	std::priority_queue<PmcrNode_t*, std::vector<PmcrNode_t*>, PmcrNode_comparison> m_open;
+	std::vector<PmcrNode_t*> m_closed;
+	std::vector<PmcrNode_t*> m_virtualOpen;
 	std::vector<int> m_path;
 
 public:
