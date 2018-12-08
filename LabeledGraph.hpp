@@ -13,14 +13,17 @@
 
 class LabeledGraph_t
 {
-	int m_gridSize; // the size of the grid
+	// the size of the grid
+	int m_row;
+	int m_col;
+	int m_nNodes; 
 	std::vector<std::vector<int>> m_nodeNeighbors;
 	std::vector<std::vector<std::vector<int>>> m_edgeLabels;
 	std::vector<double> m_labelWeights;
 public:
 	// Constructor
 	LabeledGraph_t() {}
-	LabeledGraph_t(int n_nodes);
+	LabeledGraph_t(int row, int col);
 
 	// function to load a graph (manually generate a graph)
 	void load_graph();

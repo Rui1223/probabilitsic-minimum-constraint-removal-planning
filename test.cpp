@@ -12,7 +12,7 @@
 int main()
 {
 	// Problem input
-	LabeledGraph_t g(3);
+	LabeledGraph_t g(3,3);
 	int start = 0;
 	int goal = 8;
 	// Call the search algorithm

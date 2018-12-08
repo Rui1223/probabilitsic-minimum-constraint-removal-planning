@@ -33,15 +33,4 @@ void PmcrNode_t::print()
 }
 
 
-// bool operator<(const std::shared_ptr<PmcrNode_t> n1, const std::shared_ptr<PmcrNode_t> n2)
-// {
-// 	// Here is an operator overloading on class PmcrNode
-// 	// to compare the total weights of nodes
-// 	// will be used in priority queue
-// 	// those nodes who have less weights will be
-// 	// on top of the priority queue
-// 	return (n1->m_weights) < (n2->m_weights);
-// }
-
-
 

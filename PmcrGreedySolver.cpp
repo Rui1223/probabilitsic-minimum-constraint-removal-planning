@@ -18,6 +18,18 @@ PmcrGreedySolver_t::PmcrGreedySolver_t(LabeledGraph_t g, int start, int goal)
 	printf("start greedy search\n");
 	m_open.push(new PmcrNode_t(m_start, {0}, nullptr, compute_weight({0})));
 	m_path = std::vector<int>();
+
+}
+
+PmcrGreedySolver_t::~PmcrGreedySolver_t()
+{
+	while (!m_open.empty())
+	{
+		PmcrNode_t* a1 = m_open.top();
+		delete a1;
+		m_open.pop();
+	}
+	for (auto &e : m_closed) { delete e; }
 }
 
 void PmcrGreedySolver_t::greedy_search()

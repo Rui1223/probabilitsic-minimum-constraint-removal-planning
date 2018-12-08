@@ -29,9 +29,6 @@ public:
 	double getWeights() const { return m_weights; } 
 	PmcrNode_t* getParent() { return m_parent;}
 
-	//friend bool operator<(const std::shared_ptr<PmcrNode_t> n1, const std::shared_ptr<PmcrNode_t> n2);
-
-
 };
 
 #endif
