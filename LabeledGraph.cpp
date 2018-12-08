@@ -101,6 +101,43 @@ void LabeledGraph_t::specify_labels()
 	}
 	// manually assign the label
 	m_edgeLabels[0][1].push_back(1);
+	m_edgeLabels[1][0].push_back(1);
+	m_edgeLabels[1][2].push_back(1);
+	m_edgeLabels[1][7].push_back(1);
+	m_edgeLabels[1][7].push_back(2);
+	m_edgeLabels[2][1].push_back(1);
+	m_edgeLabels[2][3].push_back(1);
+	m_edgeLabels[2][8].push_back(2);
+	m_edgeLabels[3][2].push_back(1);
+	m_edgeLabels[3][4].push_back(1);
+	m_edgeLabels[3][9].push_back(1);
+	m_edgeLabels[3][9].push_back(3);
+	m_edgeLabels[4][3].push_back(1);
+	m_edgeLabels[4][5].push_back(1);
+	m_edgeLabels[4][10].push_back(3);
+	m_edgeLabels[5][4].push_back(1);
+	m_edgeLabels[5][11].push_back(1);
+	m_edgeLabels[6][7].push_back(2);
+	m_edgeLabels[7][6].push_back(2);
+	m_edgeLabels[7][1].push_back(1);
+	m_edgeLabels[7][1].push_back(2);
+	m_edgeLabels[7][8].push_back(2);
+	m_edgeLabels[8][7].push_back(2);
+	m_edgeLabels[8][2].push_back(2);
+	m_edgeLabels[8][9].push_back(2);
+	m_edgeLabels[8][9].push_back(3);
+	m_edgeLabels[9][8].push_back(2);
+	m_edgeLabels[9][8].push_back(3);
+	m_edgeLabels[9][3].push_back(1);
+	m_edgeLabels[9][3].push_back(3);
+	m_edgeLabels[9][10].push_back(3);
+	m_edgeLabels[10][9].push_back(3);
+	m_edgeLabels[10][4].push_back(3);
+	m_edgeLabels[10][11].push_back(3);
+	m_edgeLabels[11][10].push_back(3);
+	m_edgeLabels[11][5].push_back(1);
+	/*
+	m_edgeLabels[0][1].push_back(1);
 	m_edgeLabels[0][3].push_back(1);
 	m_edgeLabels[1][0].push_back(1);
 	m_edgeLabels[3][0].push_back(1);
@@ -122,14 +159,15 @@ void LabeledGraph_t::specify_labels()
 	m_edgeLabels[7][8].push_back(2);
 	m_edgeLabels[8][7].push_back(2);
 	m_edgeLabels[8][5].push_back(3);
+	*/
 }
 
 void LabeledGraph_t::load_weights()
 {
 	m_labelWeights.push_back(0.0);
-	m_labelWeights.push_back(0.1);
+	m_labelWeights.push_back(0.4);
 	m_labelWeights.push_back(0.3);
-	m_labelWeights.push_back(0.6);
+	m_labelWeights.push_back(0.3);
 }
 
 void LabeledGraph_t::graph_print() 
