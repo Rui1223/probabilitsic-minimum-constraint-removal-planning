@@ -3,6 +3,7 @@
 #include <cassert>
 #include <cstdio>
 #include <algorithm>
+#include <iomanip>
 
 #include "PmcrNode.hpp"
 #include "LabeledGraph.hpp"
@@ -16,7 +17,7 @@ PmcrGreedySolver_t::PmcrGreedySolver_t(LabeledGraph_t g, int start, int goal)
 	m_start = start;
 	m_goal = goal;
 	printf("start greedy search\n");
-	m_open.push(new PmcrNode_t(m_start, {0}, nullptr, compute_weight({0})));
+	m_open.push(new PmcrNode_t(m_start, {0}, nullptr, m_lgraph.compute_weight({0})));
 	m_path = std::vector<int>();
 
 }
@@ -59,7 +60,7 @@ void PmcrGreedySolver_t::greedy_search()
 			std::vector<int> currentLabels = 
 				label_union(current->getLabels(), 
 					m_lgraph.getEdgeLabels()[current->getID()][neighbor]);
-			double currentWeights = compute_weight(currentLabels);
+			double currentWeights = m_lgraph.compute_weight(currentLabels);
 
 			bool isPrune = check_prune(neighbor, currentWeights);
 			if (!isPrune)
@@ -155,18 +156,6 @@ void PmcrGreedySolver_t::push_virtualOpen()
 	m_virtualOpen.erase(m_virtualOpen.begin(), m_virtualOpen.end());
 }
 
-double PmcrGreedySolver_t::compute_weight(std::vector<int> currentLabels)
-{
-	double currentWeights = 0.0;
-	std::vector<double> labelWeights = m_lgraph.getLabelWeights();
-	for (auto const &label : currentLabels)
-	{
-		currentWeights += labelWeights[label]; 
-	}
-	return currentWeights;
-
-}
-
 std::vector<int> PmcrGreedySolver_t::label_union(std::vector<int> s1, std::vector<int> s2)
 {
 	// sort the sets first before applying union operation
@@ -186,8 +175,9 @@ std::vector<int> PmcrGreedySolver_t::label_union(std::vector<int> s1, std::vecto
 
 void PmcrGreedySolver_t::back_track_path()
 {	
+	// check closed list
+	print_closedList();
 	// start from the goal
-	print_test();
 	PmcrNode_t *current = m_closed[m_closed.size()-1];
 	while (current->getID() != m_start)
 	{
@@ -210,7 +200,7 @@ void PmcrGreedySolver_t::print_path()
 	std::cout << "\n";
 }
 
-void PmcrGreedySolver_t::print_test()
+void PmcrGreedySolver_t::print_closedList()
 {
 	printf("Check whether there is something in the closed list\n");
 	for (auto &node : m_closed)

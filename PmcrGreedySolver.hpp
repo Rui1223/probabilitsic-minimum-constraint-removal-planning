@@ -33,13 +33,12 @@ public:
 	void greedy_search();
 	void back_track_path();
 	std::vector<int> label_union(std::vector<int> s1, std::vector<int> s2);
-	double compute_weight(std::vector<int> labels);
 	bool check_prune(int neighborID, double weights);
 	bool search_closedList(int neighborID, double weights, bool isPrune);
 	bool search_openList(int neighborID, double weights, bool isPrune);
 	void push_virtualOpen();
 	void print_path();
-	void print_test();
+	void print_closedList();
 };
 
 #endif

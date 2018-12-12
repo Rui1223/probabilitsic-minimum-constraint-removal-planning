@@ -1,3 +1,4 @@
+/*test whether powerset works or not*/
 #include <iostream> // std::cout
 #include <cstdio> // printf() 
 #include <vector> // std::vector
@@ -96,6 +97,9 @@ int main()
 	std::map<std::vector<int>, double> map_combinations 
 		= zip_combinations(labelCombinations, weightCombinations);
 
+	std::set<std::pair<std::vector<int>, double>, Comparator> labelMap;
+
+	
 	// Declaring a set that will store the pairs using above comparison logic
 	std::set<std::pair<std::vector<int>, double>, Comparator> labelMap(
 		map_combinations.begin(), map_combinations.end(), compFunctor);
@@ -113,78 +117,8 @@ int main()
 	}
 
 	//print_label_combinations(labelCombinations);
+	
 	return 0;
 }
 
 
-// #include <iostream> // std::cout
-// #include <iterator>
-// #include <map> // std::map
-// #include <functional>
-// #include <set>
-
-
-
-// int main()
-// {
-// 	// empty map container
-// 	std::map<int, int> gquiz1;
-
-// 	// insert elements in random order
-// 	gquiz1.insert(std::pair<int, int>(1, 40));
-// 	gquiz1.insert(std::pair<int, int>(2, 30));
-// 	gquiz1.insert(std::pair<int, int>(3, 60)); 
-//     gquiz1.insert(std::pair<int, int>(4, 20)); 
-//     gquiz1.insert(std::pair<int, int>(5, 50)); 
-//     gquiz1.insert(std::pair<int, int>(6, 50)); 
-//     gquiz1.insert(std::pair<int, int>(7, 10));
-
-//     // printing map gquiz1
-//     std::map<int, int>::iterator itr;
-//     std::cout << "\nThe map gquiz1 is: \n";
-//     std::cout << "\tKEY\tELEMENTS\n";
-//     for (itr = gquiz1.begin(); itr != gquiz1.end(); itr++)
-//     {
-//     	std::cout << "\t" << itr->first
-//     			<< "\t" << itr->second << "\n";
-//     }
-//     std::cout << std::endl;
-
-//     // assigning the elements from gquiz1 to gquiz2
-//     std::map<int, int> gquiz2(gquiz1.begin(), gquiz1.end());
-
-//     // print all elements of the map gquiz2
-//     std::cout << "\nThe map gquiz2 after assign from gquiz1 is : \n";
-//     std::cout << "\tKEY\tELEMENTS\n";
-//     for (itr = gquiz2.begin(); itr != gquiz2.end(); itr++)
-//     {
-//     	std::cout << "\t" << itr->first
-//     			<< "\t" << itr->second << "\n";
-//     }
-//     std::cout << std::endl;
-
-
-//     // Declaring the type of Predicate that accepts 2 pairs and return a bool
-//     typedef std::function< bool(std::pair<int, int>, std::pair<int, int>) > Comparator;
-
-//     // Define a lambda function to compare two pairs. It will compare two pairs using second field
-//     Comparator compFunctor =
-//     					[](std::pair<int, int> elem1, std::pair<int, int> elem2)
-//     {
-//     	return elem1.second <= elem2.second;
-//     };
-
-//     // declaring a set that will store the pairs using above comparison logic
-//     std::set<std::pair<int, int>, Comparator> setOfInt(
-//     	gquiz2.begin(), gquiz2.end(), compFunctor);
-
-//     // Iterate over a set using range base for loop
-//     // It will display the item in sorted order of values
-//     for (auto const &e : setOfInt)
-//     {
-//     	std::cout << e.first << " :: " << e.second << "\n";
-//     }
-
-// 	return 0; 
-
-// }

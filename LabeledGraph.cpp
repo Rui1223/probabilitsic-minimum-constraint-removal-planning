@@ -3,10 +3,22 @@ formulation*/
 
 #include <cstdio>
 #include <cassert>
-#include <cmath>
+#include <cmath>  // pow()
 #include <iostream>
+#include <cstdio> // printf() 
+#include <vector> // std::vector
+#include <algorithm> // std::set_union, std::sort
+#include <bitset> // for bitwise operation
+#include <map> // std::map
+#include <functional>
+#include <set>
 #include "LabeledGraph.hpp"
 
+Comparator compFunctor = 
+		[](std::pair<std::vector<int>, double> elem1, std::pair<std::vector<int>, double> elem2)
+		{
+			return elem1.second <= elem2.second; // compare weights, prefer less weight  
+		};
 
 LabeledGraph_t::LabeledGraph_t(int row, int col)
 {
@@ -16,6 +28,7 @@ LabeledGraph_t::LabeledGraph_t(int row, int col)
 	m_col = col;
 	m_nNodes = m_row * m_col;
 	load_graph();
+	load_labels();
 	load_weights();
 	graph_print();
 	printf("-------------------------------\n");
@@ -81,23 +94,14 @@ void LabeledGraph_t::specify_neighbors()
 void LabeledGraph_t::specify_labels()
 {
 	// we manually specify the labels for each edge
-	// for those edges which don't have labels, we simply assign 0
-	// for those noeds which don't even have an edgem, we can also assign 0
-	/*
-	for (int i=0; i <= pow(m_gridSize, 2)-1; i++)
-	{
-		m_edgeLabels.push_back(std::vector<std::vector<int>>());
-		for (int j=0; j <= pow(m_gridSize, 2)-1; j++)
-		{
-			m_edgeLabels[i].push_back(std::vector<int>(1,0));
-		}
-	}
-	*/
+	// for those edges which don't have labels, we simply assign empty vector
+	// for those noeds which don't even have an edgem, we can also assign empty vector
+
 
 	for (int i=0; i <= m_nNodes-1; i++)
 	{
 		m_edgeLabels.push_back(std::vector<std::vector<int>>(m_nNodes,
-			 std::vector<int>(1, 0)));
+			 std::vector<int>()));
 	}
 	// manually assign the label
 	m_edgeLabels[0][1].push_back(1);
@@ -162,16 +166,24 @@ void LabeledGraph_t::specify_labels()
 	*/
 }
 
+void LabeledGraph_t::load_labels()
+{
+	m_labels.push_back(1);
+	m_labels.push_back(2);
+	m_labels.push_back(3);
+}
+
 void LabeledGraph_t::load_weights()
 {
-	m_labelWeights.push_back(0.0);
 	m_labelWeights.push_back(0.4);
 	m_labelWeights.push_back(0.3);
 	m_labelWeights.push_back(0.3);
 }
 
 void LabeledGraph_t::graph_print() 
-{	
+{
+	printf("*********edgeLabels***********\n");
+
 	for (int i=0; i <= m_nNodes-1; i++)
 	{
 		for (int j=0; j <= m_nNodes-1; j++)
@@ -197,6 +209,94 @@ void LabeledGraph_t::graph_print()
 	}
 	
 }
+
+double LabeledGraph_t::compute_weight(std::vector<int> currentLabels)
+{
+	double currentWeights = 0.0;
+	for (auto const &label : currentLabels)
+	{
+		currentWeights += m_labelWeights[label-1]; 
+	}
+	return currentWeights;
+
+}
+
+std::vector<double> LabeledGraph_t::compute_weights(std::vector<std::vector<int>> powerSet)
+{
+	std::vector<double> weightCombinations;
+	for (auto const &set : powerSet)
+	{
+		double weight = compute_weight(set);
+		weightCombinations.push_back(weight);
+	}
+
+	return weightCombinations;
+}
+
+std::vector<std::vector<int>> LabeledGraph_t::cal_powerSet()
+{
+	// This function takes a set and then compute the powerset of the set
+	// which is a vector of sets (std::vector<std::vector<int>>)
+
+	// first determines the size of the powerset that you will have
+	// for each one's derivation we will do bitwise operation
+	int powerSet_size = pow(2, m_labels.size()); // 2^n combinations
+	std::vector<std::vector<int>> powerSet;
+	for (int counter = 0; counter < powerSet_size; counter++)
+	{
+		std::vector<int> labels; // labels for a single combination
+		for (int j=0; j < m_labels.size(); j++)
+		{
+			if ( counter & (1<<j) )
+			{
+				labels.push_back(m_labels[j]);
+			}
+		}
+		powerSet.push_back(labels);
+	}
+	return powerSet;
+}
+
+std::map<std::vector<int>, double> LabeledGraph_t::zip_combinations(
+	std::vector<std::vector<int>>& a, std::vector<double>& b)
+{
+	std::map<std::vector<int>, double> m;
+	//assert(a.size() == b.size());
+	for (int i=0; i < a.size(); ++i)
+	{
+		m[a[i]] = b[i];
+	}
+	return m;	
+}
+
+void LabeledGraph_t::cal_labelMap()
+{
+	std::vector<std::vector<int>> labelCombinations = cal_powerSet();
+	std::vector<double> weightCombinations = compute_weights(labelCombinations);
+
+	// zip label and weight combination
+	std::map<std::vector<int>, double> map_combinations 
+		= zip_combinations(labelCombinations, weightCombinations);
+
+	m_labelMap = std::set<std::pair<std::vector<int>, double>, Comparator>(
+		map_combinations.begin(), map_combinations.end(), compFunctor);
+}
+
+void LabeledGraph_t::print_labelMap()
+{
+	//Iterate over the set you just come up with
+	for (auto const &e : m_labelMap)
+	{
+		std::cout << "<";
+		for (auto const &l : e.first)
+		{
+			std::cout << l << ",";
+		}
+		std::cout << "> :\t\t";
+		std::cout << e.second << std::endl;
+	}	
+}
+
 
 LabeledGraph_t::~LabeledGraph_t() {}
 
