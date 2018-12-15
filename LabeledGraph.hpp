@@ -83,9 +83,15 @@ public:
 	void print_labelMap();
 
 	// lots of getters
+	int getnNodes() { return m_nNodes; }
 	std::vector<std::vector<int>> getNodeNeighbors() { return m_nodeNeighbors; }
 	std::vector<std::vector<std::vector<int>>> getEdgeLabels() { return m_edgeLabels; } 
 	std::vector<double> getLabelWeights() { return m_labelWeights; }
+	std::vector<int> getLabels() { return m_labels; }
+	std::set<std::pair<std::vector<int>, double>, Comparator> getLabelMap()
+	{
+		return m_labelMap;
+	}
 
 	// Destructor
 	~LabeledGraph_t();

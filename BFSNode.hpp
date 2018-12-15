@@ -1,1 +1,0 @@
-/*This hpp file defines a node which will be used in a basic Breadth First Search*/
