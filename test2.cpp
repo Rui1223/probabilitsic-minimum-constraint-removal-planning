@@ -1,31 +1,43 @@
-/*test whether subset check works or not*/
+/*test how we can extract all first item of a pair of a set*/
 
-#include <algorithm>
+#include <set>
+#include <vector>
 #include <iostream>
+#include <map>
+#include <cstdlib>
+#include <ctime>
+#include <cmath>
 
-// bool check_subset(std::vector<int> &l1, std::vector<int> &l2)
-// {
-// 	return ( std::includes(l1.begin(), l1.end(),
-// 							l2.begin(), l2.end()) );
-// }
-
-std::ostream& operator<<(std::ostream &out, const std::vector<int> &v)
+std::ostream& operator<<(std::ostream &out, std::vector<double> v)
 {
-	for (auto const &item : v)
+	out << "<";
+	for (auto const &e : v)
 	{
-		out << item << " ";
+		out << e << "\t";
 	}
+	out << ">\n";
 	return out;
+}
+
+int random_generate_integer(int min, int max)
+{
+
+	return std::rand() % (max + 1 - min) + min;
+}
+
+void operator/=(std::vector<double> &v, double d)
+{
+	for (auto &e : v)
+	{
+		e /= d;
+	}
 }
 
 int main()
 {
-	std::vector<int> l1{1,2,3};
-	std::vector<int> l2{};
-	// bool isSubset = check_subset(l1, l2);
-	std::cout << "<" << l2 << ">\n";
+	std::vector<double> v{1,2,3,4};
+	v /= sqrt(3.0);
+	std::cout << v;
 	return 0;
 }
-
-
 

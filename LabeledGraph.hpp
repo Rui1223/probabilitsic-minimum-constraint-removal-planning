@@ -35,15 +35,19 @@ class LabeledGraph_t
 	// specify neighbors (edge) and labels of the edge 
 	std::vector<std::vector<int>> m_nodeNeighbors;
 	std::vector<std::vector<std::vector<int>>> m_edgeLabels;
+	
 	// specify the weights for labels
+	int m_nlabels;
 	std::vector<double> m_labelWeights;
 	std::vector<int> m_labels;
 
+	// all label combinations
+	std::vector<std::vector<int>> m_labelCombinations;
 	std::set<std::pair<std::vector<int>, double>, Comparator> m_labelMap;
 public:
 	// Constructor
 	LabeledGraph_t() {}
-	LabeledGraph_t(int row, int col);
+	LabeledGraph_t(int row, int col, int n_labels);
 
 	// function to load a graph (manually generate a graph)
 	void load_graph();
@@ -67,20 +71,22 @@ public:
 	double compute_weight(std::vector<int> labels);
 
 	// function to compute weight for a power set
-	std::vector<double> compute_weights(std::vector<std::vector<int>> powerSet);
+	std::vector<double> compute_weights();
 
 	// function to compute a powerset given a set of labels
-	std::vector<std::vector<int>> cal_powerSet();
+	void cal_powerSet();
 
-	// function to zip a and b into a map
-	std::map<std::vector<int>, double> zip_combinations(
-		std::vector<std::vector<int>>& a, std::vector<double>& b);
+	// function to zip labelCombination and another vector b into a map
+	std::map<std::vector<int>, double> zip_combinations(std::vector<double>& b);
 
 	// function to calculate labelMap
 	void cal_labelMap();
 
 	// function to print labelMap for test purpose so far
 	void print_labelMap();
+
+	// function to randomize a set of labels from m_labelCombinations
+	std::vector<int> randomize_setLabel();
 
 	// lots of getters
 	int getnNodes() { return m_nNodes; }
@@ -96,5 +102,11 @@ public:
 	// Destructor
 	~LabeledGraph_t();
 };
+
+// function to generate a random integer between min and max
+int random_generate_integer(int min, int max);
+
+// operator /= overloading used to normalize a vector of doubles
+void operator/=(std::vector<double> &v, double d);
 
 #endif

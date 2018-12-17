@@ -35,7 +35,6 @@ void FixedLabelSolver_t::fixedLabel_search()
 		std::cout << "current set of labels: " << m_currentLabels << "\n";
 		std::cout << "currrent weight: " << m_currentWeight << "\n"; 
 		std::cout << "start the " << k << "th search\n";
-		std::cout << "-----------------------------------------------"; 
 		bool goalFound = BFSearch();
 		if (goalFound)
 		{
@@ -117,13 +116,14 @@ bool FixedLabelSolver_t::BFSearch()
 	}
 	// You are reaching here because the queue is empty and goal is not found
 	std::cout << "Coundn't found the goal at the current subgraph\n";
+	std::cout << "-----------------------------------------------\n"; 
 	return false;
 
 }
 
 void FixedLabelSolver_t::print_path()
 {
-	std::cout << m_path;
+	std::cout << m_path << "\n";
 }
 
 std::ostream& operator<<(std::ostream &out, const std::vector<int> &v)

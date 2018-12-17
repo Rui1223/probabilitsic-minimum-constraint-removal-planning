@@ -13,9 +13,9 @@ int main()
 {
 	// Problem input
 	//LabeledGraph_t g(3, 3);
-	LabeledGraph_t g(2, 6);
+	LabeledGraph_t g(5, 5, 3);
 	int start = 0;
-	int goal = 5;
+	int goal = 24;
 	// Call the search algorithm
 	PmcrGreedySolver_t pmcr_solver(g, start, goal);
 	pmcr_solver.greedy_search();
