@@ -222,7 +222,9 @@ void LabeledGraph_t::load_weights()
 	// now randomize them so that the sum of weights are equal to 1 (can be smaller than one)
 	m_labelWeights /= r;
 
+
 	/*
+	// manually assign label weights
 	m_labelWeights.push_back(0.4);
 	m_labelWeights.push_back(0.3);
 	m_labelWeights.push_back(0.3);

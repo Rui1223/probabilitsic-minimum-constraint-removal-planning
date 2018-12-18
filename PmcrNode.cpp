@@ -16,7 +16,6 @@ PmcrNode_t::PmcrNode_t(int id, std::vector<int> labels,
 	m_weights = weights;
 	m_parent = parent;
 	
-	
 }
 
 

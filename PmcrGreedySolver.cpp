@@ -17,7 +17,7 @@ PmcrGreedySolver_t::PmcrGreedySolver_t(LabeledGraph_t g, int start, int goal)
 	m_start = start;
 	m_goal = goal;
 	printf("start greedy search\n");
-	m_open.push(new PmcrNode_t(m_start, {0}, nullptr, m_lgraph.compute_weight({0})));
+	m_open.push(new PmcrNode_t(m_start, {}, nullptr, m_lgraph.compute_weight({})));
 	m_path = std::vector<int>();
 
 }
@@ -44,6 +44,14 @@ void PmcrGreedySolver_t::greedy_search()
 		if (current->getID() == m_goal)
 		{
 			printf("goal found!\n");
+			// print the labels & weights for the found path
+			std::cout << "The weight of the path is " << current->getWeights() << "\n";
+			std::cout << "<";
+			for (auto const &e : current->getLabels())
+			{
+				std::cout << e << " ";
+			}
+			std::cout << ">\n";
 			// should return a path here
 			back_track_path();
 			return;
@@ -176,7 +184,7 @@ std::vector<int> PmcrGreedySolver_t::label_union(std::vector<int> s1, std::vecto
 void PmcrGreedySolver_t::back_track_path()
 {	
 	// check closed list
-	print_closedList();
+	//print_closedList();
 	// start from the goal
 	PmcrNode_t *current = m_closed[m_closed.size()-1];
 	while (current->getID() != m_start)
