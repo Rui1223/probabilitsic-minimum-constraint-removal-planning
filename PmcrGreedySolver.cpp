@@ -9,7 +9,7 @@
 #include "LabeledGraph.hpp"
 #include "PmcrGreedySolver.hpp"
 
-PmcrGreedySolver_t::PmcrGreedySolver_t(LabeledGraph_t g, int start, int goal)
+PmcrGreedySolver_t::PmcrGreedySolver_t(LabeledGraph_t &g, int start, int goal)
 {
 	m_lgraph = g;
 	assert(start >=0);

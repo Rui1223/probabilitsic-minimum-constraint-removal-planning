@@ -7,6 +7,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <cmath>
+#include <random>
 
 std::ostream& operator<<(std::ostream &out, std::vector<double> v)
 {
@@ -33,11 +34,13 @@ void operator/=(std::vector<double> &v, double d)
 	}
 }
 
+
 int main()
 {
-	std::vector<double> v{1,2,3,4};
-	v /= sqrt(3.0);
-	std::cout << v;
-	return 0;
+	std::vector<int> v{1,2,3,4};
+	for (int i=0; i < 5; i++)
+	{
+		add_member();
+	}
 }
 

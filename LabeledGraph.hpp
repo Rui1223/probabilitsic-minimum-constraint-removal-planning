@@ -44,6 +44,11 @@ class LabeledGraph_t
 	// all label combinations
 	std::vector<std::vector<int>> m_labelCombinations;
 	std::set<std::pair<std::vector<int>, double>, Comparator> m_labelMap;
+
+	// the percent of edges that are expected to have at least a label
+	double m_percentLabelEdge;
+	// the probability that a label is assigned to an edge
+	double m_prob;
 public:
 	// Constructor
 	LabeledGraph_t() {}
@@ -84,9 +89,6 @@ public:
 
 	// function to print labelMap for test purpose so far
 	void print_labelMap();
-
-	// function to randomize a set of labels from m_labelCombinations
-	std::vector<int> randomize_setLabel();
 
 	// lots of getters
 	int getnNodes() { return m_nNodes; }

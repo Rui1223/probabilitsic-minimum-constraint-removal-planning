@@ -28,7 +28,7 @@ class PmcrGreedySolver_t
 	std::vector<int> m_path;
 
 public:
-	PmcrGreedySolver_t(LabeledGraph_t g, int start, int goal);
+	PmcrGreedySolver_t(LabeledGraph_t &g, int start, int goal);
 	~PmcrGreedySolver_t();
 	void greedy_search();
 	void back_track_path();

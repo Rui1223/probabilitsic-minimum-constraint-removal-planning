@@ -17,7 +17,7 @@ class FixedLabelSolver_t
 
 public:
 	FixedLabelSolver_t() {}
-	FixedLabelSolver_t(LabeledGraph_t g, int start, int goal);
+	FixedLabelSolver_t(LabeledGraph_t &g, int start, int goal);
 	~FixedLabelSolver_t() {}
 
 	// The function to search for a path in a fixed label scenario

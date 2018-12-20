@@ -11,7 +11,7 @@
 #include "FixedLabelSolver.hpp"
 #include "LabeledGraph.hpp"
 
-FixedLabelSolver_t::FixedLabelSolver_t(LabeledGraph_t g, int start, int goal)
+FixedLabelSolver_t::FixedLabelSolver_t(LabeledGraph_t &g, int start, int goal)
 {
 	// problem formulation specified at the beginning of the solver
 	m_lgraph = g;

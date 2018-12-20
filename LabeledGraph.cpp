@@ -29,7 +29,13 @@ LabeledGraph_t::LabeledGraph_t(int row, int col, int n_labels)
 	m_row = row;
 	m_col = col;
 	m_nNodes = m_row * m_col;
+	
 	m_nlabels = n_labels;
+	m_percentLabelEdge = 0.3;
+	// The probability of a label to be assigned to an edge is determined by the number of labels
+	// and the percent of labeled edge we expect in the graph
+	m_prob = 1 - exp(1.0/m_nlabels*log(1-m_percentLabelEdge));
+	std::cout << "m_prob: " << m_prob << std::endl;
 
 	// specify the number of labels and their corresponding weights
 	// Based on weighted labels, build the labelMap which maps a set of labels to weights
@@ -42,7 +48,7 @@ LabeledGraph_t::LabeledGraph_t(int row, int col, int n_labels)
 
 	// print the basic information of the graph
 	print_labelMap();
-	graph_print();
+	//graph_print();
 	printf("-------------------------------\n");
 }
 
@@ -114,6 +120,7 @@ void LabeledGraph_t::specify_labels()
 	}
 
 	// 1. randomly assign labels to each existing edge
+	double r;
 	int iter = 0;
 	for (int i=0; i < m_row; i++)
 	{
@@ -127,24 +134,58 @@ void LabeledGraph_t::specify_labels()
 			{
 				// the node is in the bottom line of the grid graph
 				// only add the neighbor of its right
-				// randomize a set of labels from m_labelCombinations
-				m_edgeLabels[iter][iter+1] = randomize_setLabel();
-				m_edgeLabels[iter+1][iter] = m_edgeLabels[iter][iter+1]; // should be identical
+				for (auto const &l : m_labels)
+				{
+					r = ((double) rand() / (RAND_MAX));
+					if (r < m_prob)
+					{
+						// assign the label to that edge
+						m_edgeLabels[iter][iter+1].push_back(l);
+						m_edgeLabels[iter+1][iter].push_back(l); // should be identical
+					}
+				}
+				
 			}
 			else if (i % m_row != m_row-1 and j % m_col == m_col-1)
 			{
 				// the node is in the rightmost line of the grid graph
 				// only add the neighbor of its bottom
-				m_edgeLabels[iter][iter+m_col] = randomize_setLabel();	
-				m_edgeLabels[iter+m_col][iter] = m_edgeLabels[iter][iter+m_col];							
+				for (auto const &l : m_labels)
+				{
+					r = ((double) rand() / (RAND_MAX));
+					if (r < m_prob)
+					{
+						// assign the label to that edge
+						m_edgeLabels[iter][iter+m_col].push_back(l);
+						m_edgeLabels[iter+m_col][iter].push_back(l); // should be identical
+					}
+				}							
 			}
 			else
 			{
 				// add the neighbor of its right and bottom
-				m_edgeLabels[iter][iter+1] = randomize_setLabel();
-				m_edgeLabels[iter+1][iter] = m_edgeLabels[iter][iter+1];
-				m_edgeLabels[iter][iter+m_col] = randomize_setLabel();
-				m_edgeLabels[iter+m_col][iter] = m_edgeLabels[iter][iter+m_col];
+				for (auto const &l : m_labels)
+				{
+					r = ((double) rand() / (RAND_MAX));
+					if (r < m_prob)
+					{
+						// assign the label to that edge
+						m_edgeLabels[iter][iter+1].push_back(l);
+						m_edgeLabels[iter+1][iter].push_back(l); // should be identical
+					}
+				}
+
+				for (auto const &l : m_labels)
+				{
+					r = ((double) rand() / (RAND_MAX));
+					if (r < m_prob)
+					{
+						// assign the label to that edge
+						m_edgeLabels[iter][iter+m_col].push_back(l);
+						m_edgeLabels[iter+m_col][iter].push_back(l); // should be identical
+					}
+				}	
+
 			}
 			iter++;
 		}
@@ -190,6 +231,7 @@ void LabeledGraph_t::specify_labels()
 	m_edgeLabels[11][5].push_back(1);
 	*/
 }
+
 
 void LabeledGraph_t::load_labels()
 {
@@ -344,12 +386,6 @@ void LabeledGraph_t::print_labelMap()
 		std::cout << "> :\t\t";
 		std::cout << e.second << std::endl;
 	}	
-}
-
-std::vector<int> LabeledGraph_t::randomize_setLabel()
-{
-	int indx = random_generate_integer(0, m_labelCombinations.size()-1);
-	return m_labelCombinations[indx];
 }
 
 
