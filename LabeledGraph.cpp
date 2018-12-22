@@ -31,7 +31,7 @@ LabeledGraph_t::LabeledGraph_t(int row, int col, int n_labels)
 	m_nNodes = m_row * m_col;
 	
 	m_nlabels = n_labels;
-	m_percentLabelEdge = 0.3;
+	m_percentLabelEdge = 0.4;
 	// The probability of a label to be assigned to an edge is determined by the number of labels
 	// and the percent of labeled edge we expect in the graph
 	m_prob = 1 - exp(1.0/m_nlabels*log(1-m_percentLabelEdge));

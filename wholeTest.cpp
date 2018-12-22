@@ -13,9 +13,9 @@ int main()
 {
 	std::srand(static_cast<unsigned int>(std::time(nullptr)));
 
-	LabeledGraph_t g(30, 30, 5);
+	LabeledGraph_t g(20, 20, 5);
 	int start = 0;
-	int goal = 87;
+	int goal = 378;
 
 	Timer t;
 	std::cout << "----------start the fixedLabel search-------------\n";
