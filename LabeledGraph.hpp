@@ -58,7 +58,7 @@ public:
 	void load_graph();
 
 	// function to specify the neighbors for each node
-	void specify_neighbors();
+	//void specify_neighbors();
 
 	// function to specify the labels for each edge
 	void specify_labels();
@@ -70,7 +70,7 @@ public:
 	void load_weights();
 
 	// function for printing (test) purpose only
-	void graph_print();
+	void print_graph();
 
 	// function to compute weight for a set of labels
 	double compute_weight(std::vector<int> labels);

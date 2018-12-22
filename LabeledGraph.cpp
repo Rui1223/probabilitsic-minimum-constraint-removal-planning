@@ -43,153 +43,255 @@ LabeledGraph_t::LabeledGraph_t(int row, int col, int n_labels)
 	load_weights();
 	cal_labelMap();
 
-	// Based on the labelMap, construct the whole graph in a random fashion
+	// construct the graph 
 	load_graph();
 
 	// print the basic information of the graph
 	print_labelMap();
-	//graph_print();
+	print_graph();
 	printf("-------------------------------\n");
 }
+
+// void LabeledGraph_t::load_graph()
+// {
+// 	printf("Build the graph now\n");
+// 	specify_neighbors();
+// 	specify_labels();
+// 	printf("Finish building the graph\n");
+
+// }
 
 void LabeledGraph_t::load_graph()
 {
 	printf("Build the graph now\n");
-	specify_neighbors();
-	specify_labels();
-	printf("Finish building the graph\n");
-
-}
-
-void LabeledGraph_t::specify_neighbors()
-{
+	// This is the function to construct a random weighted labeled graph with 2 procedures
+	// 1. specify edges (achieved by specifying neighbors)
+	// 2. specify labels
 	// we assume for each node, we have two neighbors to actively add by default
 	// The right one and the bottom one
-	for (int i=0; i < m_row; i++)
-	{
-		for (int j=0; j < m_col; j++)
-		{
-			m_nodeNeighbors.push_back(std::vector<int>());
-		}
-	}
 
 	int iter = 0;
-	for (int i=0; i < m_row; i++)
+	// first create empty neighbor and label vector for each node
+	while (iter != m_nNodes)
 	{
-		for (int j=0; j < m_col; j++)
-		{
-			if (i % m_row == m_row-1 and j % m_col == m_col-1)
-			{
-				// no neighbor to add since the node is at the right-bottom corner
-			}
-			else if (i % m_row == m_row-1 and j % m_col != m_col-1)
-			{
-				// the node is in the bottom line of the grid graph
-				// only add the neighbor of its right
-				m_nodeNeighbors[iter].push_back(iter+1);
-				m_nodeNeighbors[iter+1].push_back(iter);
-			}
-			else if (i % m_row != m_row-1 and j % m_col == m_col-1)
-			{
-				// the node is in the rightmost line of the grid graph
-				// only add the neighbor of its bottom
-				m_nodeNeighbors[iter].push_back(iter+m_col);
-				m_nodeNeighbors[iter+m_col].push_back(iter);
-			}
-			else
-			{
-				// add the neighbor of its right and bottom
-				m_nodeNeighbors[iter].push_back(iter+1);
-				m_nodeNeighbors[iter+1].push_back(iter);
-				m_nodeNeighbors[iter].push_back(iter+m_col);
-				m_nodeNeighbors[iter+m_col].push_back(iter);
-			}
-			iter++;
-		}		
+		m_nodeNeighbors.push_back(std::vector<int>());
+		m_edgeLabels.push_back(std::vector<std::vector<int>>(m_nNodes,
+			 std::vector<int>()));
+		iter++;
 	}
+
+	int currentID = 0; // the id of the current node
+	double r;
+	while (currentID != m_nNodes)
+	{
+		// add neighbors (in forms of their ids) of the current node and label the edge
+		// between current node and its neighbors.
+
+		// if the node is a rightmost and bottommost one
+		if (currentID / m_col == m_row-1 and currentID % m_col == m_col-1)
+		{
+			// no neighbor to add since the node is at the right-bottom corner
+		}
+		// if the node is a rightmost one
+		else if (currentID / m_col != m_row-1 and currentID % m_col == m_col-1)
+		{
+			// the node is in the rightmost line of the grid graph
+			// only add the neighbor of its bottom	
+			m_nodeNeighbors[currentID].push_back(currentID+m_col);
+			m_nodeNeighbors[currentID+m_col].push_back(currentID);
+			// assign labels
+			for (auto const &l : m_labels)
+			{
+				r = ((double) rand() / (RAND_MAX));
+				if (r < m_prob)
+				{
+					// assign the label to that edge
+					m_edgeLabels[currentID][currentID+m_col].push_back(l);
+					m_edgeLabels[currentID+m_col][currentID].push_back(l); // should be identical
+				}
+			}		
+		}
+		// if the node is a bottommost one
+		else if (currentID / m_col == m_row-1 and currentID % m_col != m_col-1)
+		{
+			// the node is in the bottom line of the grid graph
+			// only add the neighbor of its right
+			m_nodeNeighbors[currentID].push_back(currentID+1);
+			m_nodeNeighbors[currentID+1].push_back(currentID);
+			for (auto const &l : m_labels)
+			{
+				r = ((double) rand() / (RAND_MAX));
+				if (r < m_prob)
+				{
+					// assign the label to that edge
+					m_edgeLabels[currentID][currentID+1].push_back(l);
+					m_edgeLabels[currentID+1][currentID].push_back(l); // should be identical
+				}
+			}		
+		}
+		// if the node is a normal one (should have two neighbors)
+		else
+		{
+			// add the neighbor of its right and bottom
+			m_nodeNeighbors[currentID].push_back(currentID+1);
+			m_nodeNeighbors[currentID+1].push_back(currentID);
+			for (auto const &l : m_labels)
+			{
+				r = ((double) rand() / (RAND_MAX));
+				if (r < m_prob)
+				{
+					// assign the label to that edge
+					m_edgeLabels[currentID][currentID+1].push_back(l);
+					m_edgeLabels[currentID+1][currentID].push_back(l); // should be identical
+				}
+			}
+			m_nodeNeighbors[currentID].push_back(currentID+m_col);
+			m_nodeNeighbors[currentID+m_col].push_back(currentID);
+			for (auto const &l : m_labels)
+			{
+				r = ((double) rand() / (RAND_MAX));
+				if (r < m_prob)
+				{
+					// assign the label to that edge
+					m_edgeLabels[currentID][currentID+m_col].push_back(l);
+					m_edgeLabels[currentID+m_col][currentID].push_back(l); // should be identical
+				}
+			}
+		}
+		//std::cout << "working on next node!\n";
+		currentID++; // start working on the next node
+	}
+	printf("Finish building the graph\n");
+
+
+
+	// old version
+	//-----------------------------------------------------------------//
+	// for (int i=0; i < m_row; i++)
+	// {
+	// 	for (int j=0; j < m_col; j++)
+	// 	{
+	// 		m_nodeNeighbors.push_back(std::vector<int>());
+	// 	}
+	// }
+
+	// int iter = 0;
+	// for (int i=0; i < m_row; i++)
+	// {
+	// 	for (int j=0; j < m_col; j++)
+	// 	{
+	// 		if (i % m_row == m_row-1 and j % m_col == m_col-1)
+	// 		{
+	// 			// no neighbor to add since the node is at the right-bottom corner
+	// 		}
+	// 		else if (i % m_row == m_row-1 and j % m_col != m_col-1)
+	// 		{
+	// 			// the node is in the bottom line of the grid graph
+	// 			// only add the neighbor of its right
+	// 			m_nodeNeighbors[iter].push_back(iter+1);
+	// 			m_nodeNeighbors[iter+1].push_back(iter);
+	// 		}
+	// 		else if (i % m_row != m_row-1 and j % m_col == m_col-1)
+	// 		{
+	// 			// the node is in the rightmost line of the grid graph
+	// 			// only add the neighbor of its bottom
+	// 			m_nodeNeighbors[iter].push_back(iter+m_col);
+	// 			m_nodeNeighbors[iter+m_col].push_back(iter);
+	// 		}
+	// 		else
+	// 		{
+	// 			// add the neighbor of its right and bottom
+	// 			m_nodeNeighbors[iter].push_back(iter+1);
+	// 			m_nodeNeighbors[iter+1].push_back(iter);
+	// 			m_nodeNeighbors[iter].push_back(iter+m_col);
+	// 			m_nodeNeighbors[iter+m_col].push_back(iter);
+	// 		}
+	// 		iter++;
+	// 	}		
+	// }
 }
 
 void LabeledGraph_t::specify_labels()
 {
-	// for those edges which don't have labels, we simply assign empty vector
-	// for those noeds which don't even have an edgem, we can also assign empty vector
-	for (int i=0; i <= m_nNodes-1; i++)
-	{
-		m_edgeLabels.push_back(std::vector<std::vector<int>>(m_nNodes,
-			 std::vector<int>()));
-	}
+	// // for those edges which don't have labels, we simply assign empty vector
+	// // for those noeds which don't even have an edgem, we can also assign empty vector
+	// for (int i=0; i <= m_nNodes-1; i++)
+	// {
+	// 	m_edgeLabels.push_back(std::vector<std::vector<int>>(m_nNodes,
+	// 		 std::vector<int>()));
+	// }
 
-	// 1. randomly assign labels to each existing edge
-	double r;
-	int iter = 0;
-	for (int i=0; i < m_row; i++)
-	{
-		for (int j=0; j < m_col; j++)
-		{
-			if (i % m_row == m_row-1 and j % m_col == m_col-1)
-			{
-				// no neighbor, no labels to add
-			}
-			else if (i % m_row == m_row-1 and j % m_col != m_col-1)
-			{
-				// the node is in the bottom line of the grid graph
-				// only add the neighbor of its right
-				for (auto const &l : m_labels)
-				{
-					r = ((double) rand() / (RAND_MAX));
-					if (r < m_prob)
-					{
-						// assign the label to that edge
-						m_edgeLabels[iter][iter+1].push_back(l);
-						m_edgeLabels[iter+1][iter].push_back(l); // should be identical
-					}
-				}
+	// // 1. randomly assign labels to each existing edge
+	// double r;
+	// int iter = 0;
+	// for (int i=0; i < m_row; i++)
+	// {
+	// 	for (int j=0; j < m_col; j++)
+	// 	{
+	// 		if (i % m_row == m_row-1 and j % m_col == m_col-1)
+	// 		{
+	// 			// no neighbor, no labels to add
+	// 		}
+	// 		else if (i % m_row == m_row-1 and j % m_col != m_col-1)
+	// 		{
+	// 			// the node is in the bottom line of the grid graph
+	// 			// only add the neighbor of its right
+	// 			for (auto const &l : m_labels)
+	// 			{
+	// 				r = ((double) rand() / (RAND_MAX));
+	// 				if (r < m_prob)
+	// 				{
+	// 					// assign the label to that edge
+	// 					m_edgeLabels[iter][iter+1].push_back(l);
+	// 					m_edgeLabels[iter+1][iter].push_back(l); // should be identical
+	// 				}
+	// 			}
 				
-			}
-			else if (i % m_row != m_row-1 and j % m_col == m_col-1)
-			{
-				// the node is in the rightmost line of the grid graph
-				// only add the neighbor of its bottom
-				for (auto const &l : m_labels)
-				{
-					r = ((double) rand() / (RAND_MAX));
-					if (r < m_prob)
-					{
-						// assign the label to that edge
-						m_edgeLabels[iter][iter+m_col].push_back(l);
-						m_edgeLabels[iter+m_col][iter].push_back(l); // should be identical
-					}
-				}							
-			}
-			else
-			{
-				// add the neighbor of its right and bottom
-				for (auto const &l : m_labels)
-				{
-					r = ((double) rand() / (RAND_MAX));
-					if (r < m_prob)
-					{
-						// assign the label to that edge
-						m_edgeLabels[iter][iter+1].push_back(l);
-						m_edgeLabels[iter+1][iter].push_back(l); // should be identical
-					}
-				}
+	// 		}
+	// 		else if (i % m_row != m_row-1 and j % m_col == m_col-1)
+	// 		{
+	// 			// the node is in the rightmost line of the grid graph
+	// 			// only add the neighbor of its bottom
+	// 			for (auto const &l : m_labels)
+	// 			{
+	// 				r = ((double) rand() / (RAND_MAX));
+	// 				if (r < m_prob)
+	// 				{
+	// 					// assign the label to that edge
+	// 					m_edgeLabels[iter][iter+m_col].push_back(l);
+	// 					m_edgeLabels[iter+m_col][iter].push_back(l); // should be identical
+	// 				}
+	// 			}							
+	// 		}
+	// 		else
+	// 		{
+	// 			// add the neighbor of its right and bottom
+	// 			for (auto const &l : m_labels)
+	// 			{
+	// 				r = ((double) rand() / (RAND_MAX));
+	// 				if (r < m_prob)
+	// 				{
+	// 					// assign the label to that edge
+	// 					m_edgeLabels[iter][iter+1].push_back(l);
+	// 					m_edgeLabels[iter+1][iter].push_back(l); // should be identical
+	// 				}
+	// 			}
 
-				for (auto const &l : m_labels)
-				{
-					r = ((double) rand() / (RAND_MAX));
-					if (r < m_prob)
-					{
-						// assign the label to that edge
-						m_edgeLabels[iter][iter+m_col].push_back(l);
-						m_edgeLabels[iter+m_col][iter].push_back(l); // should be identical
-					}
-				}	
+	// 			for (auto const &l : m_labels)
+	// 			{
+	// 				r = ((double) rand() / (RAND_MAX));
+	// 				if (r < m_prob)
+	// 				{
+	// 					// assign the label to that edge
+	// 					m_edgeLabels[iter][iter+m_col].push_back(l);
+	// 					m_edgeLabels[iter+m_col][iter].push_back(l); // should be identical
+	// 				}
+	// 			}	
 
-			}
-			iter++;
-		}
-	}
+	// 		}
+	// 		iter++;
+	// 	}
+	// }
 
 	/*
 	// 2. manually assign the label (toy problem for test purposes)
@@ -273,7 +375,7 @@ void LabeledGraph_t::load_weights()
 	*/
 }
 
-void LabeledGraph_t::graph_print() 
+void LabeledGraph_t::print_graph() 
 {
 	printf("*********edgeLabels***********\n");
 
