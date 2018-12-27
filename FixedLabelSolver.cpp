@@ -7,6 +7,7 @@
 #include <vector>
 #include <algorithm>
 #include <iostream>
+#include <fstream>
 
 #include "FixedLabelSolver.hpp"
 #include "LabeledGraph.hpp"
@@ -124,6 +125,37 @@ bool FixedLabelSolver_t::BFSearch()
 void FixedLabelSolver_t::print_path()
 {
 	std::cout << m_path << "\n";
+}
+
+void FixedLabelSolver_t::write_solution()
+{
+	std::ofstream file_("FixedLabel_solution.txt");
+	if (file_.is_open())
+	{
+		file_ << m_start << " " << m_goal << "\n";
+		for (auto const &waypoint : m_path)
+		{
+			file_ << waypoint << " ";
+		}
+		file_ << "\n";
+		// write the label and weight for the solution
+		file_ << m_currentWeight << "\n";
+		
+		if (!m_currentLabels.empty())
+		{
+			int pp = 0;
+			while (pp < m_currentLabels.size()-1)
+			{
+				file_ << m_currentLabels[pp] << ",";
+				pp++;
+			}
+			file_ << m_currentLabels[pp];
+		}
+		file_ << "\n";
+		file_.close();
+	}
+
+
 }
 
 std::ostream& operator<<(std::ostream &out, const std::vector<int> &v)

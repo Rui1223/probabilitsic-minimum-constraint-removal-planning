@@ -22,10 +22,15 @@ class PmcrGreedySolver_t
 	LabeledGraph_t m_lgraph; 
 	int m_start; // the id of the start node
 	int m_goal; // the id of the goal node
+
+	std::vector<int> m_currentLabels;
+	double m_currentWeight;
+	std::vector<int> m_path;
+
 	std::priority_queue<PmcrNode_t*, std::vector<PmcrNode_t*>, PmcrNode_comparison> m_open;
 	std::vector<PmcrNode_t*> m_closed;
 	std::vector<PmcrNode_t*> m_virtualOpen;
-	std::vector<int> m_path;
+
 
 public:
 	PmcrGreedySolver_t(LabeledGraph_t &g, int start, int goal);
@@ -38,6 +43,7 @@ public:
 	bool search_openList(int neighborID, double weights, bool isPrune);
 	void push_virtualOpen();
 	void print_path();
+	void write_solution();
 	void print_closedList();
 };
 

@@ -4,6 +4,7 @@
 #include <cstdio>
 #include <algorithm>
 #include <iomanip>
+#include <fstream>
 
 #include "PmcrNode.hpp"
 #include "LabeledGraph.hpp"
@@ -40,6 +41,8 @@ void PmcrGreedySolver_t::greedy_search()
 	{
 		PmcrNode_t *current = m_open.top();
 		m_open.pop();
+		m_currentWeight = current->getWeights();
+		m_currentLabels = current->getLabels();
 		m_closed.push_back(current);
 		if (current->getID() == m_goal)
 		{
@@ -221,6 +224,38 @@ void PmcrGreedySolver_t::print_closedList()
 		}
 	
 	}	
+
+
+}
+
+void PmcrGreedySolver_t::write_solution()
+{
+
+	std::ofstream file_("GreedySearch_solution.txt");
+	if (file_.is_open())
+	{
+		file_ << m_start << " " << m_goal << "\n";
+		for (auto const &waypoint : m_path)
+		{
+			file_ << waypoint << " ";
+		}
+		file_ << "\n";
+		// write the label and weight for the solution
+		file_ << m_currentWeight << "\n";
+		
+		if (!m_currentLabels.empty())
+		{
+			int pp = 0;
+			while (pp < m_currentLabels.size()-1)
+			{
+				file_ << m_currentLabels[pp] << ",";
+				pp++;
+			}
+			file_ << m_currentLabels[pp];
+		}
+		file_ << "\n";
+		file_.close();
+	}
 
 
 }

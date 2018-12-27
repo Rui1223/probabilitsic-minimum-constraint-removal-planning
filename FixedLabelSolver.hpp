@@ -35,6 +35,9 @@ public:
 	// The function to print the path
 	void print_path();
 
+	// The function to write the path and start & goal into a text file
+	void write_solution();
+
 };
 
 std::ostream& operator<<(std::ostream &out, const std::vector<int> &v);

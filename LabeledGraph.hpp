@@ -57,12 +57,6 @@ public:
 	// function to load a graph (manually generate a graph)
 	void load_graph();
 
-	// function to specify the neighbors for each node
-	//void specify_neighbors();
-
-	// function to specify the labels for each edge
-	void specify_labels();
-
 	// function to specify all possible labels
 	void load_labels();
 
@@ -89,6 +83,9 @@ public:
 
 	// function to print labelMap for test purpose so far
 	void print_labelMap();
+
+	// function to write the graph into a txt file
+	void write_graph();
 
 	// lots of getters
 	int getnNodes() { return m_nNodes; }
