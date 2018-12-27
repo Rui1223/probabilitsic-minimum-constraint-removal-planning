@@ -49,7 +49,7 @@ LabeledGraph_t::LabeledGraph_t(int row, int col, int n_labels)
 
 	// print the basic information of the graph
 	print_labelMap();
-	print_graph();
+	//print_graph();
 	printf("-------------------------------\n");
 }
 

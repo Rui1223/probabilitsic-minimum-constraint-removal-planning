@@ -13,9 +13,9 @@ int main()
 {
 	std::srand(static_cast<unsigned int>(std::time(nullptr)));
 
-	LabeledGraph_t g(15, 15, 5);
+	LabeledGraph_t g(20, 20, 5);
 	int start = 0;
-	int goal = 224;
+	int goal = 399;
 	g.write_graph();
 
 	Timer t;
