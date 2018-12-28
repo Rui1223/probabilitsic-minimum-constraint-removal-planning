@@ -43,7 +43,7 @@ public:
 	bool search_openList(int neighborID, double weights, bool isPrune);
 	void push_virtualOpen();
 	void print_path();
-	void write_solution();
+	void write_solution(int n);
 	void print_closedList();
 
 	//getters

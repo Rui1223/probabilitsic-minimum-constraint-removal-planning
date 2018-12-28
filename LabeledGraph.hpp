@@ -85,7 +85,7 @@ public:
 	void print_labelMap();
 
 	// function to write the graph into a txt file
-	void write_graph();
+	void write_graph(int n);
 
 	// lots of getters
 	int getnNodes() { return m_nNodes; }

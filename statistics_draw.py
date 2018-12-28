@@ -10,7 +10,7 @@ if __name__ == '__main__':
 	
 	## write in my first file
 	############################################################################
-	f = open("labelCoverage_performance.txt")
+	f = open("./statistics_1/labelCoverage_performance.txt")
 	labelCoverage = []
 	time_G = []
 	solution_G = []
@@ -43,7 +43,7 @@ if __name__ == '__main__':
 
 	## write in my second file
 	##############################################################################
-	f = open("gridSize_performance.txt")
+	f = open("./statistics_1/gridSize_performance.txt")
 	gridSize = []
 	time_G = []
 	solution_G = []
@@ -75,7 +75,7 @@ if __name__ == '__main__':
 
 	## write in my third file
 	#############################################################################
-	f = open("nLabels_performance.txt")
+	f = open("./statistics_1/nLabels_performance.txt")
 	nLabels = []
 	time_G = []
 	solution_G = []

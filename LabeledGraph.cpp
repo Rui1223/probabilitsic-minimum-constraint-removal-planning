@@ -13,8 +13,10 @@ formulation*/
 #include <map> // std::map
 #include <functional>
 #include <set>
-#include "LabeledGraph.hpp"
 #include <cstdlib>
+#include <string> // std::string, std::to_string
+
+#include "LabeledGraph.hpp"
 
 
 Comparator compFunctor = 
@@ -201,14 +203,14 @@ void LabeledGraph_t::load_graph()
 // }
 
 
-void LabeledGraph_t::write_graph()
+void LabeledGraph_t::write_graph(int n)
 {
 	// This function write the constructed graph into a text file so as to be loaded by a python
 	// script so as to visualize using matplotlib
 
 	// to write in a text file (ostream)
 	// we need to loop through the neighbor list, and then access to corresponding labels
-	std::ofstream file_("graph.txt");
+	std::ofstream file_("./graph_1/graph" + std::to_string(n) + ".txt");
 	if (file_.is_open())
 	{
 		// Write in the 1st line the size of the grid graph

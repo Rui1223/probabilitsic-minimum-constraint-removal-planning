@@ -36,7 +36,7 @@ public:
 	void print_path();
 
 	// The function to write the path and start & goal into a text file
-	void write_solution();
+	void write_solution(int n);
 
 	// getters
 	double getCurrentWeight() { return m_currentWeight; }

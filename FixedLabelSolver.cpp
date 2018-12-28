@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <iostream>
 #include <fstream>
+#include <string> // std::string, std::to_string
 
 #include "FixedLabelSolver.hpp"
 #include "LabeledGraph.hpp"
@@ -127,9 +128,9 @@ void FixedLabelSolver_t::print_path()
 	std::cout << m_path << "\n";
 }
 
-void FixedLabelSolver_t::write_solution()
+void FixedLabelSolver_t::write_solution(int n)
 {
-	std::ofstream file_("FixedLabel_solution.txt");
+	std::ofstream file_("./graph_1/FixedLabel_solution" + std::to_string(n) + ".txt");
 	if (file_.is_open())
 	{
 		file_ << m_start << " " << m_goal << "\n";

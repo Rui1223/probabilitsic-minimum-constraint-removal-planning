@@ -1,6 +1,7 @@
 ## This python script will visualize the graph stored in a text file with certain formaat of data
 
 from __future__ import division
+import sys
 import IPython
 import matplotlib.pyplot as plt
 plt.switch_backend('TKagg')
@@ -12,9 +13,10 @@ def cal_co(indx, col, row):
 
 if __name__ == "__main__":
 
+	n = sys.argv[1];
 
 	## write in my text file
-	f = open("graph.txt", "r")
+	f = open("./graph_1/graph" + str(n) + ".txt", "r")
 	# start to count the line
 	n_line = 0
 	for line in f:
@@ -67,7 +69,7 @@ if __name__ == "__main__":
 	##Now plot the solution for FixedLabel Algorithm
 	##################################################################
 
-	f_fixedLabel = open("FixedLabel_solution.txt", "r")
+	f_fixedLabel = open("./graph_1/FixedLabel_solution" + str(n) + ".txt", "r")
 	n_line = 0;
 	for line in f_fixedLabel:
 		line = line.split()
@@ -109,7 +111,7 @@ if __name__ == "__main__":
 
 	##Now plot the solution for Greedy Algorithm
 	##################################################################
-	f_fixedLabel = open("GreedySearch_solution.txt", "r")
+	f_fixedLabel = open("./graph_1/GreedySearch_solution" + str(n) + ".txt", "r")
 	n_line = 0;
 	for line in f_fixedLabel:
 		line = line.split()

@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <iomanip>
 #include <fstream>
+#include <string> // std::string, std::to_string
 
 #include "PmcrNode.hpp"
 #include "LabeledGraph.hpp"
@@ -228,10 +229,10 @@ void PmcrGreedySolver_t::print_closedList()
 
 }
 
-void PmcrGreedySolver_t::write_solution()
+void PmcrGreedySolver_t::write_solution(int n)
 {
 
-	std::ofstream file_("GreedySearch_solution.txt");
+	std::ofstream file_("./graph_1/GreedySearch_solution" + std::to_string(n) + ".txt");
 	if (file_.is_open())
 	{
 		file_ << m_start << " " << m_goal << "\n";
