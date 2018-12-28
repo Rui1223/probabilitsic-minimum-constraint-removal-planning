@@ -45,6 +45,9 @@ public:
 	void print_path();
 	void write_solution();
 	void print_closedList();
+
+	//getters
+	double getCurrentWeight() { return m_currentWeight; }
 };
 
 #endif

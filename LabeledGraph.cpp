@@ -16,13 +16,14 @@ formulation*/
 #include "LabeledGraph.hpp"
 #include <cstdlib>
 
+
 Comparator compFunctor = 
 		[](std::pair<std::vector<int>, double> elem1, std::pair<std::vector<int>, double> elem2)
 		{
 			return elem1.second <= elem2.second; // compare weights, prefer less weight  
 		};
 
-LabeledGraph_t::LabeledGraph_t(int row, int col, int n_labels)
+LabeledGraph_t::LabeledGraph_t(int row, int col, int n_labels, double percentLabelEdge)
 {
 	// specify the size of the graph
 	assert(row > 0);
@@ -32,10 +33,11 @@ LabeledGraph_t::LabeledGraph_t(int row, int col, int n_labels)
 	m_nNodes = m_row * m_col;
 	
 	m_nlabels = n_labels;
-	m_percentLabelEdge = 0.4;
+	m_percentLabelEdge = percentLabelEdge;
 	// The probability of a label to be assigned to an edge is determined by the number of labels
 	// and the percent of labeled edge we expect in the graph
 	m_prob = 1 - exp(1.0/m_nlabels*log(1-m_percentLabelEdge));
+	std::cout << "m_percentLabelEdge: " << m_percentLabelEdge << std::endl;
 	std::cout << "m_prob: " << m_prob << std::endl;
 
 	// specify the number of labels and their corresponding weights
@@ -48,7 +50,7 @@ LabeledGraph_t::LabeledGraph_t(int row, int col, int n_labels)
 	load_graph();
 
 	// print the basic information of the graph
-	print_labelMap();
+	//print_labelMap();
 	//print_graph();
 	printf("-------------------------------\n");
 }
@@ -264,13 +266,12 @@ void LabeledGraph_t::load_labels()
 
 void LabeledGraph_t::load_weights()
 {
-
 	double r = 0.0;
 	int temp;
 
 	for (int kk = 0; kk < m_nlabels; kk++)
 	{
-		temp = random_generate_integer(1, 5);
+		temp = random_generate_integer(1, 30);
 		m_labelWeights.push_back(temp);
 		r += double(temp);
 	}
@@ -408,7 +409,7 @@ LabeledGraph_t::~LabeledGraph_t() {}
 int random_generate_integer(int min, int max)
 {
 
-	return std::rand() % (max + 1 - min) + min;
+	return rand() % (max + 1 - min) + min;
 }
 
 void operator/=(std::vector<double> &v, double d)

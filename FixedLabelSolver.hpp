@@ -38,6 +38,9 @@ public:
 	// The function to write the path and start & goal into a text file
 	void write_solution();
 
+	// getters
+	double getCurrentWeight() { return m_currentWeight; }
+
 };
 
 std::ostream& operator<<(std::ostream &out, const std::vector<int> &v);

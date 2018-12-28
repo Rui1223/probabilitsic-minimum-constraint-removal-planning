@@ -52,7 +52,7 @@ class LabeledGraph_t
 public:
 	// Constructor
 	LabeledGraph_t() {}
-	LabeledGraph_t(int row, int col, int n_labels);
+	LabeledGraph_t(int row, int col, int n_labels, double percentLabelEdge);
 
 	// function to load a graph (manually generate a graph)
 	void load_graph();
