@@ -18,7 +18,6 @@ PmcrGreedySolver_t::PmcrGreedySolver_t(LabeledGraph_t &g, int start, int goal)
 	assert(goal >=0);
 	m_start = start;
 	m_goal = goal;
-	printf("start greedy search\n");
 	m_open.push(new PmcrNode_t(m_start, {}, nullptr, m_lgraph.compute_weight({})));
 	m_path = std::vector<int>();
 
@@ -187,8 +186,6 @@ std::vector<int> PmcrGreedySolver_t::label_union(std::vector<int> s1, std::vecto
 
 void PmcrGreedySolver_t::back_track_path()
 {	
-	// check closed list
-	//print_closedList();
 	// start from the goal
 	PmcrNode_t *current = m_closed[m_closed.size()-1];
 	while (current->getID() != m_start)
@@ -232,7 +229,7 @@ void PmcrGreedySolver_t::print_closedList()
 void PmcrGreedySolver_t::write_solution(int n)
 {
 
-	std::ofstream file_("./graph_1/GreedySearch_solution" + std::to_string(n) + ".txt");
+	std::ofstream file_("./graph_2/GreedySearch_solution" + std::to_string(n) + ".txt");
 	if (file_.is_open())
 	{
 		file_ << m_start << " " << m_goal << "\n";

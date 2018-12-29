@@ -88,6 +88,7 @@ public:
 	void write_graph(int n);
 
 	// lots of getters
+	int getnCol() { return m_col; }
 	int getnNodes() { return m_nNodes; }
 	std::vector<std::vector<int>> getNodeNeighbors() { return m_nodeNeighbors; }
 	std::vector<std::vector<std::vector<int>>> getEdgeLabels() { return m_edgeLabels; } 

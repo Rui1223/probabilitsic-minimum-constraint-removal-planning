@@ -3,6 +3,8 @@
   is fixed in a MinLP problem)*/
 /*full implementation*/
 
+#include <cassert>
+#include <cmath>
 #include <queue>
 #include <vector>
 #include <algorithm>
@@ -10,6 +12,7 @@
 #include <fstream>
 #include <string> // std::string, std::to_string
 
+#include "HeuristicSearchSolver.hpp"
 #include "FixedLabelSolver.hpp"
 #include "LabeledGraph.hpp"
 
@@ -17,11 +20,13 @@ FixedLabelSolver_t::FixedLabelSolver_t(LabeledGraph_t &g, int start, int goal)
 {
 	// problem formulation specified at the beginning of the solver
 	m_lgraph = g;
+	assert(start >=0);
+	assert(goal >=0);
 	m_start = start;
 	m_goal = goal;
 }
 
-void FixedLabelSolver_t::fixedLabel_search()
+void FixedLabelSolver_t::fixedLabel_search(int n_time)
 {
 	// The search method takes advantage of the labelMap obtained from the given graph.
 	// Then for each set of labels and corresponding weight in the labelMap, construct a subgraph
@@ -29,7 +34,8 @@ void FixedLabelSolver_t::fixedLabel_search()
 	// A breast-first search is performed on the subgraph to see whether the start and the goal
 	// forms a connected component. If it is, return the path, then the path is optimal. Otherwise, 
 	// switch to next set of labels in the labelMap (with ascending order with respect to weight).
-	int k = 0;
+	int n = n_time;
+	int k = 1;
 	for (auto const &pair : m_lgraph.getLabelMap())
 	{
 		m_currentLabels = pair.first;
@@ -37,10 +43,10 @@ void FixedLabelSolver_t::fixedLabel_search()
 		std::cout << "current set of labels: " << m_currentLabels << "\n";
 		std::cout << "currrent weight: " << m_currentWeight << "\n"; 
 		std::cout << "start the " << k << "th search\n";
-		bool goalFound = BFSearch();
+		bool goalFound = HeuristicSearch(n);
+		//print_closedList();
 		if (goalFound)
 		{
-			print_path();
 			return;
 		}
 		k++;
@@ -49,123 +55,22 @@ void FixedLabelSolver_t::fixedLabel_search()
 
 }
 
-bool FixedLabelSolver_t::check_subset(std::vector<int> labels)
+bool FixedLabelSolver_t::HeuristicSearch(int n_time)
 {
-	// This function check whether a input set of labels is a subset of the m_currentLabels
-	return ( std::includes(m_currentLabels.begin(), m_currentLabels.end(),
-						labels.begin(), labels.end()) );
-}
-
-void FixedLabelSolver_t::backtrackPath(std::vector<int> &parents)
-{
-	int temp = m_goal;
-	while (temp != m_start)
+	// HeuristicSearch() performs a greedy Best-First search based on HeuristicSearchSolver 
+	// with a label checking condition, which decides whether a newly propogated node 
+	// should be added into the priority queue
+	int n = n_time;
+	HeuristicSearchSolver_t heuristic_search_solver(m_lgraph, m_start, m_goal, 
+													m_currentLabels, m_currentWeight);
+	bool goalFound = heuristic_search_solver.Heuristic_search();
+	if (goalFound)
 	{
-		m_path.push_back(temp);
-		temp = parents[temp];
+		heuristic_search_solver.write_solution(n);
 	}
-	m_path.push_back(m_start);
+	return goalFound;
 }
 
-bool FixedLabelSolver_t::BFSearch()
-{
-	// BFSearch() performs a Breadth-First search with a label checking condition, which decides
-	// whether a newly propogated node should be added into the queue
- 	// you need two data structure to perform BFSearch
-	// 1. a regular queue
-	// 2. a parent list for backtracking path purpose
-	// 3. a list which keep track of visited status of each node
-	std::queue<int> q;
-	std::vector<int> parents(m_lgraph.getnNodes(), -1); // initially all 
-												//the values are -1 (means no parents)
-	std::vector<bool> visited(m_lgraph.getnNodes(), false);
-	q.push(m_start);
-	visited[m_start] = true;
 
 
-	while (!q.empty())
-	{
-		int current = q.front(); // get the top item of the queue
-		q.pop();
 
-		//get neighbors of the current node
-		std::vector<int> neighbors = m_lgraph.getNodeNeighbors()[current];
-		for (auto const &neighbor : neighbors)
-		{
-			if (visited[neighbor]) { continue; }
-			// check if the node has been visited or extended before
-			// check whether the edge between current and neighbor node form a valid edge in the 
-			// subgraph
-			bool isSubset = check_subset(m_lgraph.getEdgeLabels()[current][neighbor]);
-			if (isSubset)
-			{
-				// the neighbor is a true neighbor in the current subgraph
-				parents[neighbor] = current;
-				// add the neighbor to the queue
-				q.push(neighbor);
-				visited[neighbor] = true;
-				// Additional step: IMPORTANT since it may get rid of unnecessary search
-				// Once goal appears, claims that goal is found and terminate
-				if (neighbor == m_goal)
-				{
-					std::cout << "Goal is connected all the way to the start\n";
-					backtrackPath(parents); // construct your m_path
-					return true;
-				}
-			} 
-		}
-
-	}
-	// You are reaching here because the queue is empty and goal is not found
-	std::cout << "Coundn't found the goal at the current subgraph\n";
-	std::cout << "-----------------------------------------------\n"; 
-	return false;
-
-}
-
-void FixedLabelSolver_t::print_path()
-{
-	std::cout << m_path << "\n";
-}
-
-void FixedLabelSolver_t::write_solution(int n)
-{
-	std::ofstream file_("./graph_1/FixedLabel_solution" + std::to_string(n) + ".txt");
-	if (file_.is_open())
-	{
-		file_ << m_start << " " << m_goal << "\n";
-		for (auto const &waypoint : m_path)
-		{
-			file_ << waypoint << " ";
-		}
-		file_ << "\n";
-		// write the label and weight for the solution
-		file_ << m_currentWeight << "\n";
-		
-		if (!m_currentLabels.empty())
-		{
-			int pp = 0;
-			while (pp < m_currentLabels.size()-1)
-			{
-				file_ << m_currentLabels[pp] << ",";
-				pp++;
-			}
-			file_ << m_currentLabels[pp];
-		}
-		file_ << "\n";
-		file_.close();
-	}
-
-
-}
-
-std::ostream& operator<<(std::ostream &out, const std::vector<int> &v)
-{
-	out << "<"; 
-	for (auto const &item : v)
-	{
-		out << item << " ";
-	}
-	out << ">";
-	return out;
-}

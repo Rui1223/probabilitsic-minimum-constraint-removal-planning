@@ -25,7 +25,7 @@ int main()
 	std::vector<double> labelCoverage{30, 40, 50, 60};
 
 	// write into a txt file
-	std::ofstream file_("./statistics_1/labelCoverage_performance.txt");
+	std::ofstream file_("./statistics_2/labelCoverage_performance.txt");
 
 	// experiment on each labelCoverage
 	for (auto const &lc : labelCoverage)
@@ -79,7 +79,7 @@ int main()
 	std::vector<int> gridSize{10, 15, 20, 25};
 
 	// write into a txt file
-	std::ofstream file1_("./statistics_1/gridSize_performance.txt");
+	std::ofstream file1_("./statistics_2/gridSize_performance.txt");
 
 	// experiment on each gridSize
 	for (auto const &gs : gridSize)
@@ -134,7 +134,7 @@ int main()
 	std::vector<int> nLabels{4, 5, 6, 7};
 
 	// write into a txt file
-	std::ofstream file2_("./statistics_1/nLabels_performance.txt");
+	std::ofstream file2_("./statistics_2/nLabels_performance.txt");
 
 	// experiment on each gridSize
 	for (auto const &nl : nLabels)

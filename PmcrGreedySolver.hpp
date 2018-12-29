@@ -4,6 +4,7 @@
 #define PMCRGREEDYSOLVER_H
 
 #include <queue>
+
 #include "LabeledGraph.hpp"
 #include "PmcrNode.hpp"
 

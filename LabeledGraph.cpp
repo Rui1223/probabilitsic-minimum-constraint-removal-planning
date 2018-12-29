@@ -210,7 +210,7 @@ void LabeledGraph_t::write_graph(int n)
 
 	// to write in a text file (ostream)
 	// we need to loop through the neighbor list, and then access to corresponding labels
-	std::ofstream file_("./graph_1/graph" + std::to_string(n) + ".txt");
+	std::ofstream file_("./graph_2/graph" + std::to_string(n) + ".txt");
 	if (file_.is_open())
 	{
 		// Write in the 1st line the size of the grid graph

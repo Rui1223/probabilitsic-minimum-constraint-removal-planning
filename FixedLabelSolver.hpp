@@ -2,6 +2,9 @@
   that each obstacle has fixed number of potential pose (equivalently, the number of labels
   is fixed in a MinLP problem)*/
 
+#ifndef FIXEDLABELSOLVER_H
+#define FIXEDLABELSOLVER_H
+
 #include "LabeledGraph.hpp"
 
 
@@ -11,7 +14,6 @@ class FixedLabelSolver_t
 	int m_start;
 	int m_goal;
 
-	std::vector<int> m_path;
 	std::vector<int> m_currentLabels;
 	double m_currentWeight;
 
@@ -21,26 +23,12 @@ public:
 	~FixedLabelSolver_t() {}
 
 	// The function to search for a path in a fixed label scenario
-	void fixedLabel_search();
+	void fixedLabel_search(int n_time);
 
-	// The function to check whether a input set of labels is a subset of the m_currentLabel
-	bool check_subset(std::vector<int> labels);
-
-	// The function to search on a subgraph with a certain set of labels being looped on
-	bool BFSearch();
-
-	// The function to back track the path
-	void backtrackPath(std::vector<int> &parents);
-
-	// The function to print the path
-	void print_path();
-
-	// The function to write the path and start & goal into a text file
-	void write_solution(int n);
-
-	// getters
-	double getCurrentWeight() { return m_currentWeight; }
+	// The function to perform heuristic search on a subgraph 
+	// with a certain set of labels being looped on
+	bool HeuristicSearch(int n_time);
 
 };
 
-std::ostream& operator<<(std::ostream &out, const std::vector<int> &v);
+#endif
