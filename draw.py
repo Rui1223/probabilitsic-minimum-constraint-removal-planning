@@ -109,40 +109,40 @@ if __name__ == "__main__":
 	ax.text(col+3-3, -2+1.5, "F labels:"+solution_labels, color="r", fontsize=10)
 
 
-	# ##Now plot the solution for Greedy Algorithm
-	# ##################################################################
-	# f_fixedLabel = open("./graph_2/GreedySearch_solution" + str(n) + ".txt", "r")
-	# n_line = 0;
-	# for line in f_fixedLabel:
-	# 	line = line.split()
-	# 	n_line += 1
-	# 	if (n_line == 1):
-	# 		start = int(line[0])
-	# 		goal = int(line[1])
-	# 	elif (n_line == 2):
-	# 		path = map(int, line)
-	# 	elif (n_line == 3):
-	# 		solution_weight = line[0]
-	# 	else:
-	# 		if len(line) == 0:
-	# 			solution_labels = " ";
-	# 		else:
-	# 			solution_labels = line[0]
+	##Now plot the solution for Greedy Algorithm
+	##################################################################
+	f_fixedLabel = open("./graph_2/GreedySearch_solution" + str(n) + ".txt", "r")
+	n_line = 0;
+	for line in f_fixedLabel:
+		line = line.split()
+		n_line += 1
+		if (n_line == 1):
+			start = int(line[0])
+			goal = int(line[1])
+		elif (n_line == 2):
+			path = map(int, line)
+		elif (n_line == 3):
+			solution_weight = line[0]
+		else:
+			if len(line) == 0:
+				solution_labels = " ";
+			else:
+				solution_labels = line[0]
 
-	# #plot the optimal path 
-	# counter = 0
-	# while (counter != (len(path)-1)):
-	# 	v1 = path[counter]
-	# 	v2 = path[counter+1]
-	# 	ax.plot(cal_co(v1,col,row)[0], cal_co(v1,col,row)[1], "co")
-	# 	ax.plot([cal_co(v1,col,row)[0], cal_co(v2,col,row)[0]], 
-	# 			[cal_co(v1,col,row)[1], cal_co(v2,col,row)[1]], "c--")
-	# 	counter += 1
-	# ax.plot(cal_co(v2,col,row)[0], cal_co(v2,col,row)[1], "co")
+	#plot the optimal path 
+	counter = 0
+	while (counter != (len(path)-1)):
+		v1 = path[counter]
+		v2 = path[counter+1]
+		ax.plot(cal_co(v1,col,row)[0], cal_co(v1,col,row)[1], "co")
+		ax.plot([cal_co(v1,col,row)[0], cal_co(v2,col,row)[0]], 
+				[cal_co(v1,col,row)[1], cal_co(v2,col,row)[1]], "c--")
+		counter += 1
+	ax.plot(cal_co(v2,col,row)[0], cal_co(v2,col,row)[1], "co")
 
-	# # plot solution labels and weights
-	# ax.text(col+3-3, -2+2.0, "G weight:"+solution_weight, color="c", fontsize=10)
-	# ax.text(col+3-3, -2+2.5, "G labels:"+solution_labels, color="c", fontsize=10)
+	# plot solution labels and weights
+	ax.text(col+3-3, -2+2.0, "G weight:"+solution_weight, color="c", fontsize=10)
+	ax.text(col+3-3, -2+2.5, "G labels:"+solution_labels, color="c", fontsize=10)
 
 	
 	plt.show()

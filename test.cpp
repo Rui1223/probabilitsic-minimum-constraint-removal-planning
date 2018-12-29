@@ -52,24 +52,30 @@
 int main()
 {
 	std::srand(static_cast<unsigned int>(std::time(nullptr)));
+	Timer t;
 
-	LabeledGraph_t g(20, 20, 5, 0.5);
-	int start = 0;
-	int goal = 398;
+	LabeledGraph_t g(25, 25, 5, 0.5);
+	int start = random_generate_integer(0, 15*15-1);
+	int goal = random_generate_integer(0, 15*15-1);
+	while (start == goal)
+	{
+		int start = random_generate_integer(0, 15*15-1);
+		int goal = random_generate_integer(0, 15*15-1);
+	}
 	g.write_graph(0);
 
-	Timer t;
 	std::cout << "----------start the fixedLabel search-------------\n";
 	FixedLabelSolver_t fixedlabel_solver(g, start, goal);
+	t.reset();
 	fixedlabel_solver.fixedLabel_search(0);
 	std::cout << "\nTimer elapsed: " << t.elapsed() << " seconds\n";
 
-	// t.reset();
-	// std::cout << "----------start the greedy search-------------\n";
-	// PmcrGreedySolver_t pmcr_solver(g, start, goal);
-	// pmcr_solver.greedy_search();
-	// std::cout << "\nTimer elapsed: " << t.elapsed() << " seconds\n";
-	// pmcr_solver.write_solution();
+	std::cout << "----------start the greedy search-------------\n";
+	PmcrGreedySolver_t pmcr_solver(g, start, goal);
+	t.reset();
+	pmcr_solver.greedy_search();
+	std::cout << "\nTimer elapsed: " << t.elapsed() << " seconds\n";
+	pmcr_solver.write_solution(0);
 
 	return 0;
 

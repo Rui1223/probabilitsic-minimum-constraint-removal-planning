@@ -20,6 +20,7 @@ PmcrGreedySolver_t::PmcrGreedySolver_t(LabeledGraph_t &g, int start, int goal)
 	m_goal = goal;
 	m_open.push(new PmcrNode_t(m_start, {}, nullptr, m_lgraph.compute_weight({})));
 	m_path = std::vector<int>();
+	m_lowestWeights = std::vector<double>(m_lgraph.getnNodes(), 1.0);
 
 }
 
@@ -35,12 +36,22 @@ PmcrGreedySolver_t::~PmcrGreedySolver_t()
 }
 
 void PmcrGreedySolver_t::greedy_search()
-{	
+{
+	// need a list to record the lowest weight so far for each node
+	m_lowestWeights[m_start] = 0.0;
 
 	while(!m_open.empty())
 	{
 		PmcrNode_t *current = m_open.top();
 		m_open.pop();
+		// Now check if the current node has the smallest recorded weight
+		if (current->getWeights() > m_lowestWeights[current->getID()])
+		{
+			// This node has been beated by some nodes with the same id but less weight
+			// No need to put it into the closed list
+			continue;
+		}
+		// This node has the smallest recorded weight
 		m_currentWeight = current->getWeights();
 		m_currentLabels = current->getLabels();
 		m_closed.push_back(current);
@@ -48,9 +59,9 @@ void PmcrGreedySolver_t::greedy_search()
 		{
 			printf("goal found!\n");
 			// print the labels & weights for the found path
-			std::cout << "The weight of the path is " << current->getWeights() << "\n";
+			std::cout << "The weight of the path is " << m_currentWeight << "\n";
 			std::cout << "<";
-			for (auto const &e : current->getLabels())
+			for (auto const &e : m_currentLabels)
 			{
 				std::cout << e << " ";
 			}
@@ -65,107 +76,159 @@ void PmcrGreedySolver_t::greedy_search()
 		{
 			// no need to come back to parent, since it will
 			// always prune that parent (superset will always be pruned without check)
-			if ( current->getID() != m_start and neighbor == current->getParent()->getID()) 
-				{continue;}
+			// But if current is m_start, it has no parent			
+			if (current->getID() != m_start and neighbor == current->getParent()->getID()) 
+			{ 
+				continue; 
+			}
 			// check neighbor's label
 			std::vector<int> currentLabels = 
 				label_union(current->getLabels(), 
 					m_lgraph.getEdgeLabels()[current->getID()][neighbor]);
-			double currentWeights = m_lgraph.compute_weight(currentLabels);
+			double currentWeight = m_lgraph.compute_weight(currentLabels);
 
-			bool isPrune = check_prune(neighbor, currentWeights);
-			if (!isPrune)
+			// check whether we need to prune this neighbor (based on weight)
+			// If the neighbor has less weight, update lowest weight record put into open
+			// Otherwise, discard
+			if (currentWeight < m_lowestWeights[neighbor])
 			{
-				// Congrats! This neighbor node stand up to all pruning tests
-				// Let's add it to the open list, welcome!
-				m_open.push(new PmcrNode_t(neighbor, currentLabels, current, currentWeights));
-
+				m_lowestWeights[neighbor] = currentWeight;
+				m_open.push(new PmcrNode_t(neighbor, currentLabels, current, currentWeight));
 			}
 		}
-		// finish search all the neighbors of expanded node at the iteration
 	}
 	// You are reaching here because the m_open is empty and you haven't reached the goal
 	printf("failed to find a solution in this problem!\n");
 }
 
-bool PmcrGreedySolver_t::check_prune(int neighborID, double weights)
-// This function checks whether any node in OPEN and CLOSED with the same id of the query node 
-// is necessary to be pruned (including the query node). If it is, return true. Otherwise false.
-{
-	bool isPrune = false;
-	// check if there are nodes in CLOSED with the same neighborID
-	isPrune = search_closedList(neighborID, weights, isPrune);
-	if (isPrune)
-	{
-		return isPrune;
-	}
-	// now check if there are nodes in OPEN with the same neighborID
-	isPrune = search_openList(neighborID, weights, isPrune);
-	return isPrune;
-}
+	// while(!m_open.empty())
+	// {
+	// 	PmcrNode_t *current = m_open.top();
+	// 	m_open.pop();
+	// 	m_currentWeight = current->getWeights();
+	// 	m_currentLabels = current->getLabels();
+	// 	m_closed.push_back(current);
+	// 	if (current->getID() == m_goal)
+	// 	{
+	// 		printf("goal found!\n");
+	// 		// print the labels & weights for the found path
+	// 		std::cout << "The weight of the path is " << current->getWeights() << "\n";
+	// 		std::cout << "<";
+	// 		for (auto const &e : current->getLabels())
+	// 		{
+	// 			std::cout << e << " ";
+	// 		}
+	// 		std::cout << ">\n";
+	// 		// should return a path here
+	// 		back_track_path();
+	// 		return;
+	// 	}
+	// 	// look at each neighbor of the current node
+	// 	std::vector<int> neighbors = m_lgraph.getNodeNeighbors()[current->getID()];
+	// 	for (auto const &neighbor : neighbors)
+	// 	{
+	// 		// no need to come back to parent, since it will
+	// 		// always prune that parent (superset will always be pruned without check)
+	// 		if ( current->getID() != m_start and neighbor == current->getParent()->getID()) 
+	// 			{continue;}
+	// 		// check neighbor's label
+	// 		std::vector<int> currentLabels = 
+	// 			label_union(current->getLabels(), 
+	// 				m_lgraph.getEdgeLabels()[current->getID()][neighbor]);
+	// 		double currentWeights = m_lgraph.compute_weight(currentLabels);
 
-bool PmcrGreedySolver_t::search_closedList(int neighborID, double weights, bool isPrune)
-{
-	for (auto &node : m_closed)
-	{
-		if (node->getID() == neighborID)
-		{
-			if (weights >= node->getWeights())
-			{
-				isPrune = true;
-				return isPrune;
-			}			
-		}
+	// 		bool isPrune = check_prune(neighbor, currentWeights);
+	// 		if (!isPrune)
+	// 		{
+	// 			// Congrats! This neighbor node stand up to all pruning tests
+	// 			// Let's add it to the open list, welcome!
+	// 			m_open.push(new PmcrNode_t(neighbor, currentLabels, current, currentWeights));
 
-	}
-	// You are reaching here because either there is no node with the same neighborID
-	// or the weight of the current neighbor is smaller than all the nodes with the 
-	// same neighborID in the closed list.
-	return isPrune; // should be false
-}
+	// 		}
+	// 	}
+	// 	// finish search all the neighbors of expanded node at the iteration
+	// }
+	// // You are reaching here because the m_open is empty and you haven't reached the goal
+	// printf("failed to find a solution in this problem!\n");
+
+// bool PmcrGreedySolver_t::check_prune(int neighborID, double weights)
+// // This function checks whether any node in OPEN and CLOSED with the same id of the query node 
+// // is necessary to be pruned (including the query node). If it is, return true. Otherwise false.
+// {
+// 	bool isPrune = false;
+// 	// check if there are nodes in CLOSED with the same neighborID
+// 	isPrune = search_closedList(neighborID, weights, isPrune);
+// 	if (isPrune)
+// 	{
+// 		return isPrune;
+// 	}
+// 	// now check if there are nodes in OPEN with the same neighborID
+// 	isPrune = search_openList(neighborID, weights, isPrune);
+// 	return isPrune;
+// }
+
+// bool PmcrGreedySolver_t::search_closedList(int neighborID, double weights, bool isPrune)
+// {
+// 	for (auto &node : m_closed)
+// 	{
+// 		if (node->getID() == neighborID)
+// 		{
+// 			if (weights >= node->getWeights())
+// 			{
+// 				isPrune = true;
+// 				return isPrune;
+// 			}			
+// 		}
+
+// 	}
+// 	// You are reaching here because either there is no node with the same neighborID
+// 	// or the weight of the current neighbor is smaller than all the nodes with the 
+// 	// same neighborID in the closed list.
+// 	return isPrune; // should be false
+// }
 
 
-bool PmcrGreedySolver_t::search_openList(int neighborID, double weights, bool isPrune)
-{
-	// search for all elements in the priority queue (annoying)
-	// the APIs for priority queue are not as rich as those provided for std::vector
-	while(!m_open.empty())
-	{
-		PmcrNode_t *node = m_open.top();
-		m_open.pop(); // pop out that node so as to keep searching
-		if (node->getID() == neighborID)
-		{
-			if (weights >= node->getWeights())
-			{
-				isPrune = true;
-				m_open.push(node);
-				push_virtualOpen();
-				return isPrune;				
-			}
-			// if the weight of current neighbor is smaller than the node with the same neighborID
-			// in open list for the first time, it must be smaller than all the nodes with
-			// the same neighborID, no need for further comparison
-			// In addition, the node with the same id won't show up twice
-			push_virtualOpen();
-			return isPrune; // should be false
-		}
-		// only put the node poped from open list with different ID than neighborID
-		m_virtualOpen.push_back(node);
-	}
-	// You are reaching here since the open list is empty and you didn't find any node with
-	// the same id as that of neighbor.
-	push_virtualOpen();
-	return isPrune; // should be false
-}
-void PmcrGreedySolver_t::push_virtualOpen()
-{
-	for (auto &e : m_virtualOpen)
-	{
-		m_open.push(e);
-	}
-	// empty virtualOpen
-	m_virtualOpen.erase(m_virtualOpen.begin(), m_virtualOpen.end());
-}
+// bool PmcrGreedySolver_t::search_openList(int neighborID, double weights, bool isPrune)
+// {
+// 	// search for all elements in the priority queue (annoying)
+// 	// the APIs for priority queue are not as rich as those provided for std::vector
+// 	while(!m_open.empty())
+// 	{
+// 		PmcrNode_t *node = m_open.top();
+// 		m_open.pop(); // pop out that node so as to keep searching
+// 		if (node->getID() == neighborID)
+// 		{
+// 			if (weights >= node->getWeights())
+// 			{
+// 				isPrune = true;
+// 				m_open.push(node);
+// 				push_virtualOpen();
+// 				return isPrune;				
+// 			}
+// 			// if the weight of current neighbor is smaller than the node with the same neighborID
+// 			// in open list for the first time, it must be smaller than all the nodes with
+// 			// the same neighborID, no need for further comparison
+// 			// In addition, the node with the same id won't show up twice
+// 			push_virtualOpen();
+// 			return isPrune; // should be false
+// 		}
+// 		// only put the node poped from open list with different ID than neighborID
+// 		m_virtualOpen.push_back(node);
+// 	}
+// 	// You are reaching here since the open list is empty and you didn't find any node with
+// 	// the same id as that of neighbor.
+// 	push_virtualOpen();
+// 	return isPrune; // should be false
+// }
+// void PmcrGreedySolver_t::push_virtualOpen()
+// {
+// 	for (auto &e : m_virtualOpen)
+// 	{
+// 		m_open.push(e);
+// 	}
+// 	// empty virtualOpen
+// 	m_virtualOpen.erase(m_virtualOpen.begin(), m_virtualOpen.end());
+// }
 
 std::vector<int> PmcrGreedySolver_t::label_union(std::vector<int> s1, std::vector<int> s2)
 {
