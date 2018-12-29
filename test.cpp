@@ -49,6 +49,7 @@
 // 	return 0;
 // }
 
+/*
 int main()
 {
 	std::srand(static_cast<unsigned int>(std::time(nullptr)));
@@ -64,19 +65,27 @@ int main()
 	}
 	g.write_graph(0);
 
-	std::cout << "----------start the fixedLabel search-------------\n";
-	FixedLabelSolver_t fixedlabel_solver(g, start, goal);
-	t.reset();
-	fixedlabel_solver.fixedLabel_search(0);
-	std::cout << "\nTimer elapsed: " << t.elapsed() << " seconds\n";
+	// std::cout << "----------start the fixedLabel search-------------\n";
+	// FixedLabelSolver_t fixedlabel_solver(g, start, goal);
+	// t.reset();
+	// fixedlabel_solver.fixedLabel_search(0);
+	// std::cout << "\nTimer elapsed: " << t.elapsed() << " seconds\n";
 
-	std::cout << "----------start the greedy search-------------\n";
-	PmcrGreedySolver_t pmcr_solver(g, start, goal);
-	t.reset();
-	pmcr_solver.greedy_search();
-	std::cout << "\nTimer elapsed: " << t.elapsed() << " seconds\n";
-	pmcr_solver.write_solution(0);
+	// std::cout << "----------start the greedy search-------------\n";
+	// PmcrGreedySolver_t pmcr_solver(g, start, goal);
+	// t.reset();
+	// pmcr_solver.greedy_search();
+	// std::cout << "\nTimer elapsed: " << t.elapsed() << " seconds\n";
+	// pmcr_solver.write_solution(0);
 
 	return 0;
 
+}
+*/
+
+int main()
+{
+	int a = int (5.0 / 3.0);
+	std::cout << a << "\n";
+	return 0;
 }
