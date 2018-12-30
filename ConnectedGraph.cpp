@@ -43,6 +43,8 @@ ConnectedGraph_t::ConnectedGraph_t(int row, int col, int n_labels, double percen
 	m_prob = 1 - exp(1.0/m_nlabels*log(1-m_percentLabelEdge));
 	std::cout << "m_percentLabelEdge: " << m_percentLabelEdge << std::endl;
 	std::cout << "m_prob: " << m_prob << std::endl;
+	m_nExpansion = int(m_nEdges * m_prob);
+	std::cout << "n_expansion: " << m_nExpansion << "\n";
 
 	// specify the number of labels and their corresponding weights
 	// Based on weighted labels, build the labelMap which maps a set of labels to weights
@@ -129,23 +131,21 @@ void ConnectedGraph_t::label_graph()
 	// for each label
 	for (auto const &l : m_labels)
 	{
-		int n_expansion =  int(m_nEdges * m_prob);
-		std::cout << "n_expansion: " << n_expansion << "\n";
 		// random pick up a node to expand (in a BFS search)
 		int BF_start = random_generate_integer(0, m_nNodes-1);
 		std::cout << "start per label: " << BF_start << "\n"; 
-		BFSearch(BF_start, n_expansion, l);
+		BFSearch(BF_start, l);
 	}
 }
 
-void ConnectedGraph_t::BFSearch(int BF_start, int n_expansion, int l)
+void ConnectedGraph_t::BFSearch(int BF_start, int l)
 {
 	std::queue<int> q;
 	std::vector<bool> expanded(m_nNodes, false);
 	q.push(BF_start);
 
 	int counter = 0;
-	while(counter < n_expansion)
+	while(true)
 	{
 		int current = q.front(); // get the top of the queue
 		q.pop();
@@ -166,7 +166,9 @@ void ConnectedGraph_t::BFSearch(int BF_start, int n_expansion, int l)
 			q.push(neighbor);
 			// count for each label process
 			counter++;
+			if (counter == m_nExpansion) { break; }
 		}
+		if (counter == m_nExpansion) { break; }
 		expanded[current]=true;
 	}
 }

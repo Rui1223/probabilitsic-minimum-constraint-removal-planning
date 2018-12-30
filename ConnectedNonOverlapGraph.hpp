@@ -28,7 +28,8 @@ class ConnectedNonOverlapGraph_t
 	// specify neighbors (edge) and labels of the edge 
 	std::vector<std::vector<int>> m_nodeNeighbors;
 	std::vector<std::vector<std::vector<int>>> m_edgeLabels;
-	std::vector<std::vector<int>> m_marked;
+	std::vector<std::vector<bool>> m_marked;
+	int m_nExpansion;
 	
 	// specify the weights for labels
 	int m_nlabels;
@@ -85,7 +86,7 @@ public:
 	void write_graph(int n);
 
 	// function to perform a BF-like expansion for a label
-	void BFSearch(int BF_start, int n_expansion, int l);
+	bool BFSearch(int BF_start, int l);
 
 	// lots of getters
 	int getnCol() { return m_col; }

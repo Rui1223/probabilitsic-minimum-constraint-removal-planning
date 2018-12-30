@@ -16,7 +16,7 @@ if __name__ == "__main__":
 	n = sys.argv[1];
 
 	## write in my text file
-	f = open("./ConnectedGraph/graph" + str(n) + ".txt", "r")
+	f = open("./ConnectedNonOverlapGraph/graph" + str(n) + ".txt", "r")
 	# start to count the line
 	n_line = 0
 	for line in f:

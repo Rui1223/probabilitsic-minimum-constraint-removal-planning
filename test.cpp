@@ -3,6 +3,7 @@
 
 #include "LabeledGraph.hpp"
 #include "ConnectedGraph.hpp"
+#include "ConnectedNonOverlapGraph.hpp"
 #include "PmcrGreedySolver.hpp"
 #include "FixedLabelSolver.hpp"
 #include "Timer.hpp"
@@ -92,7 +93,7 @@ int main()
 	int gridSize = 10;
 	int nLabels = 5;
 	double labelCoverage = 0.5;
-	ConnectedGraph_t g(gridSize, gridSize, nLabels, labelCoverage);
+	ConnectedNonOverlapGraph_t g(gridSize, gridSize, nLabels, labelCoverage);
 	int start = random_generate_integer(0, gridSize*gridSize-1);
 	int goal = random_generate_integer(0, gridSize*gridSize-1);
 	while (start == goal)

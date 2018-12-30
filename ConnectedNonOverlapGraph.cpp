@@ -17,7 +17,7 @@ in our problem formulation*/
 #include <string> // std::string, std::to_string
 #include <queue>
 
-#include "ConnectedGraph.hpp"
+#include "ConnectedNonOverlapGraph.hpp"
 
 
 Comparator compFunctor = 
@@ -44,6 +44,8 @@ ConnectedNonOverlapGraph_t::ConnectedNonOverlapGraph_t(int row, int col,
 	m_prob = 1 - exp(1.0/m_nlabels*log(1-m_percentLabelEdge));
 	std::cout << "m_percentLabelEdge: " << m_percentLabelEdge << std::endl;
 	std::cout << "m_prob: " << m_prob << std::endl;
+	m_nExpansion = int(m_nEdges * m_percentLabelEdge / m_nlabels);
+	std::cout << "n_expansion: " << m_nExpansion << "\n";
 
 	// specify the number of labels and their corresponding weights
 	// Based on weighted labels, build the labelMap which maps a set of labels to weights
@@ -76,7 +78,7 @@ void ConnectedNonOverlapGraph_t::load_graph()
 		m_nodeNeighbors.push_back(std::vector<int>());
 		m_edgeLabels.push_back(std::vector<std::vector<int>>(m_nNodes,
 			 std::vector<int>()));
-		m_marked.push_back(std::vector<int>());
+		m_marked.push_back(std::vector<bool>(m_nNodes, false));
 		iter++;
 	}
 
@@ -131,23 +133,29 @@ void ConnectedNonOverlapGraph_t::label_graph()
 	// for each label
 	for (auto const &l : m_labels)
 	{
-		int n_expansion =  int(m_nEdges * m_prob);
-		std::cout << "n_expansion: " << n_expansion << "\n";
 		// random pick up a node to expand (in a BFS search)
 		int BF_start = random_generate_integer(0, m_nNodes-1);
-		std::cout << "start per label: " << BF_start << "\n"; 
-		BFSearch(BF_start, n_expansion, l);
+		std::cout << "start for label " + std::to_string(l) + ": " << BF_start << "\n";
+		bool success = BFSearch(BF_start, l);
+		while (!success)
+		{
+			int BF_start = random_generate_integer(0, m_nNodes-1);
+			std::cout << "start for label " + std::to_string(l) + ": " << BF_start << "\n";
+			success = BFSearch(BF_start, l);
+		}
 	}
 }
 
-void ConnectedNonOverlapGraph_t::BFSearch(int BF_start, int n_expansion, int l)
+bool ConnectedNonOverlapGraph_t::BFSearch(int BF_start, int l)
 {
+	bool success = false;
 	std::queue<int> q;
 	std::vector<bool> expanded(m_nNodes, false);
+	std::set<std::pair<int, int>> edgesToLabel;
 	q.push(BF_start);
 
 	int counter = 0;
-	while(counter < n_expansion)
+	while(!q.empty())
 	{
 		int current = q.front(); // get the top of the queue
 		q.pop();
@@ -160,17 +168,51 @@ void ConnectedNonOverlapGraph_t::BFSearch(int BF_start, int n_expansion, int l)
 		std::vector<int> neighbors = m_nodeNeighbors[current];
 		for (auto const &neighbor : neighbors)
 		{
-			if (expanded[neighbor]) { continue; }
-			// Otherwise, label the edge between current and neighbor
-			// and push the neighbor to the open list
-			m_edgeLabels[current][neighbor].push_back(l);
-			m_edgeLabels[neighbor][current].push_back(l);
+			if (expanded[neighbor] or m_marked[current][neighbor] == true) { continue; }
+			// Otherwise, put the edge between current and neighbor 
+			// into edgesToLabel (wait to be labeled) and mark the edge to be labeled in m_marked
+			edgesToLabel.insert(std::pair<int, int>(current, neighbor));
+			m_marked[current][neighbor] = true;
+			m_marked[neighbor][current] = true;
 			q.push(neighbor);
 			// count for each label process
 			counter++;
+			if (counter == m_nExpansion) 
+			{
+				success = true; 
+				break; 
+			}
 		}
+		if (counter == m_nExpansion) { break; }
 		expanded[current]=true;
 	}
+	// You are reaching here either because
+	// 1. you hit the counter limit, and it means you finish expansion OR
+	// 2. the q is empty before the counter goes to m_nExpansion
+	if (success)
+	{
+		// now label the edges
+		for (auto const &pair : edgesToLabel)
+		{
+			int n1 = pair.first;
+			int n2 = pair.second;
+			m_edgeLabels[n1][n2].push_back(l);
+			m_edgeLabels[n2][n1].push_back(l);
+		}
+	}
+	else
+	{
+		// need to revert the information we change during this failure label process
+		// specifically m_marked
+		for (auto const &pair : edgesToLabel)
+		{
+			int n1 = pair.first;
+			int n2 = pair.second;
+			m_marked[n1][n2] = false;
+			m_marked[n2][n1] = false;			
+		}
+	}
+	return success;
 }
 
 
@@ -181,7 +223,7 @@ void ConnectedNonOverlapGraph_t::write_graph(int n)
 
 	// to write in a text file (ostream)
 	// we need to loop through the neighbor list, and then access to corresponding labels
-	std::ofstream file_("./ConnectedGraph/graph" + std::to_string(n) + ".txt");
+	std::ofstream file_("./ConnectedNonOverlapGraph/graph" + std::to_string(n) + ".txt");
 	if (file_.is_open())
 	{
 		// Write in the 1st line the size of the grid graph
