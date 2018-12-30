@@ -86,7 +86,7 @@ public:
 	void write_graph(int n);
 
 	// function to perform a BF-like expansion for a label
-	void BFSearch();
+	void BFSearch(int BF_start, int n_expansion, int l);
 
 	// lots of getters
 	int getnCol() { return m_col; }

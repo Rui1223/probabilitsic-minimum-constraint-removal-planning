@@ -15,8 +15,9 @@ formulation*/
 #include <set>
 #include <cstdlib>
 #include <string> // std::string, std::to_string
+#include <queue>
 
-#include "LabeledGraph.hpp"
+#include "ConnectedGraph.hpp"
 
 
 Comparator compFunctor = 
@@ -129,33 +130,44 @@ void ConnectedGraph_t::label_graph()
 	for (auto const &l : m_labels)
 	{
 		int n_expansion =  int(m_nEdges * m_prob);
+		std::cout << "n_expansion: " << n_expansion << "\n";
 		// random pick up a node to expand (in a BFS search)
-		int BF_start = random_generate_integer(0, m_nNodes-1); 
-		BFSearch(BF_start, n_expansion);
+		int BF_start = random_generate_integer(0, m_nNodes-1);
+		std::cout << "start per label: " << BF_start << "\n"; 
+		BFSearch(BF_start, n_expansion, l);
 	}
 }
 
-void ConnectedGraph_t::BFSearch(int BF_start, n_expansion)
+void ConnectedGraph_t::BFSearch(int BF_start, int n_expansion, int l)
 {
 	std::queue<int> q;
-	std::vector<bool> visited(m_nNodes, false);
+	std::vector<bool> expanded(m_nNodes, false);
 	q.push(BF_start);
-	visited[BF_start] = true;
 
-	counter = 0;
+	int counter = 0;
 	while(counter < n_expansion)
 	{
-		int current = q.front; // get the top of the queue
+		int current = q.front(); // get the top of the queue
 		q.pop();
-
+		if (expanded[current]==true)
+		{
+			// no need to expand from that current node since it has been expanded before
+			continue;
+		}
 		// get neighbors of the current node
-		std::vector<int> neighbors = m_lgraph.getNodeNeighbors()[current];
+		std::vector<int> neighbors = m_nodeNeighbors[current];
 		for (auto const &neighbor : neighbors)
 		{
-			if (visited[neighbor]) { continue; }
+			if (expanded[neighbor]) { continue; }
 			// Otherwise, label the edge between current and neighbor
 			// and push the neighbor to the open list
+			m_edgeLabels[current][neighbor].push_back(l);
+			m_edgeLabels[neighbor][current].push_back(l);
+			q.push(neighbor);
+			// count for each label process
+			counter++;
 		}
+		expanded[current]=true;
 	}
 }
 
@@ -167,7 +179,7 @@ void ConnectedGraph_t::write_graph(int n)
 
 	// to write in a text file (ostream)
 	// we need to loop through the neighbor list, and then access to corresponding labels
-	std::ofstream file_("./graph_2/graph" + std::to_string(n) + ".txt");
+	std::ofstream file_("./ConnectedGraph/graph" + std::to_string(n) + ".txt");
 	if (file_.is_open())
 	{
 		// Write in the 1st line the size of the grid graph

@@ -2,6 +2,7 @@
 /*save graphs and several corresponding solutions, respectively*/
 
 #include "LabeledGraph.hpp"
+#include "ConnectedGraph.hpp"
 #include "PmcrGreedySolver.hpp"
 #include "FixedLabelSolver.hpp"
 #include "Timer.hpp"
@@ -85,7 +86,19 @@ int main()
 
 int main()
 {
-	int a = int (5.0 / 3.0);
-	std::cout << a << "\n";
-	return 0;
+	std::srand(static_cast<unsigned int>(std::time(nullptr)));
+	Timer t;
+
+	int gridSize = 10;
+	int nLabels = 5;
+	double labelCoverage = 0.5;
+	ConnectedGraph_t g(gridSize, gridSize, nLabels, labelCoverage);
+	int start = random_generate_integer(0, gridSize*gridSize-1);
+	int goal = random_generate_integer(0, gridSize*gridSize-1);
+	while (start == goal)
+	{
+		int start = random_generate_integer(0, gridSize*gridSize-1);
+		int goal = random_generate_integer(0, gridSize*gridSize-1);
+	}
+	g.write_graph(0);
 }
