@@ -26,7 +26,8 @@ Comparator compFunctor =
 			return elem1.second <= elem2.second; // compare weights, prefer less weight  
 		};
 
-ConnectedGraph_t::ConnectedGraph_t(int row, int col, int n_labels, double percentLabelEdge)
+ConnectedNonOverlapGraph_t::ConnectedNonOverlapGraph_t(int row, int col, 
+									int n_labels, double percentLabelEdge)
 {
 	// specify the size of the graph
 	assert(row > 0);
@@ -59,7 +60,7 @@ ConnectedGraph_t::ConnectedGraph_t(int row, int col, int n_labels, double percen
 	printf("-------------------------------\n");
 }
 
-void ConnectedGraph_t::load_graph()
+void ConnectedNonOverlapGraph_t::load_graph()
 {
 	printf("Build the graph now\n");
 	// This is the function to construct a random weighted labeled graph with 2 procedures
@@ -75,6 +76,7 @@ void ConnectedGraph_t::load_graph()
 		m_nodeNeighbors.push_back(std::vector<int>());
 		m_edgeLabels.push_back(std::vector<std::vector<int>>(m_nNodes,
 			 std::vector<int>()));
+		m_marked.push_back(std::vector<int>());
 		iter++;
 	}
 
@@ -124,7 +126,7 @@ void ConnectedGraph_t::load_graph()
 
 }
 
-void ConnectedGraph_t::label_graph()
+void ConnectedNonOverlapGraph_t::label_graph()
 {
 	// for each label
 	for (auto const &l : m_labels)
@@ -138,7 +140,7 @@ void ConnectedGraph_t::label_graph()
 	}
 }
 
-void ConnectedGraph_t::BFSearch(int BF_start, int n_expansion, int l)
+void ConnectedNonOverlapGraph_t::BFSearch(int BF_start, int n_expansion, int l)
 {
 	std::queue<int> q;
 	std::vector<bool> expanded(m_nNodes, false);
@@ -172,7 +174,7 @@ void ConnectedGraph_t::BFSearch(int BF_start, int n_expansion, int l)
 }
 
 
-void ConnectedGraph_t::write_graph(int n)
+void ConnectedNonOverlapGraph_t::write_graph(int n)
 {
 	// This function write the constructed graph into a text file so as to be loaded by a python
 	// script so as to visualize using matplotlib
@@ -220,7 +222,7 @@ void ConnectedGraph_t::write_graph(int n)
 	} 
 }
 
-void ConnectedGraph_t::load_labels()
+void ConnectedNonOverlapGraph_t::load_labels()
 {
 	for (int ii=1; ii <= m_nlabels; ii++)
 	{
@@ -228,7 +230,7 @@ void ConnectedGraph_t::load_labels()
 	}
 }
 
-void ConnectedGraph_t::load_weights()
+void ConnectedNonOverlapGraph_t::load_weights()
 {
 	double r = 0.0;
 	int temp;
@@ -245,7 +247,7 @@ void ConnectedGraph_t::load_weights()
 
 }
 
-void ConnectedGraph_t::print_graph() 
+void ConnectedNonOverlapGraph_t::print_graph() 
 {
 	printf("*********edgeLabels***********\n");
 
@@ -275,7 +277,7 @@ void ConnectedGraph_t::print_graph()
 	
 }
 
-double ConnectedGraph_t::compute_weight(std::vector<int> currentLabels)
+double ConnectedNonOverlapGraph_t::compute_weight(std::vector<int> currentLabels)
 {
 	double currentWeights = 0.0;
 	for (auto const &label : currentLabels)
@@ -286,7 +288,7 @@ double ConnectedGraph_t::compute_weight(std::vector<int> currentLabels)
 
 }
 
-std::vector<double> ConnectedGraph_t::compute_weights()
+std::vector<double> ConnectedNonOverlapGraph_t::compute_weights()
 {
 	std::vector<double> weightCombinations;
 	for (auto const &set : m_labelCombinations)
@@ -298,7 +300,7 @@ std::vector<double> ConnectedGraph_t::compute_weights()
 	return weightCombinations;
 }
 
-void ConnectedGraph_t::cal_powerSet()
+void ConnectedNonOverlapGraph_t::cal_powerSet()
 {
 	// This function takes a set and then compute the powerset of the set
 	// which is a vector of sets (std::vector<std::vector<int>>)
@@ -320,7 +322,8 @@ void ConnectedGraph_t::cal_powerSet()
 	}
 }
 
-std::map<std::vector<int>, double> ConnectedGraph_t::zip_combinations(std::vector<double>& b)
+std::map<std::vector<int>, double> 
+	ConnectedNonOverlapGraph_t::zip_combinations(std::vector<double>& b)
 {
 	std::map<std::vector<int>, double> m;
 	//assert(a.size() == b.size());
@@ -331,7 +334,7 @@ std::map<std::vector<int>, double> ConnectedGraph_t::zip_combinations(std::vecto
 	return m;	
 }
 
-void ConnectedGraph_t::cal_labelMap()
+void ConnectedNonOverlapGraph_t::cal_labelMap()
 {
 	cal_powerSet();
 	std::vector<double> weightCombinations = compute_weights();
@@ -344,7 +347,7 @@ void ConnectedGraph_t::cal_labelMap()
 		map_combinations.begin(), map_combinations.end(), compFunctor);
 }
 
-void ConnectedGraph_t::print_labelMap()
+void ConnectedNonOverlapGraph_t::print_labelMap()
 {
 	printf("*********labelMap************\n");
 	//Iterate over the set you just come up with
@@ -361,7 +364,7 @@ void ConnectedGraph_t::print_labelMap()
 }
 
 
-ConnectedGraph_t::~ConnectedGraph_t() {}
+ConnectedNonOverlapGraph_t::~ConnectedNonOverlapGraph_t() {}
 
 int random_generate_integer(int min, int max)
 {
