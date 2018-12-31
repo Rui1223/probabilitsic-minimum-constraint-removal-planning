@@ -31,49 +31,54 @@ int main(int argc, char** argv)
 	std::vector<double> labelCoverage{30, 40, 50, 60};
 
 	// write into a txt file
-	std::ofstream file_(file_dir1);
+	std::ofstream file_1(file_dir1);
 
-	// experiment on each labelCoverage
-	for (auto const &lc : labelCoverage)
+	if (file_1.is_open())
 	{
-		double time_G = 0.0;
-		double solution_G = 0.0;
-		double time_F = 0.0;
-		double solution_F = 0.0;
-		for (int i=0; i < nExperiments; i++)
+		// experiment on each labelCoverage
+		for (auto const &lc : labelCoverage)
 		{
-			// generate a graph
-			ConnectedGraph_t g(15, 15, 5, lc/100.0);
-			int start = random_generate_integer(0, 15*15-1);
-			int goal = random_generate_integer(0, 15*15-1);
-			while (start == goal)
+			double time_G = 0.0;
+			double solution_G = 0.0;
+			double time_F = 0.0;
+			double solution_F = 0.0;
+			for (int i=0; i < nExperiments; i++)
 			{
+				// generate a graph
+				ConnectedGraph_t g(15, 15, 5, lc/100.0);
 				int start = random_generate_integer(0, 15*15-1);
 				int goal = random_generate_integer(0, 15*15-1);
-			}
-			//g.write_graph();//
+				while (start == goal)
+				{
+					int start = random_generate_integer(0, 15*15-1);
+					int goal = random_generate_integer(0, 15*15-1);
+				}
+				//g.write_graph();//
 
-			std::cout << "----------start the fixedLabel search-------------\n";
-			FixedLabelSolver_t fixedlabel_solver(g, start, goal);
-			t.reset();
-			fixedlabel_solver.fixedLabel_search();
-			time_F += t.elapsed();
-			solution_F += (1 - fixedlabel_solver.getCurrentWeight());
-			std::cout << "----------start the greedy search-------------\n";
-			PmcrGreedySolver_t pmcr_solver(g, start, goal);
-			t.reset();
-			pmcr_solver.greedy_search();
-			time_G += t.elapsed();
-			solution_G += (1 - pmcr_solver.getCurrentWeight());
+				std::cout << "----------start the fixedLabel search-------------\n";
+				FixedLabelSolver_t fixedlabel_solver(g, start, goal);
+				t.reset();
+				fixedlabel_solver.fixedLabel_search();
+				time_F += t.elapsed();
+				solution_F += (1 - fixedlabel_solver.getCurrentWeight());
+				std::cout << "----------start the greedy search-------------\n";
+				PmcrGreedySolver_t pmcr_solver(g, start, goal);
+				t.reset();
+				pmcr_solver.greedy_search();
+				time_G += t.elapsed();
+				solution_G += (1 - pmcr_solver.getCurrentWeight());
+			}
+			// calculate the average time and survivability
+			time_G /= nExperiments;	
+			solution_G /= nExperiments;
+			time_F /= nExperiments;
+			solution_F /= nExperiments;
+			// write your results into the file
+			file_1 << lc << " " << time_G << " " << solution_G << " " 
+					<< time_F << " " << solution_F << "\n";
 		}
-		// calculate the average time and survivability
-		time_G /= nExperiments;	
-		solution_G /= nExperiments;
-		time_F /= nExperiments;
-		solution_F /= nExperiments;
-		// write your results into the file
-		file_ << lc << " " << time_G << " " << solution_G << " " 
-				<< time_F << " " << solution_F << "\n";
+		file_1 << "\n";
+		file_1.close();		
 	}
 	//////////////////////////////////////////////////////////////////////////////////
 
@@ -85,49 +90,54 @@ int main(int argc, char** argv)
 	std::vector<int> gridSize{10, 15, 20, 25};
 
 	// write into a txt file
-	std::ofstream file1_(file_dir2);
+	std::ofstream file_2(file_dir2);
 
-	// experiment on each gridSize
-	for (auto const &gs : gridSize)
+	if (file_2.is_open())
 	{
-		double time_G = 0.0;
-		double solution_G = 0.0;
-		double time_F = 0.0;
-		double solution_F = 0.0;
-		for (int i=0; i < nExperiments; i++)
+		// experiment on each gridSize
+		for (auto const &gs : gridSize)
 		{
-			// generate a graph
-			ConnectedGraph_t g(gs, gs, 5, 0.4);
-			int start = random_generate_integer(0, gs*gs-1);
-			int goal = random_generate_integer(0, gs*gs-1);
-			while (start == goal)
+			double time_G = 0.0;
+			double solution_G = 0.0;
+			double time_F = 0.0;
+			double solution_F = 0.0;
+			for (int i=0; i < nExperiments; i++)
 			{
+				// generate a graph
+				ConnectedGraph_t g(gs, gs, 5, 0.4);
 				int start = random_generate_integer(0, gs*gs-1);
 				int goal = random_generate_integer(0, gs*gs-1);
-			}
-			//g.write_graph();//
+				while (start == goal)
+				{
+					int start = random_generate_integer(0, gs*gs-1);
+					int goal = random_generate_integer(0, gs*gs-1);
+				}
+				//g.write_graph();//
 
-			std::cout << "----------start the fixedLabel search-------------\n";
-			FixedLabelSolver_t fixedlabel_solver(g, start, goal);
-			t.reset();
-			fixedlabel_solver.fixedLabel_search();
-			time_F += t.elapsed();
-			solution_F += (1 - fixedlabel_solver.getCurrentWeight());
-			std::cout << "----------start the greedy search-------------\n";
-			PmcrGreedySolver_t pmcr_solver(g, start, goal);
-			t.reset();
-			pmcr_solver.greedy_search();
-			time_G += t.elapsed();
-			solution_G += (1 - pmcr_solver.getCurrentWeight());
+				std::cout << "----------start the fixedLabel search-------------\n";
+				FixedLabelSolver_t fixedlabel_solver(g, start, goal);
+				t.reset();
+				fixedlabel_solver.fixedLabel_search();
+				time_F += t.elapsed();
+				solution_F += (1 - fixedlabel_solver.getCurrentWeight());
+				std::cout << "----------start the greedy search-------------\n";
+				PmcrGreedySolver_t pmcr_solver(g, start, goal);
+				t.reset();
+				pmcr_solver.greedy_search();
+				time_G += t.elapsed();
+				solution_G += (1 - pmcr_solver.getCurrentWeight());
+			}
+			// calculate the average time and survivability
+			time_G /= nExperiments;	
+			solution_G /= nExperiments;
+			time_F /= nExperiments;
+			solution_F /= nExperiments;
+			// write your results into the file
+			file_2 << gs << " " << time_G << " " << solution_G << " " 
+					<< time_F << " " << solution_F << "\n";		
 		}
-		// calculate the average time and survivability
-		time_G /= nExperiments;	
-		solution_G /= nExperiments;
-		time_F /= nExperiments;
-		solution_F /= nExperiments;
-		// write your results into the file
-		file1_ << gs << " " << time_G << " " << solution_G << " " 
-				<< time_F << " " << solution_F << "\n";		
+		file_2 << "\n";
+		file_2.close();		
 	}
 	//////////////////////////////////////////////////////////////////////////////////
 
@@ -140,50 +150,55 @@ int main(int argc, char** argv)
 	std::vector<int> nLabels{4, 5, 6, 7};
 
 	// write into a txt file
-	std::ofstream file2_(file_dir3);
+	std::ofstream file_3(file_dir3);
 
-	// experiment on each gridSize
-	for (auto const &nl : nLabels)
+	if (file_3.is_open())
 	{
-		double time_G = 0.0;
-		double solution_G = 0.0;
-		double time_F = 0.0;
-		double solution_F = 0.0;
-		for (int i=0; i < nExperiments; i++)
+		// experiment on each gridSize
+		for (auto const &nl : nLabels)
 		{
-			// generate a graph
-			ConnectedGraph_t g(15, 15, nl, 0.4);
-			int start = random_generate_integer(0, 15*15-1);
-			int goal = random_generate_integer(0, 15*15-1);
-			while (start == goal)
+			double time_G = 0.0;
+			double solution_G = 0.0;
+			double time_F = 0.0;
+			double solution_F = 0.0;
+			for (int i=0; i < nExperiments; i++)
 			{
+				// generate a graph
+				ConnectedGraph_t g(15, 15, nl, 0.4);
 				int start = random_generate_integer(0, 15*15-1);
 				int goal = random_generate_integer(0, 15*15-1);
+				while (start == goal)
+				{
+					int start = random_generate_integer(0, 15*15-1);
+					int goal = random_generate_integer(0, 15*15-1);
+				}
+				//g.write_graph();//
+
+
+				std::cout << "----------start the fixedLabel search-------------\n";
+				FixedLabelSolver_t fixedlabel_solver(g, start, goal);
+				t.reset();
+				fixedlabel_solver.fixedLabel_search();
+				time_F += t.elapsed();
+				solution_F += (1 - fixedlabel_solver.getCurrentWeight());
+				std::cout << "----------start the greedy search-------------\n";
+				PmcrGreedySolver_t pmcr_solver(g, start, goal);
+				t.reset();
+				pmcr_solver.greedy_search();
+				time_G += t.elapsed();
+				solution_G += (1 - pmcr_solver.getCurrentWeight());
 			}
-			//g.write_graph();//
-
-
-			std::cout << "----------start the fixedLabel search-------------\n";
-			FixedLabelSolver_t fixedlabel_solver(g, start, goal);
-			t.reset();
-			fixedlabel_solver.fixedLabel_search();
-			time_F += t.elapsed();
-			solution_F += (1 - fixedlabel_solver.getCurrentWeight());
-			std::cout << "----------start the greedy search-------------\n";
-			PmcrGreedySolver_t pmcr_solver(g, start, goal);
-			t.reset();
-			pmcr_solver.greedy_search();
-			time_G += t.elapsed();
-			solution_G += (1 - pmcr_solver.getCurrentWeight());
+			// calculate the average time and survivability
+			time_G /= nExperiments;	
+			solution_G /= nExperiments;
+			time_F /= nExperiments;
+			solution_F /= nExperiments;
+			// write your results into the file
+			file_3 << nl << " " << time_G << " " << solution_G << " " 
+					<< time_F << " " << solution_F << "\n";		
 		}
-		// calculate the average time and survivability
-		time_G /= nExperiments;	
-		solution_G /= nExperiments;
-		time_F /= nExperiments;
-		solution_F /= nExperiments;
-		// write your results into the file
-		file2_ << nl << " " << time_G << " " << solution_G << " " 
-				<< time_F << " " << solution_F << "\n";		
+		file_3 << "\n";
+		file_3.close();		
 	}
 	//////////////////////////////////////////////////////////////////////////////////
 
