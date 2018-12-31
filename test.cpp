@@ -14,92 +14,78 @@
 #include <ctime>
 #include <string> // std::string, std::to_string
 
-// int main()
+int main(int argc, char** argv)
+{
+	int nExperiments = 5;
+	int gridSize = 15;
+	int nLabels = 5;
+	double labelCoverage = 0.7;
+	Timer t;
+	std::srand(std::time(0));
+
+	std::string folder_dir(argv[1]);
+
+	for (int ii = 0; ii < nExperiments; ii++)
+	{
+		std::string file_dir1 = "./" + folder_dir + "/graph" + std::to_string(ii) + ".txt";
+		std::string file_dir2 = "./" + folder_dir + "/FixedLabel_solution" 
+															+ std::to_string(ii) + ".txt";
+		std::string file_dir3 = "./" + folder_dir + "/GreedySearch_solution" 
+																+ std::to_string(ii) + ".txt";
+
+		// generate a grpah
+		ConnectedGraph_t g(gridSize, gridSize, nLabels, labelCoverage);
+		int start = random_generate_integer(0, gridSize*gridSize-1);
+		int goal = random_generate_integer(0, gridSize*gridSize-1);
+		while (start == goal)
+		{
+			int start = random_generate_integer(0, gridSize*gridSize-1);
+			int goal = random_generate_integer(0, gridSize*gridSize-1);
+		}
+		g.write_graph(file_dir1);
+
+		// work out on solutions
+		std::cout << "----------start the fixedLabel search-------------\n";
+		FixedLabelSolver_t fixedlabel_solver(g, start, goal);
+		t.reset();
+		fixedlabel_solver.fixedLabel_search();
+		std::cout << "\nTimer elapsed: " << t.elapsed() << " seconds\n";
+		fixedlabel_solver.write_solution(file_dir2);
+
+		std::cout << "----------start the greedy search-------------\n";
+		PmcrGreedySolver_t pmcr_solver(g, start, goal);
+		t.reset();
+		pmcr_solver.greedy_search();
+		std::cout << "\nTimer elapsed: " << t.elapsed() << " seconds\n";
+		pmcr_solver.write_solution(file_dir3);
+	}
+
+	return 0;
+}
+
+
+
+//////////////////// just generate a graph //////////////////////////
+// int main(int argc, char** argv)
 // {
+// 	std::srand(static_cast<unsigned int>(std::time(nullptr)));
 // 	Timer t;
-// 	std::srand(std::time(0));
-// 	int nExperiments = 5;
-// 	for (int ii = 0; ii < nExperiments; ii++)
+
+// 	std::string folder_dir(argv[1]);
+// 	std::string file_dir1 = "./" + folder_dir + "/graph" + std::to_string(0) + ".txt";
+
+// 	int gridSize = 15;
+// 	int nLabels = 5;
+// 	double labelCoverage = 0.5;
+// 	ConnectedNonOverlapGraph_t g(gridSize, gridSize, nLabels, labelCoverage);
+// 	int start = random_generate_integer(0, gridSize*gridSize-1);
+// 	int goal = random_generate_integer(0, gridSize*gridSize-1);
+// 	while (start == goal)
 // 	{
-// 		// generate a grpah
-// 		LabeledGraph_t g(15,15,5, 0.4);
-// 		int start = random_generate_integer(0, 15*15-1);
-// 		int goal = random_generate_integer(0, 15*15-1);
-// 		while (start == goal)
-// 		{
-// 			int start = random_generate_integer(0, 15*15-1);
-// 			int goal = random_generate_integer(0, 15*15-1);
-// 		}
-// 		g.write_graph(ii);
-
-// 		// work out on solutions
-// 		t.reset();
-// 		std::cout << "----------start the fixedLabel search-------------\n";
-// 		FixedLabelSolver_t fixedlabel_solver(g, start, goal);
-// 		fixedlabel_solver.fixedLabel_search();
-// 		std::cout << "\nTimer elapsed: " << t.elapsed() << " seconds\n";
-// 		fixedlabel_solver.write_solution(ii);
-
-// 		t.reset();
-// 		std::cout << "----------start the greedy search-------------\n";
-// 		PmcrGreedySolver_t pmcr_solver(g, start, goal);
-// 		pmcr_solver.greedy_search();
-// 		std::cout << "\nTimer elapsed: " << t.elapsed() << " seconds\n";
-// 		pmcr_solver.write_solution(ii);
+// 		int start = random_generate_integer(0, gridSize*gridSize-1);
+// 		int goal = random_generate_integer(0, gridSize*gridSize-1);
 // 	}
+// 	g.write_graph(file_dir1);
 
 // 	return 0;
 // }
-
-/*
-int main()
-{
-	std::srand(static_cast<unsigned int>(std::time(nullptr)));
-	Timer t;
-
-	LabeledGraph_t g(25, 25, 5, 0.5);
-	int start = random_generate_integer(0, 15*15-1);
-	int goal = random_generate_integer(0, 15*15-1);
-	while (start == goal)
-	{
-		int start = random_generate_integer(0, 15*15-1);
-		int goal = random_generate_integer(0, 15*15-1);
-	}
-	g.write_graph(0);
-
-	// std::cout << "----------start the fixedLabel search-------------\n";
-	// FixedLabelSolver_t fixedlabel_solver(g, start, goal);
-	// t.reset();
-	// fixedlabel_solver.fixedLabel_search(0);
-	// std::cout << "\nTimer elapsed: " << t.elapsed() << " seconds\n";
-
-	// std::cout << "----------start the greedy search-------------\n";
-	// PmcrGreedySolver_t pmcr_solver(g, start, goal);
-	// t.reset();
-	// pmcr_solver.greedy_search();
-	// std::cout << "\nTimer elapsed: " << t.elapsed() << " seconds\n";
-	// pmcr_solver.write_solution(0);
-
-	return 0;
-
-}
-*/
-
-int main()
-{
-	std::srand(static_cast<unsigned int>(std::time(nullptr)));
-	Timer t;
-
-	int gridSize = 10;
-	int nLabels = 5;
-	double labelCoverage = 0.5;
-	ConnectedNonOverlapGraph_t g(gridSize, gridSize, nLabels, labelCoverage);
-	int start = random_generate_integer(0, gridSize*gridSize-1);
-	int goal = random_generate_integer(0, gridSize*gridSize-1);
-	while (start == goal)
-	{
-		int start = random_generate_integer(0, gridSize*gridSize-1);
-		int goal = random_generate_integer(0, gridSize*gridSize-1);
-	}
-	g.write_graph(0);
-}

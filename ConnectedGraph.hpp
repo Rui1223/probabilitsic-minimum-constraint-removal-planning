@@ -12,6 +12,7 @@ given to that label*/
 //#include <cassert>
 #include <functional>
 #include <set>
+#include <cstring>
 
 
 
@@ -84,7 +85,7 @@ public:
 	void print_labelMap();
 
 	// function to write the graph into a txt file
-	void write_graph(int n);
+	void write_graph(std::string file_dir);
 
 	// function to perform a BF-like expansion for a label
 	void BFSearch(int BF_start, int l);

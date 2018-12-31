@@ -13,7 +13,7 @@
 #include "LabeledGraph.hpp"
 
 
-HeuristicSearchSolver_t::HeuristicSearchSolver_t(LabeledGraph_t &g, int start, 
+HeuristicSearchSolver_t::HeuristicSearchSolver_t(ConnectedGraph_t &g, int start, 
 	int goal, std::vector<int> &l, 
 	double w) : m_lgraph(g), m_start(start), m_goal(goal), m_currentLabels(l), m_currentWeight(w)
 {
@@ -113,35 +113,6 @@ void HeuristicSearchSolver_t::print_path()
 	std::cout << m_path << "\n";
 }
 
-void HeuristicSearchSolver_t::write_solution(int n_time)
-{
-	int n = n_time;
-	std::ofstream file_("./graph_2/FixedLabel_solution" + std::to_string(n) + ".txt");
-	if (file_.is_open())
-	{
-		file_ << m_start << " " << m_goal << "\n";
-		for (auto const &waypoint : m_path)
-		{
-			file_ << waypoint << " ";
-		}
-		file_ << "\n";
-		// write the label and weight for the solution
-		file_ << m_currentWeight << "\n";
-		
-		if (!m_currentLabels.empty())
-		{
-			int pp = 0;
-			while (pp < m_currentLabels.size()-1)
-			{
-				file_ << m_currentLabels[pp] << ",";
-				pp++;
-			}
-			file_ << m_currentLabels[pp];
-		}
-		file_ << "\n";
-		file_.close();
-	}
-}
 
 HeuristicSearchSolver_t::~HeuristicSearchSolver_t()
 {

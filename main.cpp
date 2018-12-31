@@ -2,17 +2,10 @@
 #include <iostream>
 
 
-int main()
+int main(int argc, char** argv)
 {
-	std::set<std::pair<int, int>> set;
-	set.insert(std::pair<int, int>(10,15));
-	set.insert(std::pair<int, int>(20,17));
-
-	for (auto const &pair : set)
-	{
-		std::cout << pair.first << "\t" << pair.second << "\n";
-	}
-
+	char* a = argv[1];
+	std::cout << a << "\n";
 
 	return 0;
 }

@@ -3,14 +3,19 @@
 
 from __future__ import division
 import IPython
+import sys
 import matplotlib.pyplot as plt
 plt.switch_backend('TKagg')
 
 if __name__ == '__main__':
 	
+	file_dir1 = "./" + sys.argv[1] + "/labelCoverage_performance.txt";
+	file_dir2 = "./" + sys.argv[1] + "/gridSize_performance.txt";
+	file_dir3 = "./" + sys.argv[1] + "/nLabels_performance.txt";
+
 	## write in my first file
 	############################################################################
-	f = open("./statistics_2/labelCoverage_performance.txt")
+	f = open(file_dir1)
 	labelCoverage = []
 	time_G = []
 	solution_G = []
@@ -30,20 +35,24 @@ if __name__ == '__main__':
 	plt.plot(labelCoverage, time_F, 'g^', label='FixedLabel Search')
 	plt.legend(loc='upper left')
 	plt.xlabel("labelCoverage(%)")
+	plt.xlim((0, 90))
 	plt.ylabel("Computation time(s)")
+	plt.ylim((0, 70))
 
 	plt.figure(2)
 	plt.plot(labelCoverage, solution_G, 'bs', label='Greedy Search') 
 	plt.plot(labelCoverage, solution_F, 'g^', label='FixedLabel Search')
 	plt.legend(loc='upper left')
-	plt.xlabel("labelCoverage(0-1)")
-	plt.ylabel("survivability")
+	plt.xlabel("labelCoverage(%)")
+	plt.xlim((0, 90))
+	plt.ylabel("survivability(0-1)")
+	plt.ylim((0, 1.2))
 	##############################################################################	
 
 
 	## write in my second file
 	##############################################################################
-	f = open("./statistics_2/gridSize_performance.txt")
+	f = open(file_dir2)
 	gridSize = []
 	time_G = []
 	solution_G = []
@@ -63,19 +72,23 @@ if __name__ == '__main__':
 	plt.plot(gridSize, time_F, 'g^', label='FixedLabel Search')
 	plt.legend(loc='upper left')
 	plt.xlabel("gridSize(n)")
+	plt.xlim((0, 30))
 	plt.ylabel("Computation time(s)")
+	plt.ylim((0, 70))
 
 	plt.figure(4)
 	plt.plot(gridSize, solution_G, 'bs', label='Greedy Search') 
 	plt.plot(gridSize, solution_F, 'g^', label='FixedLabel Search')
 	plt.legend(loc='upper left')
 	plt.xlabel("gridSize(n)")
-	plt.ylabel("survivability")	
+	plt.xlim((0, 30))
+	plt.ylabel("survivability(0-1)")
+	plt.ylim((0, 1.2))	
 	#############################################################################
 
 	## write in my third file
 	#############################################################################
-	f = open("./statistics_2/nLabels_performance.txt")
+	f = open(file_dir3)
 	nLabels = []
 	time_G = []
 	solution_G = []
@@ -95,14 +108,17 @@ if __name__ == '__main__':
 	plt.plot(nLabels, time_F, 'g^', label='FixedLabel Search')
 	plt.legend(loc='upper left')
 	plt.xlabel("nLabels")
+	plt.xlim((2, 12))
 	plt.ylabel("Computation time(s)")
-
+	plt.ylim((0, 70))
 	plt.figure(6)
 	plt.plot(nLabels, solution_G, 'bs', label='Greedy Search') 
 	plt.plot(nLabels, solution_F, 'g^', label='FixedLabel Search')
 	plt.legend(loc='upper left')
 	plt.xlabel("nLabels")
-	plt.ylabel("survivability")
+	plt.xlim((2, 12))
+	plt.ylabel("survivability(0-1)")
+	plt.ylim((0, 1.2))
 	###########################################################################	
 
 

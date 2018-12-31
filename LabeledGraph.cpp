@@ -203,14 +203,14 @@ void LabeledGraph_t::load_graph()
 // }
 
 
-void LabeledGraph_t::write_graph(int n)
+void LabeledGraph_t::write_graph(std::string file_dir)
 {
 	// This function write the constructed graph into a text file so as to be loaded by a python
 	// script so as to visualize using matplotlib
 
 	// to write in a text file (ostream)
 	// we need to loop through the neighbor list, and then access to corresponding labels
-	std::ofstream file_("./graph_2/graph" + std::to_string(n) + ".txt");
+	std::ofstream file_(file_dir);
 	if (file_.is_open())
 	{
 		// Write in the 1st line the size of the grid graph

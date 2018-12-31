@@ -18,6 +18,7 @@
 //#include <cassert>
 #include <functional>
 #include <set>
+#include <cstring> // for std::string & std::to_string
 
 
 
@@ -85,7 +86,7 @@ public:
 	void print_labelMap();
 
 	// function to write the graph into a txt file
-	void write_graph(int n);
+	void write_graph(std::string file_dir);
 
 	// lots of getters
 	int getnCol() { return m_col; }
