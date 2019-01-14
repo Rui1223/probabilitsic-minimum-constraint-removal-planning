@@ -44,6 +44,7 @@ int main(int argc, char** argv)
 			double solution_F = 0.0;
 			for (int i=0; i < nExperiments; i++)
 			{
+				std::cout << "***************" << lc << ":" << i << "**************\n";
 				// generate a graph
 				ConnectedGraph_t g(15, 15, 5, lc/100.0);
 				int start = random_generate_integer(0, 15*15-1);
@@ -103,6 +104,7 @@ int main(int argc, char** argv)
 			double solution_F = 0.0;
 			for (int i=0; i < nExperiments; i++)
 			{
+				std::cout << "***************" << gs << ":" << i << "**************\n";
 				// generate a graph
 				ConnectedGraph_t g(gs, gs, 5, 0.4);
 				int start = random_generate_integer(0, gs*gs-1);
@@ -163,6 +165,7 @@ int main(int argc, char** argv)
 			double solution_F = 0.0;
 			for (int i=0; i < nExperiments; i++)
 			{
+				std::cout << "***************" << nl << ":" << i << "**************\n";
 				// generate a graph
 				ConnectedGraph_t g(15, 15, nl, 0.4);
 				int start = random_generate_integer(0, 15*15-1);
