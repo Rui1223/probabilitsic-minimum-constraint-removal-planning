@@ -42,14 +42,14 @@ class ConnectedGraph_t
 	std::vector<std::vector<int>> m_labelCombinations;
 	std::set<std::pair<std::vector<int>, double>, Comparator> m_labelMap;
 
-	// the percent of edges that are expected to have at least a label
-	double m_percentLabelEdge;
 	// the probability that a label is assigned to an edge
-	double m_prob;
+	double m_probPerLabel;
+	// the density which meansures how densely the graph is labeled
+	double m_labelCoverage;
 public:
 	// Constructor
 	ConnectedGraph_t() {}
-	ConnectedGraph_t(int row, int col, int n_labels, double percentLabelEdge);
+	ConnectedGraph_t(int row, int col, int n_labels, double m_probPerLabel);
 
 	// function to load a graph (manually generate a graph)
 	void load_graph();

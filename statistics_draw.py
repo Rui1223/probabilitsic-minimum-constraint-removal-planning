@@ -21,7 +21,12 @@ if __name__ == '__main__':
 	solution_G = []
 	time_F = []
 	solution_F = []
+
+	_counter = 0;
+
 	for line in f:
+		_counter +=1
+		print "****" + str(_counter) + "****"
 		line = line.split()
 		labelCoverage.append(line[0])
 		time_G.append(line[1])
