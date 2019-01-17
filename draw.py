@@ -23,10 +23,11 @@ if __name__ == "__main__":
 		line = line.split()
 		n_line +=1
 
-		## The first line specifies the rows and cols of the graph
+		## The first line specifies the size & density of the graph
 		if (n_line == 1):
 			row = int(line[0])
 			col = int(line[1])
+			density = float(line[2])
 			# canvas setting
 			fig = plt.figure(num=None, figsize=(row+3, col+3), dpi=120, 
 											facecolor='w', edgecolor='k')
@@ -40,7 +41,7 @@ if __name__ == "__main__":
 			label_weights = line ## it's a list
 
 		else:
-			## The lines starting from the fifth line are the lines storing edges and labels
+			## The lines starting from the third line are the lines storing edges and labels
 			if (n_line >= 3):
 				v1 = line[0];
 				v2 = line[1];
@@ -65,6 +66,10 @@ if __name__ == "__main__":
 	for ii in xrange(len(label_weights)):
 		ax.text(col+3-3, row+3-0.5-0.4*ii, label_weights[ii], fontsize=10)
 
+	# plot density of graph
+	ax.text(col+3-3, row+3-0.5-0.4*len(label_weights), "density:", fontsize=10)
+	ax.text(col+3-3, row+3-0.5-0.4*(len(label_weights)+1), density, fontsize=10)
+
 	
 	# ##Now plot the solution for FixedLabel Algorithm
 	# ##################################################################
@@ -77,6 +82,7 @@ if __name__ == "__main__":
 		if (n_line == 1):
 			start = int(line[0])
 			goal = int(line[1])
+			solution_time = line[2]
 		elif (n_line == 2):
 			path = map(int, line)
 		elif (n_line == 3):
@@ -104,9 +110,11 @@ if __name__ == "__main__":
 		counter += 1
 	ax.plot(cal_co(v2,col,row)[0], cal_co(v2,col,row)[1], "ro")
 
-	# plot solution labels and weights
+	# plot solution labels & weights & time
+	ax.text(col+3-3, -2+0.5, "F time:"+solution_time, color="r", fontsize=10)
 	ax.text(col+3-3, -2+1, "F weight:"+solution_weight, color="r", fontsize=10)
 	ax.text(col+3-3, -2+1.5, "F labels:"+solution_labels, color="r", fontsize=10)
+
 
 
 	# ##Now plot the solution for Greedy Algorithm
@@ -119,6 +127,7 @@ if __name__ == "__main__":
 		if (n_line == 1):
 			start = int(line[0])
 			goal = int(line[1])
+			solution_time = line[2]
 		elif (n_line == 2):
 			path = map(int, line)
 		elif (n_line == 3):
@@ -141,8 +150,9 @@ if __name__ == "__main__":
 	ax.plot(cal_co(v2,col,row)[0], cal_co(v2,col,row)[1], "co")
 
 	# plot solution labels and weights
-	ax.text(col+3-3, -2+2.0, "G weight:"+solution_weight, color="c", fontsize=10)
-	ax.text(col+3-3, -2+2.5, "G labels:"+solution_labels, color="c", fontsize=10)
+	ax.text(col+3-3, -2+2.0, "G time:"+solution_time, color="c", fontsize=10)
+	ax.text(col+3-3, -2+2.5, "G weight:"+solution_weight, color="c", fontsize=10)
+	ax.text(col+3-3, -2+3.0, "G labels:"+solution_labels, color="c", fontsize=10)
 
 	
 	plt.show()

@@ -12,7 +12,6 @@
 #include <fstream>
 #include <string> // std::string, std::to_string
 
-#include "HeuristicSearchSolver.hpp"
 #include "FixedLabelSolver.hpp"
 #include "LabeledGraph.hpp"
 
@@ -39,8 +38,8 @@ void FixedLabelSolver_t::fixedLabel_search()
 	{
 		m_currentLabels = pair.first;
 		m_currentWeight = pair.second;
-		std::cout << "current set of labels: " << m_currentLabels << "\n";
-		std::cout << "currrent weight: " << m_currentWeight << "\n"; 
+		//std::cout << "current set of labels: " << m_currentLabels << "\n";
+		//std::cout << "currrent weight: " << m_currentWeight << "\n"; 
 		std::cout << "start the " << k << "th search\n";
 		bool goalFound = HeuristicSearch();
 		//print_closedList();
@@ -59,7 +58,7 @@ bool FixedLabelSolver_t::HeuristicSearch()
 	// HeuristicSearch() performs a greedy Best-First search based on HeuristicSearchSolver 
 	// with a label checking condition, which decides whether a newly propogated node 
 	// should be added into the priority queue
-	HeuristicSearchSolver_t heuristic_search_solver(m_lgraph, m_start, m_goal, 
+	HeuristicSearchSolver_t heuristic_search_solver(m_lgraph, m_start, m_goal,
 													m_currentLabels, m_currentWeight);
 	bool goalFound = heuristic_search_solver.Heuristic_search();
 	if (goalFound)
@@ -69,12 +68,12 @@ bool FixedLabelSolver_t::HeuristicSearch()
 	return goalFound;
 }
 
-void FixedLabelSolver_t::write_solution(std::string file_dir)
+void FixedLabelSolver_t::write_solution(std::string file_dir, double t)
 {
 	std::ofstream file_(file_dir);
 	if (file_.is_open())
 	{
-		file_ << m_start << " " << m_goal << "\n";
+		file_ << m_start << " " << m_goal << " " << t << "\n";
 		for (auto const &waypoint : m_path)
 		{
 			file_ << waypoint << " ";

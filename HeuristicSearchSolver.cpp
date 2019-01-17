@@ -33,6 +33,8 @@ bool HeuristicSearchSolver_t::Heuristic_search()
 		if (current->m_id == m_goal)
 		{
 			std::cout << "Goal is connected all the way to the start\n";
+			std::cout << "current labels: " << m_currentLabels << "\n";
+			std::cout << "current weight: " << m_currentWeight << "\n";
 			back_track_path(); // construct your path
 			print_path();
 			return true;
@@ -56,8 +58,8 @@ bool HeuristicSearchSolver_t::Heuristic_search()
 		}
 	}
 	// You are reaching here because the open list is empty and goal is not found
-	std::cout << "Coundn't found the goal at the current subgraph\n";
-	std::cout << "-----------------------------------------------\n";
+	//std::cout << "Coundn't found the goal at the current subgraph\n";
+	//std::cout << "-----------------------------------------------\n";
 	return false;	
 }
 

@@ -28,28 +28,31 @@ class ConnectedGraph_t
 	int m_col;
 	int m_nNodes;
 	int m_nEdges;
+
+	// specify the weights for labels
+	int m_nlabels;
+	std::vector<int> m_labels;
+	std::vector<double> m_labelWeights;
+
 	// specify neighbors (edge) and labels of the edge 
 	std::vector<std::vector<int>> m_nodeNeighbors;
 	std::vector<std::vector<std::vector<int>>> m_edgeLabels;
+	// the probability that a label is assigned to an edge
+	double m_probPerLabel;
+	// the density which meansures how densely the graph is labeled
+	double m_labelCoverage;
 	int m_nExpansion;
-	
-	// specify the weights for labels
-	int m_nlabels;
-	std::vector<double> m_labelWeights;
-	std::vector<int> m_labels;
+	std::vector<std::vector<bool>> m_marked;
+	int m_nmarked;
 
 	// all label combinations
 	std::vector<std::vector<int>> m_labelCombinations;
 	std::set<std::pair<std::vector<int>, double>, Comparator> m_labelMap;
 
-	// the probability that a label is assigned to an edge
-	double m_probPerLabel;
-	// the density which meansures how densely the graph is labeled
-	double m_labelCoverage;
 public:
 	// Constructor
 	ConnectedGraph_t() {}
-	ConnectedGraph_t(int row, int col, int n_labels, double m_probPerLabel);
+	ConnectedGraph_t(int row, int col, int nlabels, double probPerLabel);
 
 	// function to load a graph (manually generate a graph)
 	void load_graph();

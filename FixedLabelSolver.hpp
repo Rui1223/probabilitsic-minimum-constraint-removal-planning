@@ -10,6 +10,7 @@
 #include "LabeledGraph.hpp"
 #include "ConnectedGraph.hpp"
 #include "ConnectedNonOverlapGraph.hpp"
+#include "HeuristicSearchSolver.hpp"
 
 
 class FixedLabelSolver_t
@@ -36,7 +37,7 @@ public:
 	bool HeuristicSearch();
 
 	// The function to write in the solution
-	void write_solution(std::string file_dir);
+	void write_solution(std::string file_dir, double t);
 
 	// getters
 	std::vector<int> getCurrentLabels() { return m_currentLabels; }

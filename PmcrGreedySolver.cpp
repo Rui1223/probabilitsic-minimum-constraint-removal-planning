@@ -161,13 +161,13 @@ void PmcrGreedySolver_t::print_closedList()
 
 }
 
-void PmcrGreedySolver_t::write_solution(std::string file_dir)
+void PmcrGreedySolver_t::write_solution(std::string file_dir, double t)
 {
 
 	std::ofstream file_(file_dir);
 	if (file_.is_open())
 	{
-		file_ << m_start << " " << m_goal << "\n";
+		file_ << m_start << " " << m_goal << " " << t << "\n";
 		for (auto const &waypoint : m_path)
 		{
 			file_ << waypoint << " ";

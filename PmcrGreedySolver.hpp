@@ -34,8 +34,6 @@ class PmcrGreedySolver_t
 
 	std::priority_queue<PmcrNode_t*, std::vector<PmcrNode_t*>, PmcrNode_comparison> m_open;
 	std::vector<PmcrNode_t*> m_closed;
-	std::vector<PmcrNode_t*> m_virtualOpen;
-
 
 public:
 	PmcrGreedySolver_t(ConnectedGraph_t &g, int start, int goal);
@@ -48,7 +46,7 @@ public:
 	//bool search_openList(int neighborID, double weights, bool isPrune);
 	//void push_virtualOpen();
 	void print_path();
-	void write_solution(std::string file_dir);
+	void write_solution(std::string file_dir, double t);
 	void print_closedList();
 
 	//getters

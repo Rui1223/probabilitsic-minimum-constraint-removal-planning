@@ -16,12 +16,13 @@
 
 int main(int argc, char** argv)
 {
-	int nExperiments = 5;
-	int gridSize = 15;
-	int nLabels = 5;
-	double labelCoverage = 0.7;
+	int nExperiments = 1;
+	int gridSize = 25;
+	int nLabels = 8;
+	double probPerLabel = 0.2;
 	Timer t;
 	std::srand(std::time(0));
+	double t1;
 
 	std::string folder_dir(argv[1]);
 
@@ -34,13 +35,13 @@ int main(int argc, char** argv)
 																+ std::to_string(ii) + ".txt";
 
 		// generate a grpah
-		ConnectedGraph_t g(gridSize, gridSize, nLabels, labelCoverage);
+		ConnectedGraph_t g(gridSize, gridSize, nLabels, probPerLabel);
 		int start = random_generate_integer(0, gridSize*gridSize-1);
 		int goal = random_generate_integer(0, gridSize*gridSize-1);
 		while (start == goal)
 		{
-			int start = random_generate_integer(0, gridSize*gridSize-1);
-			int goal = random_generate_integer(0, gridSize*gridSize-1);
+			start = random_generate_integer(0, gridSize*gridSize-1);
+			goal = random_generate_integer(0, gridSize*gridSize-1);
 		}
 		g.write_graph(file_dir1);
 
@@ -49,15 +50,17 @@ int main(int argc, char** argv)
 		FixedLabelSolver_t fixedlabel_solver(g, start, goal);
 		t.reset();
 		fixedlabel_solver.fixedLabel_search();
-		std::cout << "\nTimer elapsed: " << t.elapsed() << " seconds\n";
-		fixedlabel_solver.write_solution(file_dir2);
+		t1 = t.elapsed();
+		std::cout << "\nFixedLabel time: " << t1 << " seconds\n";
+		fixedlabel_solver.write_solution(file_dir2, t1);
 
 		std::cout << "----------start the greedy search-------------\n";
 		PmcrGreedySolver_t pmcr_solver(g, start, goal);
 		t.reset();
 		pmcr_solver.greedy_search();
-		std::cout << "\nTimer elapsed: " << t.elapsed() << " seconds\n";
-		pmcr_solver.write_solution(file_dir3);
+		t1 = t.elapsed();
+		std::cout << "\nGreedy time: " << t.elapsed() << " seconds\n";
+		pmcr_solver.write_solution(file_dir3, t1);
 	}
 
 	return 0;

@@ -13,9 +13,10 @@ in our problem formulation*/
 #include <map> // std::map
 #include <functional>
 #include <set>
-#include <cstdlib>
+#include <cstdlib> // for std::srand()
 #include <string> // std::string, std::to_string
 #include <queue>
+#include <random>
 
 #include "ConnectedGraph.hpp"
 
@@ -26,8 +27,9 @@ Comparator compFunctor =
 			return elem1.second <= elem2.second; // compare weights, prefer less weight  
 		};
 
-ConnectedGraph_t::ConnectedGraph_t(int row, int col, int n_labels, double percentLabelEdge)
+ConnectedGraph_t::ConnectedGraph_t(int row, int col, int nlabels, double probPerLabel)
 {
+	printf("--------------------------------------------------\n");
 	// specify the size of the graph
 	assert(row > 0);
 	assert(col > 0);
@@ -36,16 +38,17 @@ ConnectedGraph_t::ConnectedGraph_t(int row, int col, int n_labels, double percen
 	m_nNodes = m_row * m_col;
 	m_nEdges = (m_col-1)*m_row + (m_row-1)*m_col;
 	
-	m_nlabels = n_labels;
-	m_percentLabelEdge = percentLabelEdge;
-	// The probability of a label to be assigned to an edge is determined by the number of labels
-	// and the percent of labeled edge we expect in the graph
-	m_prob = 1 - exp(1.0/m_nlabels*log(1-m_percentLabelEdge));
-	std::cout << "m_percentLabelEdge: " << m_percentLabelEdge << std::endl;
-	std::cout << "m_prob: " << m_prob << std::endl;
-	m_nExpansion = int(m_nEdges * m_prob);
-	std::cout << "n_expansion: " << m_nExpansion << "\n";
+	// label information
+	m_nlabels = nlabels;
+	m_probPerLabel = probPerLabel;
 
+	std::cout << "probPerLabel: " << m_probPerLabel << std::endl;
+	// based on the probability that a label is assigned to an edge, compute how many expansions 
+	// per label are needed 
+	m_nExpansion = round(m_nEdges * (1 - pow(1 - m_probPerLabel, m_nlabels))) / m_nlabels;
+	std::cout << "n_expansion: " << m_nExpansion << "\n";
+	std::cout << "Expected density: " << double(m_nExpansion * m_nlabels) / m_nEdges << "\n";
+	m_nmarked = 0;
 	// specify the number of labels and their corresponding weights
 	// Based on weighted labels, build the labelMap which maps a set of labels to weights
 	load_labels();
@@ -55,15 +58,13 @@ ConnectedGraph_t::ConnectedGraph_t(int row, int col, int n_labels, double percen
 	// construct the graph 
 	load_graph();
 
-	// print the basic information of the graph
-	//print_labelMap();
-	//print_graph();
-	printf("-------------------------------\n");
+	printf("--------------------------------------------------\n");
+	print_labelMap();
 }
 
 void ConnectedGraph_t::load_graph()
 {
-	printf("Build the graph now\n");
+	//printf("Build the graph now\n");
 	// This is the function to construct a random weighted labeled graph with 2 procedures
 	// 1. specify edges (achieved by specifying neighbors)
 	// 2. specify labels
@@ -77,6 +78,7 @@ void ConnectedGraph_t::load_graph()
 		m_nodeNeighbors.push_back(std::vector<int>());
 		m_edgeLabels.push_back(std::vector<std::vector<int>>(m_nNodes,
 			 std::vector<int>()));
+		m_marked.push_back(std::vector<bool>(m_nNodes, false));
 		iter++;
 	}
 
@@ -122,7 +124,8 @@ void ConnectedGraph_t::load_graph()
 	}
 
 	label_graph();
-	printf("Finish building the graph\n");
+	std::cout << "Acutal density: " << double(m_nmarked) / m_nEdges << "\n";
+	//printf("Finish building the graph\n");
 
 }
 
@@ -133,7 +136,7 @@ void ConnectedGraph_t::label_graph()
 	{
 		// random pick up a node to expand (in a BFS search)
 		int BF_start = random_generate_integer(0, m_nNodes-1);
-		std::cout << "start per label: " << BF_start << "\n"; 
+		//std::cout << "start per label: " << BF_start << "\n"; 
 		BFSearch(BF_start, l);
 	}
 }
@@ -163,6 +166,12 @@ void ConnectedGraph_t::BFSearch(int BF_start, int l)
 			// and push the neighbor to the open list
 			m_edgeLabels[current][neighbor].push_back(l);
 			m_edgeLabels[neighbor][current].push_back(l);
+			if (m_marked[current][neighbor] == false) 
+			{
+				m_marked[current][neighbor] = true;
+				m_marked[neighbor][current] = true;
+				m_nmarked++;
+			}
 			q.push(neighbor);
 			// count for each label process
 			counter++;
@@ -184,8 +193,8 @@ void ConnectedGraph_t::write_graph(std::string file_dir)
 	std::ofstream file_(file_dir);
 	if (file_.is_open())
 	{
-		// Write in the 1st line the size of the grid graph
-		file_ << m_row << " " << m_col << "\n";
+		// Write in the 1st line the size and the density of the grid graph
+		file_ << m_row << " " << m_col << " " << double(m_nmarked) / m_nEdges <<"\n";
 		// Write in the 2nd line label information
 		for (int tt=0; tt < m_nlabels; tt++)
 		{
@@ -232,19 +241,21 @@ void ConnectedGraph_t::load_labels()
 
 void ConnectedGraph_t::load_weights()
 {
+	std::random_device rd{};
+	std::mt19937 gen{rd()};
 	double r = 0.0;
-	int temp;
+
+	std::normal_distribution<> d{5.0,5.0};
 
 	for (int kk = 0; kk < m_nlabels; kk++)
 	{
-		temp = random_generate_integer(1, 30);
+		double temp = d(gen);
+		while (temp <= 0) { temp = d(gen); }
 		m_labelWeights.push_back(temp);
-		r += double(temp);
+		r += temp;
 	}
-	
-	// now randomize them so that the sum of weights are equal to 1 (can be smaller than one)
+	// normalize
 	m_labelWeights /= r;
-
 }
 
 void ConnectedGraph_t::print_graph() 

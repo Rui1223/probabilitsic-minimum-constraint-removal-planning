@@ -58,7 +58,12 @@ public:
 
 	// getters
 	double getCurrentWeight() { return m_currentWeight; }
+	std::vector<int> getCurrentLabels() { return m_currentLabels; }
 	std::vector<int> getPath() { return m_path; }
+
+	// setters
+	// void setCurrentLabels(std::vector<int> labels) { m_currentLabels = labels; }
+	// void setCurrentWeight(double currentWeight) { m_currentWeight = currentWeight; }
 
 	// destructor used to free space before exit
 	~HeuristicSearchSolver_t();	
