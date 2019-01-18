@@ -2,9 +2,7 @@
 #ifndef HEURISTICSEARCHSOLVER_H
 #define HEURISTICSEARCHSOLVER_H
 
-#include "LabeledGraph.hpp"
 #include "ConnectedGraph.hpp"
-#include "ConnectedNonOverlapGraph.hpp"
 
 struct HeuristicNode_t
 {

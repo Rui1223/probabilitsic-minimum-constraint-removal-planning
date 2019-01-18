@@ -18,8 +18,8 @@ int main(int argc, char** argv)
 {
 	int nExperiments = 1;
 	int gridSize = 25;
-	int nLabels = 6;
-	double probPerLabel = 0.2;
+	int nLabels = 4;
+	double probPerLabel = 0.3;
 	Timer t;
 	std::srand(std::time(0));
 	double t1;

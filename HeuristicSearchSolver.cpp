@@ -10,7 +10,7 @@
 #include <string> // std::string, std::to_string
 
 #include "HeuristicSearchSolver.hpp"
-#include "LabeledGraph.hpp"
+#include "ConnectedGraph.hpp"
 
 
 HeuristicSearchSolver_t::HeuristicSearchSolver_t(ConnectedGraph_t &g, int start, 
@@ -69,7 +69,7 @@ int HeuristicSearchSolver_t::computeH(int indx)
 	int indx_row = indx / col;
 	int indx_col = indx % col;
 	int goal_row = m_goal / col;
-	int goal_col = m_goal / col;
+	int goal_col = m_goal % col;
 	// manhattan distance as heuristic
 	return abs(indx_row - goal_row) + abs(indx_col - goal_col);
 }

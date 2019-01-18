@@ -7,11 +7,11 @@
 
 #include <cstring>
 
-#include "LabeledGraph.hpp"
 #include "ConnectedGraph.hpp"
-#include "ConnectedNonOverlapGraph.hpp"
-#include "HeuristicSearchSolver.hpp"
 
+// Declaring the type of Predicate that accept two pairs and return a bool
+typedef std::function<bool(std::pair<std::vector<int>, double>, 
+	std::pair<std::vector<int>, double>)> Comparator1;
 
 class FixedLabelSolver_t
 {
@@ -29,6 +29,9 @@ public:
 
 	~FixedLabelSolver_t() {}
 
+	std::vector<int> cal_sgLabel(int start, int goal);
+	std::set<std::pair<std::vector<int>, double>, Comparator1> cal_subLabelMap(std::vector<int>);
+
 	// The function to search for a path in a fixed label scenario
 	void fixedLabel_search();
 
@@ -44,5 +47,9 @@ public:
 	double getCurrentWeight() { return m_currentWeight; }
 
 };
+
+std::vector<int> label_intersection(std::vector<int>, std::vector<int>);
+std::vector<int> label_union(std::vector<int>, std::vector<int>);
+bool check_subset(std::vector<int> set, std::vector<int> subset);
 
 #endif

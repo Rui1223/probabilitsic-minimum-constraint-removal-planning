@@ -6,16 +6,19 @@
 #include <queue>
 #include <cstring>
 
-#include "LabeledGraph.hpp"
 #include "ConnectedGraph.hpp"
-#include "ConnectedNonOverlapGraph.hpp"
 #include "PmcrNode.hpp"
 
 struct PmcrNode_comparison
 {
 	bool operator()(const PmcrNode_t* a, const PmcrNode_t* b) 
 	{
-		return (a->getWeights()) > (b->getWeights());
+		if (a->getWeight() == b->getWeight())
+		{
+			return (a->getH()) > (b->getH());
+		}
+		else
+			return (a->getWeight()) > (b->getWeight());
 	}
 };
 
@@ -41,6 +44,8 @@ public:
 	void greedy_search();
 	void back_track_path();
 	std::vector<int> label_union(std::vector<int> s1, std::vector<int> s2);
+	// The functopm tp compute the heuristic value of a node of a given index
+	int computeH(int indx);
 	//bool check_prune(int neighborID, double weights);
 	//bool search_closedList(int neighborID, double weights, bool isPrune);
 	//bool search_openList(int neighborID, double weights, bool isPrune);

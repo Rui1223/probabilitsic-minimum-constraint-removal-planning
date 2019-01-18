@@ -20,7 +20,6 @@ in our problem formulation*/
 
 #include "ConnectedGraph.hpp"
 
-
 Comparator compFunctor = 
 		[](std::pair<std::vector<int>, double> elem1, std::pair<std::vector<int>, double> elem2)
 		{
@@ -59,7 +58,7 @@ ConnectedGraph_t::ConnectedGraph_t(int row, int col, int nlabels, double probPer
 	load_graph();
 
 	printf("--------------------------------------------------\n");
-	print_labelMap();
+	//print_labelMap();
 }
 
 void ConnectedGraph_t::load_graph()

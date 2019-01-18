@@ -14,12 +14,9 @@ given to that label*/
 #include <set>
 #include <cstring>
 
-
-
 // Declaring the type of Predicate that accept two pairs and return a bool
 typedef std::function<bool(std::pair<std::vector<int>, double>, 
 	std::pair<std::vector<int>, double>)> Comparator;
-
 
 class ConnectedGraph_t
 {

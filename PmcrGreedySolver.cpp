@@ -8,7 +8,7 @@
 #include <string> // std::string, std::to_string
 
 #include "PmcrNode.hpp"
-#include "LabeledGraph.hpp"
+#include "ConnectedGraph.hpp"
 #include "PmcrGreedySolver.hpp"
 
 PmcrGreedySolver_t::PmcrGreedySolver_t(ConnectedGraph_t &g, int start, int goal)
@@ -18,7 +18,7 @@ PmcrGreedySolver_t::PmcrGreedySolver_t(ConnectedGraph_t &g, int start, int goal)
 	assert(goal >=0);
 	m_start = start;
 	m_goal = goal;
-	m_open.push(new PmcrNode_t(m_start, {}, nullptr, m_lgraph.compute_weight({})));
+	m_open.push(new PmcrNode_t(m_start, computeH(m_start), {}, nullptr, m_lgraph.compute_weight({})));
 	m_path = std::vector<int>();
 	m_lowestWeights = std::vector<double>(m_lgraph.getnNodes(), 1.0);
 
@@ -45,14 +45,14 @@ void PmcrGreedySolver_t::greedy_search()
 		PmcrNode_t *current = m_open.top();
 		m_open.pop();
 		// Now check if the current node has the smallest recorded weight
-		if (current->getWeights() > m_lowestWeights[current->getID()])
+		if (current->getWeight() > m_lowestWeights[current->getID()])
 		{
 			// This node has been beated by some nodes with the same id but less weight
 			// No need to put it into the closed list
 			continue;
 		}
 		// This node has the smallest recorded weight
-		m_currentWeight = current->getWeights();
+		m_currentWeight = current->getWeight();
 		m_currentLabels = current->getLabels();
 		m_closed.push_back(current);
 		if (current->getID() == m_goal)
@@ -74,6 +74,7 @@ void PmcrGreedySolver_t::greedy_search()
 		std::vector<int> neighbors = m_lgraph.getNodeNeighbors()[current->getID()];
 		for (auto const &neighbor : neighbors)
 		{
+			///////////////////////////////////////////////////////////////////////////////////
 			// no need to come back to parent, since it will
 			// always prune that parent (superset will always be pruned without check)
 			// But if current is m_start, it has no parent			
@@ -87,14 +88,17 @@ void PmcrGreedySolver_t::greedy_search()
 					m_lgraph.getEdgeLabels()[current->getID()][neighbor]);
 			double currentWeight = m_lgraph.compute_weight(currentLabels);
 
+
 			// check whether we need to prune this neighbor (based on weight)
 			// If the neighbor has less weight, update lowest weight record put into open
 			// Otherwise, discard
 			if (currentWeight < m_lowestWeights[neighbor])
 			{
 				m_lowestWeights[neighbor] = currentWeight;
-				m_open.push(new PmcrNode_t(neighbor, currentLabels, current, currentWeight));
+				m_open.push(new PmcrNode_t(neighbor, computeH(neighbor), currentLabels, 
+																	current, currentWeight));
 			}
+			///////////////////////////////////////////////////////////////////////////////////
 		}
 	}
 	// You are reaching here because the m_open is empty and you haven't reached the goal
@@ -117,6 +121,18 @@ std::vector<int> PmcrGreedySolver_t::label_union(std::vector<int> s1, std::vecto
 	// resizing new container
 	v.resize(it - v.begin());
 	return v;
+}
+
+
+int PmcrGreedySolver_t::computeH(int indx)
+{
+	int col = m_lgraph.getnCol();
+	int indx_row = indx / col;
+	int indx_col = indx % col;
+	int goal_row = m_goal / col;
+	int goal_col = m_goal % col;
+	// manhattan distance as heuristic
+	return abs(indx_row - goal_row) + abs(indx_col - goal_col);
 }
 
 void PmcrGreedySolver_t::back_track_path()
@@ -151,7 +167,7 @@ void PmcrGreedySolver_t::print_closedList()
 	{
 		if(node->getID() != m_start)
 		{
-			std::cout << node->getID() << "\t" << node->getWeights() << "\t"
+			std::cout << node->getID() << "\t" << node->getWeight() << "\t"
 				<< node->getParent()->getID();
 			std::cout << std::endl;	
 		}
