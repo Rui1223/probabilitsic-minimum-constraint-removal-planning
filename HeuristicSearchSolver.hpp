@@ -2,8 +2,9 @@
 #ifndef HEURISTICSEARCHSOLVER_H
 #define HEURISTICSEARCHSOLVER_H
 
-#include "ConnectedGraph.hpp"
 #include "LabeledGraph.hpp"
+#include "ConnectedGraph.hpp"
+#include "ConnectedNonOverlapGraph.hpp"
 
 struct HeuristicNode_t
 {
@@ -24,7 +25,7 @@ struct HeuristicNode_comparison
 
 class HeuristicSearchSolver_t
 {
-	LabeledGraph_t m_lgraph;
+	ConnectedGraph_t m_lgraph;
 	int m_start;
 	int m_goal;
 	std::vector<int> m_currentLabels;
@@ -37,7 +38,7 @@ class HeuristicSearchSolver_t
 
 public:
 	// constructor
-	HeuristicSearchSolver_t(LabeledGraph_t &g, int start, int goal, std::vector<int> &l, double w);
+	HeuristicSearchSolver_t(ConnectedGraph_t &g, int start, int goal, std::vector<int> &l, double w);
 
 	bool Heuristic_search();
 

@@ -48,7 +48,7 @@ int main(int argc, char** argv)
 			{
 				std::cout << "***************" << lc << ":" << i << "**************\n";
 				// generate a graph
-				LabeledGraph_t g(25, 25, 4, lc/100.0);
+				ConnectedGraph_t g(25, 25, 4, lc/100.0);
 				int start = random_generate_integer(0, 25*25-1);
 				int goal = random_generate_integer(0, 25*25-1);
 				while (start == goal)
@@ -108,7 +108,7 @@ int main(int argc, char** argv)
 			{
 				std::cout << "***************" << gs << ":" << i << "**************\n";
 				// generate a graph
-				LabeledGraph_t g(gs, gs, 4, 0.3);
+				ConnectedGraph_t g(gs, gs, 4, 0.3);
 				int start = random_generate_integer(0, gs*gs-1);
 				int goal = random_generate_integer(0, gs*gs-1);
 				while (start == goal)
@@ -169,7 +169,7 @@ int main(int argc, char** argv)
 			{
 				std::cout << "***************" << nl << ":" << i << "**************\n";
 				// generate a graph
-				LabeledGraph_t g(25, 25, nl, 0.3);
+				ConnectedGraph_t g(25, 25, nl, 0.3);
 				int start = random_generate_integer(0, 25*25-1);
 				int goal = random_generate_integer(0, 25*25-1);
 				while (start == goal)

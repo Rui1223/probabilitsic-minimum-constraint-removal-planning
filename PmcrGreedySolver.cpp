@@ -7,8 +7,9 @@
 #include <fstream>
 #include <string> // std::string, std::to_string
 
-#include "ConnectedGraph.hpp"
 #include "LabeledGraph.hpp"
+#include "ConnectedGraph.hpp"
+#include "ConnectedNonOverlapGraph.hpp"
 #include "PmcrGreedySolver.hpp"
 #include "PmcrNode.hpp"
 #include "Timer.hpp"

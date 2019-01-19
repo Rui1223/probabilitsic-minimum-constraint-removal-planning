@@ -35,7 +35,7 @@ int main(int argc, char** argv)
 																+ std::to_string(ii) + ".txt";
 
 		// generate a grpah
-		LabeledGraph_t g(gridSize, gridSize, nLabels, probPerLabel);
+		ConnectedGraph_t g(gridSize, gridSize, nLabels, probPerLabel);
 		int start = random_generate_integer(0, gridSize*gridSize-1);
 		int goal = random_generate_integer(0, gridSize*gridSize-1);
 		while (start == goal)

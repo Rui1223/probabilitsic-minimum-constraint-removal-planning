@@ -10,12 +10,13 @@
 #include <string> // std::string, std::to_string
 
 #include "HeuristicSearchSolver.hpp"
-#include "ConnectedGraph.hpp"
 #include "LabeledGraph.hpp"
+#include "ConnectedGraph.hpp"
+#include "ConnectedNonOverlapGraph.hpp"
 #include "Timer.hpp"
 
 
-HeuristicSearchSolver_t::HeuristicSearchSolver_t(LabeledGraph_t &g, int start, 
+HeuristicSearchSolver_t::HeuristicSearchSolver_t(ConnectedGraph_t &g, int start, 
 	int goal, std::vector<int> &l, 
 	double w) : m_lgraph(g), m_start(start), m_goal(goal), m_currentLabels(l), m_currentWeight(w)
 {

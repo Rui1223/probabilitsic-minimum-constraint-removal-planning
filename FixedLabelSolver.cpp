@@ -18,8 +18,9 @@
 
 #include "FixedLabelSolver.hpp"
 #include "HeuristicSearchSolver.hpp"
-#include "ConnectedGraph.hpp"
 #include "LabeledGraph.hpp"
+#include "ConnectedGraph.hpp"
+#include "ConnectedNonOverlapGraph.hpp"
 #include "Timer.hpp"
 
 Comparator compFunctor1 = 
@@ -28,7 +29,7 @@ Comparator compFunctor1 =
 			return elem1.second <= elem2.second; // compare weights, prefer less weight  
 		};
 
-FixedLabelSolver_t::FixedLabelSolver_t(LabeledGraph_t &g, int start, int goal)
+FixedLabelSolver_t::FixedLabelSolver_t(ConnectedGraph_t &g, int start, int goal)
 {
 	// problem formulation specified at the beginning of the solver
 	m_lgraph = g;
