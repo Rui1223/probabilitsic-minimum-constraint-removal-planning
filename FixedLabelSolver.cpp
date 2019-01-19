@@ -37,6 +37,7 @@ FixedLabelSolver_t::FixedLabelSolver_t(ConnectedGraph_t &g, int start, int goal)
 	assert(goal >=0);
 	m_start = start;
 	m_goal = goal;
+	m_heuristic_search_solver = HeuristicSearchSolver_t(g, start, goal);
 }
 
 void FixedLabelSolver_t::fixedLabel_search()
@@ -53,11 +54,11 @@ void FixedLabelSolver_t::fixedLabel_search()
 	std::vector<int> sgLabels = cal_sgLabel(m_start, m_goal);
 	std::set<std::pair<std::vector<int>, double>, Comparator> subLabelMap = cal_subLabelMap(sgLabels);
 
-	std::cout << "sgLabels:\n";
-	for (auto const &l : sgLabels)
-	{
-		std::cout << l << "\t";
-	}
+	// std::cout << "sgLabels:\n";
+	// for (auto const &l : sgLabels)
+	// {
+	// 	std::cout << l << "\t";
+	// }
 	std::cout << std::endl;
 
 	// printf("*********sub labelMap************\n");
@@ -82,6 +83,7 @@ void FixedLabelSolver_t::fixedLabel_search()
 		//std::cout << "current set of labels: " << m_currentLabels << "\n";
 		//std::cout << "currrent weight: " << m_currentWeight << "\n"; 
 		std::cout << "start the " << k << "th search\n";
+
 		bool goalFound = HeuristicSearch();
 		//print_closedList();
 		if (goalFound)
@@ -99,12 +101,15 @@ bool FixedLabelSolver_t::HeuristicSearch()
 	// HeuristicSearch() performs a greedy Best-First search based on HeuristicSearchSolver 
 	// with a label checking condition, which decides whether a newly propogated node 
 	// should be added into the priority queue
-	HeuristicSearchSolver_t heuristic_search_solver(m_lgraph, m_start, m_goal,
-													m_currentLabels, m_currentWeight);
-	bool goalFound = heuristic_search_solver.Heuristic_search();
+
+	//HeuristicSearchSolver_t heuristic_search_solver(m_lgraph, m_start, m_goal,
+													//m_currentLabels, m_currentWeight);
+	m_heuristic_search_solver.setCurrentLabels(m_currentLabels);
+	m_heuristic_search_solver.setCurrentWeight(m_currentWeight);
+	bool goalFound = m_heuristic_search_solver.Heuristic_search();
 	if (goalFound)
 	{
-		m_path = heuristic_search_solver.getPath();
+		m_path = m_heuristic_search_solver.getPath();
 	}
 	return goalFound;
 }
@@ -141,17 +146,17 @@ void FixedLabelSolver_t::write_solution(std::string file_dir, double t)
 
 std::vector<int> FixedLabelSolver_t::cal_sgLabel(int start, int goal)
 {
-	std::vector<int> start_neighbors = m_lgraph.getNodeNeighbors()[start];
-	std::vector<int> goal_neighbors = m_lgraph.getNodeNeighbors()[goal];
+	std::vector<int> start_neighbors = m_lgraph.getNodeNeighbors(start);
+	std::vector<int> goal_neighbors = m_lgraph.getNodeNeighbors(goal);
 	std::vector<std::vector<int>> start_setsLabels;
 	std::vector<std::vector<int>> goal_setsLabels;
 	for (auto const &neighbor : start_neighbors)
 	{
-		start_setsLabels.push_back(m_lgraph.getEdgeLabels()[start][neighbor]);
+		start_setsLabels.push_back(m_lgraph.getEdgeLabels(start, neighbor));
 	}
 	for (auto const &neighbor : goal_neighbors)
 	{
-		goal_setsLabels.push_back(m_lgraph.getEdgeLabels()[goal][neighbor]);
+		goal_setsLabels.push_back(m_lgraph.getEdgeLabels(goal, neighbor));
 	}
 
 	std::vector<int> start_labels = start_setsLabels[0];

@@ -20,7 +20,6 @@ typedef std::function<bool(std::pair<std::vector<int>, double>,
 
 class ConnectedGraph_t
 {
-public:
 	// the size of the grid
 	int m_row;
 	int m_col;
@@ -47,7 +46,7 @@ public:
 	std::vector<std::vector<int>> m_labelCombinations;
 	std::set<std::pair<std::vector<int>, double>, Comparator> m_labelMap;
 
-
+public:
 	// Constructor
 	ConnectedGraph_t() {}
 	ConnectedGraph_t(int row, int col, int nlabels, double probPerLabel);
@@ -94,8 +93,9 @@ public:
 	// lots of getters
 	int getnCol() { return m_col; }
 	int getnNodes() { return m_nNodes; }
-	std::vector<std::vector<int>> getNodeNeighbors() { return m_nodeNeighbors; }
-	std::vector<std::vector<std::vector<int>>>& getEdgeLabels() { return m_edgeLabels; } 
+	std::vector<int> getNodeNeighbors(int id) { return m_nodeNeighbors[id]; }
+	std::vector<int> getEdgeLabels(int id1, int id2) 
+														{ return m_edgeLabels[id1][id2]; } 
 	std::vector<double> getLabelWeights() { return m_labelWeights; }
 	std::vector<int> getLabels() { return m_labels; }
 	std::set<std::pair<std::vector<int>, double>, Comparator> getLabelMap()

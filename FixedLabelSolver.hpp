@@ -7,6 +7,7 @@
 
 #include <cstring>
 
+#include "HeuristicSearchSolver.hpp"
 #include "LabeledGraph.hpp"
 #include "ConnectedGraph.hpp"
 #include "ConnectedNonOverlapGraph.hpp"
@@ -24,6 +25,8 @@ class FixedLabelSolver_t
 	std::vector<int> m_currentLabels;
 	double m_currentWeight;
 	std::vector<int> m_path;
+
+	HeuristicSearchSolver_t m_heuristic_search_solver;
 
 public:
 	FixedLabelSolver_t() {}

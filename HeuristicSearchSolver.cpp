@@ -17,16 +17,16 @@
 
 
 HeuristicSearchSolver_t::HeuristicSearchSolver_t(ConnectedGraph_t &g, int start, 
-	int goal, std::vector<int> &l, 
-	double w) : m_lgraph(g), m_start(start), m_goal(goal), m_currentLabels(l), m_currentWeight(w)
+	int goal) : m_lgraph(g), m_start(start), m_goal(goal)
 {
-	m_open.push(new HeuristicNode_t(m_start, computeH(m_start), nullptr));
+	//m_open.push(new HeuristicNode_t(m_start, computeH(m_start), nullptr));
 }
 
 bool HeuristicSearchSolver_t::Heuristic_search()
 {
 	std::vector<bool> visited(m_lgraph.getnNodes(), false);
 	visited[m_start] = true;
+	m_open.push(new HeuristicNode_t(m_start, computeH(m_start), nullptr));
 
 	while (!m_open.empty())
 	{
@@ -43,15 +43,15 @@ bool HeuristicSearchSolver_t::Heuristic_search()
 			return true;
 		}
 		//get neighbors of the current node
-		std::vector<int> neighbors = m_lgraph.getNodeNeighbors()[current->m_id];
+		std::vector<int> neighbors = m_lgraph.getNodeNeighbors(current->m_id);
 		for (auto const &neighbor : neighbors)
 		{
 			// check if the node has been visited or extended before
 			if (visited[neighbor]) { continue; }
 			// check whether the edge between current and neighbor node form a valid edge in the 
 			// subgraph
-			std::vector<int> EdgeLabels = m_lgraph.getEdgeLabels()[current->m_id][neighbor];
-			bool isSubset = check_subset(m_lgraph.getEdgeLabels()[current->m_id][neighbor]);
+			std::vector<int> EdgeLabels = m_lgraph.getEdgeLabels(current->m_id, neighbor);
+			bool isSubset = check_subset(m_lgraph.getEdgeLabels(current->m_id, neighbor));
 			if (isSubset)
 			{
 				// the neighbor is a true neighbor in the current subgraph
@@ -64,6 +64,12 @@ bool HeuristicSearchSolver_t::Heuristic_search()
 	// You are reaching here because the open list is empty and goal is not found
 	//std::cout << "Coundn't found the goal at the current subgraph\n";
 	//std::cout << "-----------------------------------------------\n";
+	// before return, free all the memory space
+	for (auto &e : m_closed)
+	{
+		delete e;
+		e = nullptr;
+	}
 	return false;	
 }
 

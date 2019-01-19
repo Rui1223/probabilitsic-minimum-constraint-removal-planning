@@ -14,7 +14,7 @@
 #include "PmcrNode.hpp"
 #include "Timer.hpp"
 
-PmcrGreedySolver_t::PmcrGreedySolver_t(LabeledGraph_t &g, int start, int goal)
+PmcrGreedySolver_t::PmcrGreedySolver_t(ConnectedGraph_t &g, int start, int goal)
 {
 	m_lgraph = g;
 	assert(start >=0);
@@ -41,52 +41,8 @@ PmcrGreedySolver_t::~PmcrGreedySolver_t()
 
 void PmcrGreedySolver_t::greedy_search()
 {
-	Timer t;
-	t.reset();
 	// need a list to record the lowest weight so far for each node
 	m_lowestWeights[m_start] = 0.0;
-	int nodes_to_expanded = 0;
-	// while(!m_open.empty())
-	// {
-	// 	PmcrNode_t *current = m_open.top();
-	// 	m_open.pop();
-
-	// 	m_currentWeight = current->getWeight();
-	// 	m_currentLabels = current->getLabels();
-	// 	m_closed.push_back(current);
-
-	// 	if (current->getID() == m_goal)
-	// 	{
-	// 		printf("goal found!\n");
-	// 		// print the labels & weights for the found path
-	// 		std::cout << "The weight of the path is " << m_currentWeight << "\n";
-	// 		std::cout << "<";
-	// 		for (auto const &e : m_currentLabels)
-	// 		{
-	// 			std::cout << e << " ";
-	// 		}
-	// 		std::cout << ">\n";
-	// 		// should return a path here
-	// 		back_track_path();
-	// 		return;
-	// 	}
-	// 	// look at each neighbor of the current node
-	// 	std::vector<int> neighbors = m_lgraph.getNodeNeighbors()[current->getID()];
-	// 	for (auto const &neighbor : neighbors)
-	// 	{
-	// 		if (m_expanded[neighbor] == true) { continue; }
-	// 		//std::cout << neighbor << "\n";
-	// 		m_expanded[neighbor] = true;
-	// 		std::vector<int> currentLabels = 
-	// 			label_union(current->getLabels(), 
-	// 				m_lgraph.getEdgeLabels()[current->getID()][neighbor]);
-	// 		double currentWeight = m_lgraph.compute_weight(currentLabels);
-	// 		m_open.push(new PmcrNode_t(neighbor, computeH(neighbor), currentLabels, 
-	// 															current, currentWeight));
-
-	// 	}
-
-	// }
 
 	while(!m_open.empty())
 	{
@@ -104,7 +60,6 @@ void PmcrGreedySolver_t::greedy_search()
 		m_currentWeight = current->getWeight();
 		m_currentLabels = current->getLabels();
 		m_closed.push_back(current);
-		nodes_to_expanded++;
 
 		if (current->getID() == m_goal)
 		{
@@ -122,7 +77,7 @@ void PmcrGreedySolver_t::greedy_search()
 			return;
 		}
 		// look at each neighbor of the current node
-		std::vector<int> neighbors = m_lgraph.getNodeNeighbors()[current->getID()];
+		std::vector<int> neighbors = m_lgraph.getNodeNeighbors(current->getID());
 		for (auto const &neighbor : neighbors)
 		{			
 			// no need to come back to parent, since it will
@@ -135,7 +90,7 @@ void PmcrGreedySolver_t::greedy_search()
 			// check neighbor's label
 			std::vector<int> currentLabels = 
 				label_union(current->getLabels(), 
-					m_lgraph.getEdgeLabels()[current->getID()][neighbor]);
+					m_lgraph.getEdgeLabels(current->getID(), neighbor));
 			double currentWeight = m_lgraph.compute_weight(currentLabels);
 
 
@@ -223,7 +178,6 @@ void PmcrGreedySolver_t::print_closedList()
 		}
 	
 	}	
-
 
 }
 

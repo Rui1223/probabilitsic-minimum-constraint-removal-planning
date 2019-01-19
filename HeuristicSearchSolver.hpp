@@ -38,7 +38,8 @@ class HeuristicSearchSolver_t
 
 public:
 	// constructor
-	HeuristicSearchSolver_t(ConnectedGraph_t &g, int start, int goal, std::vector<int> &l, double w);
+	HeuristicSearchSolver_t() {}
+	HeuristicSearchSolver_t(ConnectedGraph_t &g, int start, int goal);
 
 	bool Heuristic_search();
 
@@ -62,8 +63,8 @@ public:
 	std::vector<int> getPath() { return m_path; }
 
 	// setters
-	// void setCurrentLabels(std::vector<int> labels) { m_currentLabels = labels; }
-	// void setCurrentWeight(double currentWeight) { m_currentWeight = currentWeight; }
+	void setCurrentLabels(std::vector<int> labels) { m_currentLabels = labels; }
+	void setCurrentWeight(double currentWeight) { m_currentWeight = currentWeight; }
 
 	// destructor used to free space before exit
 	~HeuristicSearchSolver_t();	
