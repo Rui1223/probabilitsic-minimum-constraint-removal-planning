@@ -11,9 +11,11 @@
 
 #include "HeuristicSearchSolver.hpp"
 #include "ConnectedGraph.hpp"
+#include "LabeledGraph.hpp"
+#include "Timer.hpp"
 
 
-HeuristicSearchSolver_t::HeuristicSearchSolver_t(ConnectedGraph_t &g, int start, 
+HeuristicSearchSolver_t::HeuristicSearchSolver_t(LabeledGraph_t &g, int start, 
 	int goal, std::vector<int> &l, 
 	double w) : m_lgraph(g), m_start(start), m_goal(goal), m_currentLabels(l), m_currentWeight(w)
 {
@@ -47,6 +49,7 @@ bool HeuristicSearchSolver_t::Heuristic_search()
 			if (visited[neighbor]) { continue; }
 			// check whether the edge between current and neighbor node form a valid edge in the 
 			// subgraph
+			std::vector<int> EdgeLabels = m_lgraph.getEdgeLabels()[current->m_id][neighbor];
 			bool isSubset = check_subset(m_lgraph.getEdgeLabels()[current->m_id][neighbor]);
 			if (isSubset)
 			{
@@ -77,8 +80,9 @@ int HeuristicSearchSolver_t::computeH(int indx)
 bool HeuristicSearchSolver_t::check_subset(std::vector<int> labels)
 {
 	// This function check whether a input set of labels is a subset of the m_currentLabels
-	return ( std::includes(m_currentLabels.begin(), m_currentLabels.end(),
-						labels.begin(), labels.end()) );
+	bool isSubset = std::includes(m_currentLabels.begin(), m_currentLabels.end(),
+						labels.begin(), labels.end());
+	return isSubset;
 }
 
 void HeuristicSearchSolver_t::back_track_path()

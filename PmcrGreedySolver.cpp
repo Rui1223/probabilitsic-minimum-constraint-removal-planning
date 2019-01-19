@@ -7,11 +7,13 @@
 #include <fstream>
 #include <string> // std::string, std::to_string
 
-#include "PmcrNode.hpp"
 #include "ConnectedGraph.hpp"
+#include "LabeledGraph.hpp"
 #include "PmcrGreedySolver.hpp"
+#include "PmcrNode.hpp"
+#include "Timer.hpp"
 
-PmcrGreedySolver_t::PmcrGreedySolver_t(ConnectedGraph_t &g, int start, int goal)
+PmcrGreedySolver_t::PmcrGreedySolver_t(LabeledGraph_t &g, int start, int goal)
 {
 	m_lgraph = g;
 	assert(start >=0);
@@ -21,7 +23,8 @@ PmcrGreedySolver_t::PmcrGreedySolver_t(ConnectedGraph_t &g, int start, int goal)
 	m_open.push(new PmcrNode_t(m_start, computeH(m_start), {}, nullptr, m_lgraph.compute_weight({})));
 	m_path = std::vector<int>();
 	m_lowestWeights = std::vector<double>(m_lgraph.getnNodes(), 1.0);
-
+	// m_expanded = std::vector<bool>(m_lgraph.getnNodes(), false);
+	// m_expanded[m_start] = true;
 }
 
 PmcrGreedySolver_t::~PmcrGreedySolver_t()
@@ -37,8 +40,52 @@ PmcrGreedySolver_t::~PmcrGreedySolver_t()
 
 void PmcrGreedySolver_t::greedy_search()
 {
+	Timer t;
+	t.reset();
 	// need a list to record the lowest weight so far for each node
 	m_lowestWeights[m_start] = 0.0;
+	int nodes_to_expanded = 0;
+	// while(!m_open.empty())
+	// {
+	// 	PmcrNode_t *current = m_open.top();
+	// 	m_open.pop();
+
+	// 	m_currentWeight = current->getWeight();
+	// 	m_currentLabels = current->getLabels();
+	// 	m_closed.push_back(current);
+
+	// 	if (current->getID() == m_goal)
+	// 	{
+	// 		printf("goal found!\n");
+	// 		// print the labels & weights for the found path
+	// 		std::cout << "The weight of the path is " << m_currentWeight << "\n";
+	// 		std::cout << "<";
+	// 		for (auto const &e : m_currentLabels)
+	// 		{
+	// 			std::cout << e << " ";
+	// 		}
+	// 		std::cout << ">\n";
+	// 		// should return a path here
+	// 		back_track_path();
+	// 		return;
+	// 	}
+	// 	// look at each neighbor of the current node
+	// 	std::vector<int> neighbors = m_lgraph.getNodeNeighbors()[current->getID()];
+	// 	for (auto const &neighbor : neighbors)
+	// 	{
+	// 		if (m_expanded[neighbor] == true) { continue; }
+	// 		//std::cout << neighbor << "\n";
+	// 		m_expanded[neighbor] = true;
+	// 		std::vector<int> currentLabels = 
+	// 			label_union(current->getLabels(), 
+	// 				m_lgraph.getEdgeLabels()[current->getID()][neighbor]);
+	// 		double currentWeight = m_lgraph.compute_weight(currentLabels);
+	// 		m_open.push(new PmcrNode_t(neighbor, computeH(neighbor), currentLabels, 
+	// 															current, currentWeight));
+
+	// 	}
+
+	// }
 
 	while(!m_open.empty())
 	{
@@ -49,12 +96,15 @@ void PmcrGreedySolver_t::greedy_search()
 		{
 			// This node has been beated by some nodes with the same id but less weight
 			// No need to put it into the closed list
+			delete current;
 			continue;
 		}
 		// This node has the smallest recorded weight
 		m_currentWeight = current->getWeight();
 		m_currentLabels = current->getLabels();
 		m_closed.push_back(current);
+		nodes_to_expanded++;
+
 		if (current->getID() == m_goal)
 		{
 			printf("goal found!\n");
@@ -73,8 +123,7 @@ void PmcrGreedySolver_t::greedy_search()
 		// look at each neighbor of the current node
 		std::vector<int> neighbors = m_lgraph.getNodeNeighbors()[current->getID()];
 		for (auto const &neighbor : neighbors)
-		{
-			///////////////////////////////////////////////////////////////////////////////////
+		{			
 			// no need to come back to parent, since it will
 			// always prune that parent (superset will always be pruned without check)
 			// But if current is m_start, it has no parent			
@@ -96,12 +145,12 @@ void PmcrGreedySolver_t::greedy_search()
 			{
 				m_lowestWeights[neighbor] = currentWeight;
 				m_open.push(new PmcrNode_t(neighbor, computeH(neighbor), currentLabels, 
-																	current, currentWeight));
+																		current, currentWeight));
 			}
-			///////////////////////////////////////////////////////////////////////////////////
 		}
 	}
 	// You are reaching here because the m_open is empty and you haven't reached the goal
+	m_currentWeight = 1.0;
 	printf("failed to find a solution in this problem!\n");
 }
 

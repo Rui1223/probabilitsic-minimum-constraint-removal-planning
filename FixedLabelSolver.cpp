@@ -17,8 +17,10 @@
 #include <set>
 
 #include "FixedLabelSolver.hpp"
-#include "ConnectedGraph.hpp"
 #include "HeuristicSearchSolver.hpp"
+#include "ConnectedGraph.hpp"
+#include "LabeledGraph.hpp"
+#include "Timer.hpp"
 
 Comparator compFunctor1 = 
 		[](std::pair<std::vector<int>, double> elem1, std::pair<std::vector<int>, double> elem2)
@@ -26,7 +28,7 @@ Comparator compFunctor1 =
 			return elem1.second <= elem2.second; // compare weights, prefer less weight  
 		};
 
-FixedLabelSolver_t::FixedLabelSolver_t(ConnectedGraph_t &g, int start, int goal)
+FixedLabelSolver_t::FixedLabelSolver_t(LabeledGraph_t &g, int start, int goal)
 {
 	// problem formulation specified at the beginning of the solver
 	m_lgraph = g;
@@ -57,19 +59,19 @@ void FixedLabelSolver_t::fixedLabel_search()
 	}
 	std::cout << std::endl;
 
-	printf("*********sub labelMap************\n");
-	//Iterate over the set you just come up with
-	for (auto const &e : subLabelMap)
-	{
-		std::cout << "<";
-		for (auto const &l : e.first)
-		{
-			std::cout << l << ",";
-		}
-		std::cout << "> :\t\t";
-		std::cout << e.second << std::endl;
-	}	
-	std::cout << "*************************\n";
+	// printf("*********sub labelMap************\n");
+	// //Iterate over the set you just come up with
+	// for (auto const &e : subLabelMap)
+	// {
+	// 	std::cout << "<";
+	// 	for (auto const &l : e.first)
+	// 	{
+	// 		std::cout << l << ",";
+	// 	}
+	// 	std::cout << "> :\t\t";
+	// 	std::cout << e.second << std::endl;
+	// }	
+	// std::cout << "*************************\n";
 
 	int k = 1;
 	for (auto const &pair : subLabelMap)
@@ -150,15 +152,6 @@ std::vector<int> FixedLabelSolver_t::cal_sgLabel(int start, int goal)
 	{
 		goal_setsLabels.push_back(m_lgraph.getEdgeLabels()[goal][neighbor]);
 	}
-	for (auto const ls : start_setsLabels)
-	{
-		std::cout << ls << "\n";
-	}
-	for (auto const ls : goal_setsLabels)
-	{
-		std::cout << ls << "\n";
-	}
-
 
 	std::vector<int> start_labels = start_setsLabels[0];
 	std::vector<int> goal_labels = goal_setsLabels[0];

@@ -8,6 +8,7 @@
 #include <cstring>
 
 #include "ConnectedGraph.hpp"
+#include "LabeledGraph.hpp"
 
 // Declaring the type of Predicate that accept two pairs and return a bool
 typedef std::function<bool(std::pair<std::vector<int>, double>, 
@@ -15,7 +16,7 @@ typedef std::function<bool(std::pair<std::vector<int>, double>,
 
 class FixedLabelSolver_t
 {
-	ConnectedGraph_t m_lgraph;
+	LabeledGraph_t m_lgraph;
 	int m_start;
 	int m_goal;
 
@@ -25,7 +26,7 @@ class FixedLabelSolver_t
 
 public:
 	FixedLabelSolver_t() {}
-	FixedLabelSolver_t(ConnectedGraph_t &g, int start, int goal);
+	FixedLabelSolver_t(LabeledGraph_t &g, int start, int goal);
 
 	~FixedLabelSolver_t() {}
 
