@@ -19,7 +19,7 @@ int main(int argc, char** argv)
 	int nExperiments = 1;
 	int gridSize = 25;
 	int nLabels = 8;
-	double probPerLabel = 0.2;
+	double probPerLabel = 0.1;
 	Timer t;
 	std::srand(std::time(0));
 	double t1;
@@ -35,7 +35,7 @@ int main(int argc, char** argv)
 																+ std::to_string(ii) + ".txt";
 
 		// generate a grpah
-		ConnectedGraph_t g(gridSize, gridSize, nLabels, probPerLabel);
+		ConnectedNonOverlapGraph_t g(gridSize, gridSize, nLabels, probPerLabel);
 		int start = random_generate_integer(0, gridSize*gridSize-1);
 		int goal = random_generate_integer(0, gridSize*gridSize-1);
 		while (start == goal)

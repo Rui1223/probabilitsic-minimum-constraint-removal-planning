@@ -18,7 +18,6 @@ based on the expected number of edge given to that label*/
 typedef std::function<bool(std::pair<std::vector<int>, double>, 
 	std::pair<std::vector<int>, double>)> Comparator;
 
-
 class ConnectedNonOverlapGraph_t
 {
 	// the size of the grid
@@ -26,29 +25,31 @@ class ConnectedNonOverlapGraph_t
 	int m_col;
 	int m_nNodes;
 	int m_nEdges;
+
+	// specify the weights for labels
+	int m_nlabels;
+	std::vector<int> m_labels;
+	std::vector<double> m_labelWeights;
+
 	// specify neighbors (edge) and labels of the edge 
 	std::vector<std::vector<int>> m_nodeNeighbors;
 	std::vector<std::vector<std::vector<int>>> m_edgeLabels;
+	// the probability that a label is assigned to an edge
+	double m_probPerLabel;
+	// the density which meansures how densely the graph is labeled
+	double m_labelCoverage;
 	std::vector<std::vector<bool>> m_marked;
+	int m_nmarked;
 	int m_nExpansion;
 	
-	// specify the weights for labels
-	int m_nlabels;
-	std::vector<double> m_labelWeights;
-	std::vector<int> m_labels;
-
 	// all label combinations
 	std::vector<std::vector<int>> m_labelCombinations;
 	std::set<std::pair<std::vector<int>, double>, Comparator> m_labelMap;
 
-	// the percent of edges that are expected to have at least a label
-	double m_percentLabelEdge;
-	// the probability that a label is assigned to an edge
-	double m_prob;
 public:
 	// Constructor
 	ConnectedNonOverlapGraph_t() {}
-	ConnectedNonOverlapGraph_t(int row, int col, int n_labels, double percentLabelEdge);
+	ConnectedNonOverlapGraph_t(int row, int col, int nlabels, double probPerLabel);
 
 	// function to load a graph (manually generate a graph)
 	void load_graph();
@@ -92,8 +93,9 @@ public:
 	// lots of getters
 	int getnCol() { return m_col; }
 	int getnNodes() { return m_nNodes; }
-	std::vector<std::vector<int>> getNodeNeighbors() { return m_nodeNeighbors; }
-	std::vector<std::vector<std::vector<int>>> getEdgeLabels() { return m_edgeLabels; } 
+	std::vector<int> getNodeNeighbors(int id) { return m_nodeNeighbors[id]; }
+	std::vector<int> getEdgeLabels(int id1, int id2) 
+														{ return m_edgeLabels[id1][id2]; } 
 	std::vector<double> getLabelWeights() { return m_labelWeights; }
 	std::vector<int> getLabels() { return m_labels; }
 	std::set<std::pair<std::vector<int>, double>, Comparator> getLabelMap()

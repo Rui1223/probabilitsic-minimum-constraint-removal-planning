@@ -13,11 +13,12 @@ formulation*/
 #include <map> // std::map
 #include <functional>
 #include <set>
-#include <cstdlib>
+#include <cstdlib> // for std::srand()
 #include <string> // std::string, std::to_string
+#include <queue>
+#include <random>
 
 #include "LabeledGraph.hpp"
-
 
 Comparator compFunctor = 
 		[](std::pair<std::vector<int>, double> elem1, std::pair<std::vector<int>, double> elem2)
@@ -25,23 +26,24 @@ Comparator compFunctor =
 			return elem1.second <= elem2.second; // compare weights, prefer less weight  
 		};
 
-LabeledGraph_t::LabeledGraph_t(int row, int col, int n_labels, double percentLabelEdge)
+LabeledGraph_t::LabeledGraph_t(int row, int col, int nlabels, double probPerLabel)
 {
+	printf("--------------------------------------------------\n");
 	// specify the size of the graph
 	assert(row > 0);
 	assert(col > 0);
 	m_row = row;
 	m_col = col;
 	m_nNodes = m_row * m_col;
+	m_nEdges = (m_col-1)*m_row + (m_row-1)*m_col;
 	
-	m_nlabels = n_labels;
-	m_percentLabelEdge = percentLabelEdge;
-	// The probability of a label to be assigned to an edge is determined by the number of labels
-	// and the percent of labeled edge we expect in the graph
-	m_prob = 1 - exp(1.0/m_nlabels*log(1-m_percentLabelEdge));
-	std::cout << "m_percentLabelEdge: " << m_percentLabelEdge << std::endl;
-	std::cout << "m_prob: " << m_prob << std::endl;
+	// label information
+	m_nlabels = nlabels;
+	m_probPerLabel = probPerLabel;
 
+	std::cout << "probPerLabel: " << m_probPerLabel << std::endl;
+	std::cout << "Expected density: " << 1-pow(1 - m_probPerLabel, m_nlabels) << "\n";
+	m_nmarked = 0;
 	// specify the number of labels and their corresponding weights
 	// Based on weighted labels, build the labelMap which maps a set of labels to weights
 	load_labels();
@@ -51,15 +53,13 @@ LabeledGraph_t::LabeledGraph_t(int row, int col, int n_labels, double percentLab
 	// construct the graph 
 	load_graph();
 
-	// print the basic information of the graph
+	printf("--------------------------------------------------\n");
 	//print_labelMap();
-	//print_graph();
-	printf("-------------------------------\n");
 }
 
 void LabeledGraph_t::load_graph()
 {
-	printf("Build the graph now\n");
+	// printf("Build the graph now\n");
 	// This is the function to construct a random weighted labeled graph with 2 procedures
 	// 1. specify edges (achieved by specifying neighbors)
 	// 2. specify labels
@@ -73,11 +73,11 @@ void LabeledGraph_t::load_graph()
 		m_nodeNeighbors.push_back(std::vector<int>());
 		m_edgeLabels.push_back(std::vector<std::vector<int>>(m_nNodes,
 			 std::vector<int>()));
+		m_marked.push_back(std::vector<bool>(m_nNodes, false));
 		iter++;
 	}
 
 	int currentID = 0; // the id of the current node
-	double r;
 	while (currentID != m_nNodes)
 	{
 		// add neighbors (in forms of their ids) of the current node and label the edge
@@ -96,16 +96,7 @@ void LabeledGraph_t::load_graph()
 			m_nodeNeighbors[currentID].push_back(currentID+m_col);
 			m_nodeNeighbors[currentID+m_col].push_back(currentID);
 			// assign labels
-			for (auto const &l : m_labels)
-			{
-				r = ((double) rand() / (RAND_MAX));
-				if (r < m_prob)
-				{
-					// assign the label to that edge
-					m_edgeLabels[currentID][currentID+m_col].push_back(l);
-					m_edgeLabels[currentID+m_col][currentID].push_back(l); // should be identical
-				}
-			}		
+			label_edge(currentID, currentID+m_col);
 		}
 		// if the node is a bottommost one
 		else if (currentID / m_col == m_row-1 and currentID % m_col != m_col-1)
@@ -114,16 +105,8 @@ void LabeledGraph_t::load_graph()
 			// only add the neighbor of its right
 			m_nodeNeighbors[currentID].push_back(currentID+1);
 			m_nodeNeighbors[currentID+1].push_back(currentID);
-			for (auto const &l : m_labels)
-			{
-				r = ((double) rand() / (RAND_MAX));
-				if (r < m_prob)
-				{
-					// assign the label to that edge
-					m_edgeLabels[currentID][currentID+1].push_back(l);
-					m_edgeLabels[currentID+1][currentID].push_back(l); // should be identical
-				}
-			}		
+			label_edge(currentID, currentID+1);
+					
 		}
 		// if the node is a normal one (should have two neighbors)
 		else
@@ -131,33 +114,41 @@ void LabeledGraph_t::load_graph()
 			// add the neighbor of its right and bottom
 			m_nodeNeighbors[currentID].push_back(currentID+1);
 			m_nodeNeighbors[currentID+1].push_back(currentID);
-			for (auto const &l : m_labels)
-			{
-				r = ((double) rand() / (RAND_MAX));
-				if (r < m_prob)
-				{
-					// assign the label to that edge
-					m_edgeLabels[currentID][currentID+1].push_back(l);
-					m_edgeLabels[currentID+1][currentID].push_back(l); // should be identical
-				}
-			}
+			label_edge(currentID, currentID+1);
 			m_nodeNeighbors[currentID].push_back(currentID+m_col);
 			m_nodeNeighbors[currentID+m_col].push_back(currentID);
-			for (auto const &l : m_labels)
-			{
-				r = ((double) rand() / (RAND_MAX));
-				if (r < m_prob)
-				{
-					// assign the label to that edge
-					m_edgeLabels[currentID][currentID+m_col].push_back(l);
-					m_edgeLabels[currentID+m_col][currentID].push_back(l); // should be identical
-				}
-			}
+			label_edge(currentID, currentID+m_col);
 		}
 		//std::cout << "working on next node!\n";
 		currentID++; // start working on the next node
 	}
-	printf("Finish building the graph\n");
+
+	std::cout << "Acutal density: " << double(m_nmarked) / m_nEdges << "\n";
+	//printf("Finish building the graph\n");
+
+}
+
+void LabeledGraph_t::label_edge(int idx1, int idx2)
+{
+	double r;
+	for (auto const &l : m_labels)
+	{
+		r = ((double) rand() / (RAND_MAX));
+		if (r < m_probPerLabel)
+		{
+			// assign the label to that edge
+			m_edgeLabels[idx1][idx2].push_back(l);
+			m_edgeLabels[idx2][idx1].push_back(l); // should be identical
+			// mark the edge if it is unmarked before
+			if (m_marked[idx1][idx2] == false)
+			{
+				m_marked[idx1][idx2] = true;
+				m_marked[idx2][idx1] = true;
+				m_nmarked++;
+			}
+		}
+
+	}
 
 }
 
@@ -213,8 +204,8 @@ void LabeledGraph_t::write_graph(std::string file_dir)
 	std::ofstream file_(file_dir);
 	if (file_.is_open())
 	{
-		// Write in the 1st line the size of the grid graph
-		file_ << m_row << " " << m_col << "\n";
+		// Write in the 1st line the size and the density of the grid graph
+		file_ << m_row << " " << m_col << " " << double(m_nmarked) / m_nEdges <<"\n";
 		// Write in the 2nd line label information
 		for (int tt=0; tt < m_nlabels; tt++)
 		{
@@ -268,17 +259,21 @@ void LabeledGraph_t::load_labels()
 
 void LabeledGraph_t::load_weights()
 {
+	std::random_device rd{};
+	std::mt19937 gen{rd()};
 	double r = 0.0;
-	int temp;
+
+	std::normal_distribution<> d{5.0,5.0};
 
 	for (int kk = 0; kk < m_nlabels; kk++)
 	{
-		temp = random_generate_integer(1, 30);
+		double temp = d(gen);
+		while (temp <= 0) { temp = d(gen); }
 		m_labelWeights.push_back(temp);
-		r += double(temp);
+		r += temp;
 	}
 	
-	// now randomize them so that the sum of weights are equal to 1 (can be smaller than one)
+	// normalize
 	m_labelWeights /= r;
 
 

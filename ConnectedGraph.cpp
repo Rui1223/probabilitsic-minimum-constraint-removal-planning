@@ -46,7 +46,7 @@ ConnectedGraph_t::ConnectedGraph_t(int row, int col, int nlabels, double probPer
 	// per label are needed 
 	m_nExpansion = round(m_nEdges * (1 - pow(1 - m_probPerLabel, m_nlabels))) / m_nlabels;
 	std::cout << "n_expansion: " << m_nExpansion << "\n";
-	std::cout << "Expected density: " << double(m_nExpansion * m_nlabels) / m_nEdges << "\n";
+	std::cout << "Expected density: " << 1-pow(1 - m_probPerLabel, m_nlabels) << "\n";
 	m_nmarked = 0;
 	// specify the number of labels and their corresponding weights
 	// Based on weighted labels, build the labelMap which maps a set of labels to weights

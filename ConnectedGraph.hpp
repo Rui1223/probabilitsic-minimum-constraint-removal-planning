@@ -31,16 +31,16 @@ class ConnectedGraph_t
 	std::vector<int> m_labels;
 	std::vector<double> m_labelWeights;
 
-	// specify neighbors (edge) and labels of the edge 
+	// specify neighbors (edges) and labels of the edge 
 	std::vector<std::vector<int>> m_nodeNeighbors;
 	std::vector<std::vector<std::vector<int>>> m_edgeLabels;
 	// the probability that a label is assigned to an edge
 	double m_probPerLabel;
 	// the density which meansures how densely the graph is labeled
 	double m_labelCoverage;
-	int m_nExpansion;
 	std::vector<std::vector<bool>> m_marked;
 	int m_nmarked;
+	int m_nExpansion;
 
 	// all label combinations
 	std::vector<std::vector<int>> m_labelCombinations;

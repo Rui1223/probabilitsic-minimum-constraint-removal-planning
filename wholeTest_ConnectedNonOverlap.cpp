@@ -1,8 +1,6 @@
 /*This cpp files now do 20 experiments on greedy and fixedLabel 
 //for each setting (nLabels, labelCoverage, gridSize)*/
 
-#include "LabeledGraph.hpp"
-#include "ConnectedGraph.hpp"
 #include "ConnectedNonOverlapGraph.hpp"
 #include "PmcrGreedySolver.hpp"
 #include "FixedLabelSolver.hpp"
@@ -28,9 +26,9 @@ int main(int argc, char** argv)
 
 	// first do experiment on the computation time/survivability vs label coverage //
 	// gridSize = 25*25, nLabels = 4
-	// labelCoverage option: 20%, 30%, 40%
+	// labelCoverage option: 10%, 15%, 20%
 	//////////////////////////////////////////////////////////////////////////////////
-	std::vector<double> labelCoverage{20, 30, 40};
+	std::vector<double> labelCoverage{10, 15, 20};
 
 	// write into a txt file
 	std::ofstream file_1(file_dir1);
@@ -48,7 +46,7 @@ int main(int argc, char** argv)
 			{
 				std::cout << "***************" << lc << ":" << i << "**************\n";
 				// generate a graph
-				LabeledGraph_t g(25, 25, 4, lc/100.0);
+				ConnectedNonOverlapGraph_t g(25, 25, 4, lc/100.0);
 				int start = random_generate_integer(0, 25*25-1);
 				int goal = random_generate_integer(0, 25*25-1);
 				while (start == goal)
@@ -87,7 +85,7 @@ int main(int argc, char** argv)
 
 
 	// second do experiment on the computation time/survivability vs grid size //
-	// nLabels = 4, labelCoverage = 30%
+	// nLabels = 4, labelCoverage = 15%
 	// gridSize option: 15, 25, 35
 	///////////////////////////////////////////////////////////////////////////////////
 	std::vector<int> gridSize{15, 25, 35};
@@ -108,7 +106,7 @@ int main(int argc, char** argv)
 			{
 				std::cout << "***************" << gs << ":" << i << "**************\n";
 				// generate a graph
-				LabeledGraph_t g(gs, gs, 4, 0.3);
+				ConnectedNonOverlapGraph_t g(gs, gs, 4, 0.15);
 				int start = random_generate_integer(0, gs*gs-1);
 				int goal = random_generate_integer(0, gs*gs-1);
 				while (start == goal)
@@ -148,7 +146,7 @@ int main(int argc, char** argv)
 
 
 	// third do experiment on the computation time/survivability vs nLabels //
-	// gridSize = 25*25, labelCoverage = 30%
+	// gridSize = 25*25, labelCoverage = 10%
 	// nLabels option: 2, 4, 8
 	///////////////////////////////////////////////////////////////////////////////////
 	std::vector<int> nLabels{2, 4, 8};
@@ -169,7 +167,7 @@ int main(int argc, char** argv)
 			{
 				std::cout << "***************" << nl << ":" << i << "**************\n";
 				// generate a graph
-				LabeledGraph_t g(25, 25, nl, 0.3);
+				ConnectedNonOverlapGraph_t g(25, 25, nl, 0.1);
 				int start = random_generate_integer(0, 25*25-1);
 				int goal = random_generate_integer(0, 25*25-1);
 				while (start == goal)

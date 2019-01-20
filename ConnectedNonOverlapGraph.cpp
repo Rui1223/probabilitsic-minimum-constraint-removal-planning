@@ -13,9 +13,10 @@ in our problem formulation*/
 #include <map> // std::map
 #include <functional>
 #include <set>
-#include <cstdlib>
+#include <cstdlib> // for std::srand()
 #include <string> // std::string, std::to_string
 #include <queue>
+#include <random>
 
 #include "ConnectedNonOverlapGraph.hpp"
 
@@ -27,8 +28,9 @@ Comparator compFunctor =
 		};
 
 ConnectedNonOverlapGraph_t::ConnectedNonOverlapGraph_t(int row, int col, 
-									int n_labels, double percentLabelEdge)
+									int nlabels, double probPerLabel)
 {
+	printf("--------------------------------------------------\n");
 	// specify the size of the graph
 	assert(row > 0);
 	assert(col > 0);
@@ -37,16 +39,17 @@ ConnectedNonOverlapGraph_t::ConnectedNonOverlapGraph_t(int row, int col,
 	m_nNodes = m_row * m_col;
 	m_nEdges = (m_col-1)*m_row + (m_row-1)*m_col;
 	
-	m_nlabels = n_labels;
-	m_percentLabelEdge = percentLabelEdge;
-	// The probability of a label to be assigned to an edge is determined by the number of labels
-	// and the percent of labeled edge we expect in the graph
-	m_prob = 1 - exp(1.0/m_nlabels*log(1-m_percentLabelEdge));
-	std::cout << "m_percentLabelEdge: " << m_percentLabelEdge << std::endl;
-	std::cout << "m_prob: " << m_prob << std::endl;
-	m_nExpansion = int(m_nEdges * m_percentLabelEdge / m_nlabels);
-	std::cout << "n_expansion: " << m_nExpansion << "\n";
+	// label information
+	m_nlabels = nlabels;
+	m_probPerLabel = probPerLabel;
 
+	std::cout << "probPerLabel: " << m_probPerLabel << std::endl;
+	// based on the probability that a label is assigned to an edge, compute how many expansions 
+	// per label are needed 
+	m_nExpansion = m_probPerLabel * m_nEdges;  // keep the density to be 60%
+	std::cout << "n_expansion: " << m_nExpansion << "\n";
+	std::cout << "Expected density: " << m_probPerLabel * m_nlabels << "\n";
+	m_nmarked = 0;
 	// specify the number of labels and their corresponding weights
 	// Based on weighted labels, build the labelMap which maps a set of labels to weights
 	load_labels();
@@ -56,15 +59,13 @@ ConnectedNonOverlapGraph_t::ConnectedNonOverlapGraph_t(int row, int col,
 	// construct the graph 
 	load_graph();
 
-	// print the basic information of the graph
+	printf("--------------------------------------------------\n");
 	//print_labelMap();
-	//print_graph();
-	printf("-------------------------------\n");
 }
 
 void ConnectedNonOverlapGraph_t::load_graph()
 {
-	printf("Build the graph now\n");
+	//printf("Build the graph now\n");
 	// This is the function to construct a random weighted labeled graph with 2 procedures
 	// 1. specify edges (achieved by specifying neighbors)
 	// 2. specify labels
@@ -124,7 +125,8 @@ void ConnectedNonOverlapGraph_t::load_graph()
 	}
 
 	label_graph();
-	printf("Finish building the graph\n");
+	std::cout << "Acutal density: " << double(m_nmarked) / m_nEdges << "\n";
+	//printf("Finish building the graph\n");
 
 }
 
@@ -135,12 +137,12 @@ void ConnectedNonOverlapGraph_t::label_graph()
 	{
 		// random pick up a node to expand (in a BFS search)
 		int BF_start = random_generate_integer(0, m_nNodes-1);
-		std::cout << "start for label " + std::to_string(l) + ": " << BF_start << "\n";
+		//std::cout << "start for label " + std::to_string(l) + ": " << BF_start << "\n";
 		bool success = BFSearch(BF_start, l);
 		while (!success)
 		{
 			int BF_start = random_generate_integer(0, m_nNodes-1);
-			std::cout << "start for label " + std::to_string(l) + ": " << BF_start << "\n";
+			//std::cout << "start for label " + std::to_string(l) + ": " << BF_start << "\n";
 			success = BFSearch(BF_start, l);
 		}
 	}
@@ -194,6 +196,7 @@ bool ConnectedNonOverlapGraph_t::BFSearch(int BF_start, int l)
 		// now label the edges
 		for (auto const &pair : edgesToLabel)
 		{
+			m_nmarked++;
 			int n1 = pair.first;
 			int n2 = pair.second;
 			m_edgeLabels[n1][n2].push_back(l);
@@ -226,8 +229,8 @@ void ConnectedNonOverlapGraph_t::write_graph(std::string file_dir)
 	std::ofstream file_(file_dir);
 	if (file_.is_open())
 	{
-		// Write in the 1st line the size of the grid graph
-		file_ << m_row << " " << m_col << "\n";
+		// Write in the 1st line the size and the density of the grid graph
+		file_ << m_row << " " << m_col << " " << double(m_nmarked) / m_nEdges <<"\n";
 		// Write in the 2nd line label information
 		for (int tt=0; tt < m_nlabels; tt++)
 		{
@@ -274,19 +277,21 @@ void ConnectedNonOverlapGraph_t::load_labels()
 
 void ConnectedNonOverlapGraph_t::load_weights()
 {
+	std::random_device rd{};
+	std::mt19937 gen{rd()};
 	double r = 0.0;
-	int temp;
+
+	std::normal_distribution<> d{5.0,5.0};	
 
 	for (int kk = 0; kk < m_nlabels; kk++)
 	{
-		temp = random_generate_integer(1, 30);
+		double temp = d(gen);
+		while (temp <= 0) { temp = d(gen); }
 		m_labelWeights.push_back(temp);
-		r += double(temp);
+		r += temp;
 	}
-	
-	// now randomize them so that the sum of weights are equal to 1 (can be smaller than one)
+	// normalize
 	m_labelWeights /= r;
-
 }
 
 void ConnectedNonOverlapGraph_t::print_graph() 

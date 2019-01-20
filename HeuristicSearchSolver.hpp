@@ -25,7 +25,7 @@ struct HeuristicNode_comparison
 
 class HeuristicSearchSolver_t
 {
-	ConnectedGraph_t m_lgraph;
+	LabeledGraph_t m_lgraph;
 	int m_start;
 	int m_goal;
 	std::vector<int> m_currentLabels;
@@ -39,7 +39,7 @@ class HeuristicSearchSolver_t
 public:
 	// constructor
 	HeuristicSearchSolver_t() {}
-	HeuristicSearchSolver_t(ConnectedGraph_t &g, int start, int goal);
+	HeuristicSearchSolver_t(LabeledGraph_t &g, int start, int goal);
 
 	bool Heuristic_search();
 
