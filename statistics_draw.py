@@ -42,7 +42,7 @@ if __name__ == '__main__':
 	plt.xlabel("labelCoverage(%)")
 	plt.xlim((10, 60))
 	plt.ylabel("Computation time(s)")
-	plt.ylim((0, 0.001))
+	plt.ylim((0, 0.01))
 
 	plt.figure(2)
 	plt.plot(labelCoverage, solution_G, 'bs', label='Greedy Search') 
@@ -79,7 +79,7 @@ if __name__ == '__main__':
 	plt.xlabel("gridSize(n)")
 	plt.xlim((10, 40))
 	plt.ylabel("Computation time(s)")
-	plt.ylim((0, 0.001))
+	plt.ylim((0, 0.01))
 
 	plt.figure(4)
 	plt.plot(gridSize, solution_G, 'bs', label='Greedy Search') 
@@ -115,7 +115,7 @@ if __name__ == '__main__':
 	plt.xlabel("nLabels")
 	plt.xlim((0, 10))
 	plt.ylabel("Computation time(s)")
-	plt.ylim((0, 0.001))
+	plt.ylim((0, 0.01))
 	plt.figure(6)
 	plt.plot(nLabels, solution_G, 'bs', label='Greedy Search') 
 	plt.plot(nLabels, solution_F, 'g^', label='FixedLabel Search')

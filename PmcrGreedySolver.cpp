@@ -14,7 +14,7 @@
 #include "PmcrNode.hpp"
 #include "Timer.hpp"
 
-PmcrGreedySolver_t::PmcrGreedySolver_t(LabeledGraph_t &g, int start, int goal)
+PmcrGreedySolver_t::PmcrGreedySolver_t(ConnectedGraph_t &g, int start, int goal)
 {
 	m_lgraph = g;
 	assert(start >=0);

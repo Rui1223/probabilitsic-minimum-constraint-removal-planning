@@ -6,6 +6,7 @@
 #include "ConnectedNonOverlapGraph.hpp"
 #include "PmcrGreedySolver.hpp"
 #include "FixedLabelSolver.hpp"
+#include "GrowingTreeSolver.hpp"
 #include "Timer.hpp"
 
 #include <iostream>
@@ -32,10 +33,12 @@ int main(int argc, char** argv)
 		std::string file_dir2 = "./" + folder_dir + "/FixedLabel_solution" 
 															+ std::to_string(ii) + ".txt";
 		std::string file_dir3 = "./" + folder_dir + "/GreedySearch_solution" 
+																+ std::to_string(ii) + ".txt";		
+		std::string file_dir4 = "./" + folder_dir + "/GrowingTree_solution" 
 																+ std::to_string(ii) + ".txt";
 
 		// generate a grpah
-		ConnectedNonOverlapGraph_t g(gridSize, gridSize, nLabels, probPerLabel);
+		ConnectedGraph_t g(gridSize, gridSize, nLabels, probPerLabel);
 		int start = random_generate_integer(0, gridSize*gridSize-1);
 		int goal = random_generate_integer(0, gridSize*gridSize-1);
 		while (start == goal)
@@ -51,16 +54,24 @@ int main(int argc, char** argv)
 		t.reset();
 		fixedlabel_solver.fixedLabel_search();
 		t1 = t.elapsed();
-		std::cout << "\nFixedLabel time: " << t1 << " seconds\n";
+		std::cout << "FixedLabel time: " << t1 << " seconds\n\n";
 		fixedlabel_solver.write_solution(file_dir2, t1);
 
 		std::cout << "----------start the greedy search-------------\n";
-		PmcrGreedySolver_t pmcr_solver(g, start, goal);
+		PmcrGreedySolver_t pmcr_greedy_solver(g, start, goal);
 		t.reset();
-		pmcr_solver.greedy_search();
+		pmcr_greedy_solver.greedy_search();
 		t1 = t.elapsed();
-		std::cout << "\nGreedy time: " << t.elapsed() << " seconds\n";
-		pmcr_solver.write_solution(file_dir3, t1);
+		std::cout << "Greedy time: " << t1 << " seconds\n\n";
+		pmcr_greedy_solver.write_solution(file_dir3, t1);
+
+		std::cout << "----------start the growingtree search-------------\n";
+		GrowingTreeSolver_t growingtree_solver(g, start, goal);
+		t.reset();
+		growingtree_solver.GrowingTreeSearch();
+		t1 = t.elapsed();
+		std::cout << "GrowTree time: " << t1 << " seconds\n\n";
+		growingtree_solver.write_solution(file_dir4, t1);
 	}
 
 	return 0;

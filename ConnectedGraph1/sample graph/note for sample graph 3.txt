@@ -1,0 +1,25 @@
+For the sample graph 3 in the folder "ConnectedGraph1".
+
+From the graph you can see that the goal is stuck in region surrounded by potential pose 5, which
+is a very likely one (0.33, very large weight). 
+
+1. FixedLabel search takes advantage of the beforehand information that goal will
+inevitably collide with pose 5. So it directly start search by label combination {5} and find the
+goal in the 1st search. More impressively, when it reaches the boundary of the connected component
+which features pose 5, it directly move towards instead of circumventing the connected component.
+It is because it is performing heuristic search on a subgraph which the upper label combination is
+known in advance. All the edges in this subgraph carry the label, which is a subset of the label
+combination. So it treats these edges equally and put a bias on those closer towards the goal.
+
+2. Greedy search is intelligent though it aggressively prune nodes. When it reaches connected
+component featured pose 5, it circumvent the components since it always wants to find the best node
+so far. Finally it searches the entire space and couldn't find a better one without touching pose 5
+and goes into region of pose 5 unwillingly. So it makes sense that it goes slowly than FixedLabel.
+
+3. GrowingTree search is intelligent and also be cautious about pruning nodes. It only prunes those 
+nodes which have been visited once with a subset of the current labels. It will preserve those 
+nodes which have been visited before but encounter a different current labels (not subset/superset).
+And it loop through the label combinations to grow the tree in each iteration. Unfortunately in this
+case, pose 5 has a large weight, which means the label combination {5} will be placed after lots of 
+label combinations which have a less weight, thus increasing the number of search to reach the goal
+(in this case 63th). So it is the slowest in the case (and usually). 
