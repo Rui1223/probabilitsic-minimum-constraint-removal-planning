@@ -6,6 +6,7 @@
 #include "ConnectedNonOverlapGraph.hpp"
 #include "PmcrGreedySolver.hpp"
 #include "FixedLabelSolver.hpp"
+#include "GrowingTreeSolver.hpp"
 #include "Timer.hpp"
 
 #include <iostream>
@@ -44,6 +45,8 @@ int main(int argc, char** argv)
 			double solution_G = 0.0;
 			double time_F = 0.0;
 			double solution_F = 0.0;
+			double time_Gr = 0.0;
+			double solution_Gr = 0.0;
 			for (int i=0; i < nExperiments; i++)
 			{
 				std::cout << "***************" << lc << ":" << i << "**************\n";
@@ -70,15 +73,23 @@ int main(int argc, char** argv)
 				pmcr_solver.greedy_search();
 				time_G += t.elapsed();
 				solution_G += (1 - pmcr_solver.getCurrentWeight());
+				std::cout << "----------start the growingTree search-------------\n";
+				GrowingTreeSolver_t growingtree_solver(g, start, goal);
+				t.reset();
+				growingtree_solver.GrowingTreeSearch();
+				time_Gr += t.elapsed();
+				solution_Gr += (1 - growingtree_solver.getCurrentWeight());
 			}
 			// calculate the average time and survivability
 			time_G /= nExperiments;	
 			solution_G /= nExperiments;
 			time_F /= nExperiments;
 			solution_F /= nExperiments;
+			time_Gr /= nExperiments;
+			solution_Gr /= nExperiments;			
 			// write your results into the file
 			file_1 << lc << " " << time_G << " " << solution_G << " " 
-					<< time_F << " " << solution_F << "\n";
+					<< time_F << " " << solution_F << " " << time_Gr << " " << solution_Gr << "\n";
 		}
 		file_1 << "\n";
 		file_1.close();		
@@ -104,6 +115,8 @@ int main(int argc, char** argv)
 			double solution_G = 0.0;
 			double time_F = 0.0;
 			double solution_F = 0.0;
+			double time_Gr = 0.0;
+			double solution_Gr = 0.0;
 			for (int i=0; i < nExperiments; i++)
 			{
 				std::cout << "***************" << gs << ":" << i << "**************\n";
@@ -113,8 +126,8 @@ int main(int argc, char** argv)
 				int goal = random_generate_integer(0, gs*gs-1);
 				while (start == goal)
 				{
-					int start = random_generate_integer(0, gs*gs-1);
-					int goal = random_generate_integer(0, gs*gs-1);
+					start = random_generate_integer(0, gs*gs-1);
+					goal = random_generate_integer(0, gs*gs-1);
 				}
 				//g.write_graph();//
 
@@ -130,15 +143,23 @@ int main(int argc, char** argv)
 				pmcr_solver.greedy_search();
 				time_G += t.elapsed();
 				solution_G += (1 - pmcr_solver.getCurrentWeight());
+				std::cout << "----------start the growingTree search-------------\n";
+				GrowingTreeSolver_t growingtree_solver(g, start, goal);
+				t.reset();
+				growingtree_solver.GrowingTreeSearch();
+				time_Gr += t.elapsed();
+				solution_Gr += (1 - growingtree_solver.getCurrentWeight());
 			}
 			// calculate the average time and survivability
 			time_G /= nExperiments;	
 			solution_G /= nExperiments;
 			time_F /= nExperiments;
 			solution_F /= nExperiments;
+			time_Gr /= nExperiments;
+			solution_Gr /= nExperiments;
 			// write your results into the file
 			file_2 << gs << " " << time_G << " " << solution_G << " " 
-					<< time_F << " " << solution_F << "\n";		
+					<< time_F << " " << solution_F << " " << time_Gr << " " << solution_Gr << "\n";		
 		}
 		file_2 << "\n";
 		file_2.close();		
@@ -165,6 +186,8 @@ int main(int argc, char** argv)
 			double solution_G = 0.0;
 			double time_F = 0.0;
 			double solution_F = 0.0;
+			double time_Gr = 0.0;
+			double solution_Gr = 0.0;
 			for (int i=0; i < nExperiments; i++)
 			{
 				std::cout << "***************" << nl << ":" << i << "**************\n";
@@ -174,8 +197,8 @@ int main(int argc, char** argv)
 				int goal = random_generate_integer(0, 25*25-1);
 				while (start == goal)
 				{
-					int start = random_generate_integer(0, 25*25-1);
-					int goal = random_generate_integer(0, 25*25-1);
+					start = random_generate_integer(0, 25*25-1);
+					goal = random_generate_integer(0, 25*25-1);
 				}
 				//g.write_graph();//
 
@@ -192,15 +215,23 @@ int main(int argc, char** argv)
 				pmcr_solver.greedy_search();
 				time_G += t.elapsed();
 				solution_G += (1 - pmcr_solver.getCurrentWeight());
+				std::cout << "----------start the growingTree search-------------\n";
+				GrowingTreeSolver_t growingtree_solver(g, start, goal);
+				t.reset();
+				growingtree_solver.GrowingTreeSearch();
+				time_Gr += t.elapsed();
+				solution_Gr += (1 - growingtree_solver.getCurrentWeight());
 			}
 			// calculate the average time and survivability
 			time_G /= nExperiments;	
 			solution_G /= nExperiments;
 			time_F /= nExperiments;
 			solution_F /= nExperiments;
+			time_Gr /= nExperiments;
+			solution_Gr /= nExperiments;
 			// write your results into the file
 			file_3 << nl << " " << time_G << " " << solution_G << " " 
-					<< time_F << " " << solution_F << "\n";		
+					<< time_F << " " << solution_F << " " << time_Gr << " " << solution_Gr << "\n";		
 		}
 		file_3 << "\n";
 		file_3.close();		
