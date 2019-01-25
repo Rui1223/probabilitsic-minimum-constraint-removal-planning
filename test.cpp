@@ -18,9 +18,9 @@
 int main(int argc, char** argv)
 {
 	int nExperiments = 1;
-	int gridSize = 25;
-	int nLabels = 8;
-	double probPerLabel = 0.1;
+	int gridSize = 100;
+	int nLabels = 20;
+	double probPerLabel = 0.4;
 	Timer t;
 	std::srand(std::time(0));
 	double t1;
@@ -47,31 +47,35 @@ int main(int argc, char** argv)
 			goal = random_generate_integer(0, gridSize*gridSize-1);
 		}
 		g.write_graph(file_dir1);
+		std::cout << std::endl;
 
 		// work out on solutions
 		std::cout << "----------start the fixedLabel search-------------\n";
 		FixedLabelSolver_t fixedlabel_solver(g, start, goal);
 		t.reset();
+		std::cout << "Start to compute time\n";
 		fixedlabel_solver.fixedLabel_search();
 		t1 = t.elapsed();
 		std::cout << "FixedLabel time: " << t1 << " seconds\n\n";
-		fixedlabel_solver.write_solution(file_dir2, t1);
+		//fixedlabel_solver.write_solution(file_dir2, t1);
 
 		std::cout << "----------start the greedy search-------------\n";
 		PmcrGreedySolver_t pmcr_greedy_solver(g, start, goal);
 		t.reset();
+		std::cout << "Start to compute time\n";
 		pmcr_greedy_solver.greedy_search();
 		t1 = t.elapsed();
 		std::cout << "Greedy time: " << t1 << " seconds\n\n";
-		pmcr_greedy_solver.write_solution(file_dir3, t1);
+		//pmcr_greedy_solver.write_solution(file_dir3, t1);
 
 		std::cout << "----------start the growingtree search-------------\n";
 		GrowingTreeSolver_t growingtree_solver(g, start, goal);
 		t.reset();
+		std::cout << "Start to compute time\n";
 		growingtree_solver.GrowingTreeSearch();
 		t1 = t.elapsed();
 		std::cout << "GrowTree time: " << t1 << " seconds\n\n";
-		growingtree_solver.write_solution(file_dir4, t1);
+		//growingtree_solver.write_solution(file_dir4, t1);
 	}
 
 	return 0;

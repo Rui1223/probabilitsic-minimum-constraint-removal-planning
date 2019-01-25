@@ -20,7 +20,7 @@ int main(int argc, char** argv)
 {
 	Timer t;
 	std::srand(std::time(0));
-	int nExperiments = 20;
+	int nExperiments = 15;
 
 	std::string folder_dir(argv[1]);
 	std::string file_dir1 = "./" + folder_dir + "/labelCoverage_performance.txt";
@@ -31,7 +31,7 @@ int main(int argc, char** argv)
 	// gridSize = 25*25, nLabels = 4
 	// labelCoverage option: 20%, 30%, 40%
 	//////////////////////////////////////////////////////////////////////////////////
-	std::vector<double> labelCoverage{20, 30, 40};
+	std::vector<double> labelCoverage{40, 50, 60};
 
 	// write into a txt file
 	std::ofstream file_1(file_dir1);
@@ -51,13 +51,13 @@ int main(int argc, char** argv)
 			{
 				std::cout << "***************" << lc << ":" << i << "**************\n";
 				// generate a graph
-				ConnectedGraph_t g(25, 25, 4, lc/100.0);
-				int start = random_generate_integer(0, 25*25-1);
-				int goal = random_generate_integer(0, 25*25-1);
+				ConnectedGraph_t g(50, 50, 16, lc/100.0);
+				int start = random_generate_integer(0, 50*50-1);
+				int goal = random_generate_integer(0, 50*50-1);
 				while (start == goal)
 				{
-					start = random_generate_integer(0, 25*25-1);
-					goal = random_generate_integer(0, 25*25-1);
+					start = random_generate_integer(0, 50*50-1);
+					goal = random_generate_integer(0, 50*50-1);
 				}
 				//g.write_graph();//
 
@@ -101,7 +101,7 @@ int main(int argc, char** argv)
 	// nLabels = 4, labelCoverage = 30%
 	// gridSize option: 15, 25, 35
 	///////////////////////////////////////////////////////////////////////////////////
-	std::vector<int> gridSize{15, 25, 35};
+	std::vector<int> gridSize{35, 50, 100};
 
 	// write into a txt file
 	std::ofstream file_2(file_dir2);
@@ -121,7 +121,7 @@ int main(int argc, char** argv)
 			{
 				std::cout << "***************" << gs << ":" << i << "**************\n";
 				// generate a graph
-				ConnectedGraph_t g(gs, gs, 4, 0.3);
+				ConnectedGraph_t g(gs, gs, 16, 0.5);
 				int start = random_generate_integer(0, gs*gs-1);
 				int goal = random_generate_integer(0, gs*gs-1);
 				while (start == goal)
@@ -172,7 +172,7 @@ int main(int argc, char** argv)
 	// gridSize = 25*25, labelCoverage = 30%
 	// nLabels option: 2, 4, 8
 	///////////////////////////////////////////////////////////////////////////////////
-	std::vector<int> nLabels{2, 4, 8};
+	std::vector<int> nLabels{8, 16, 20};
 
 	// write into a txt file
 	std::ofstream file_3(file_dir3);
@@ -192,13 +192,13 @@ int main(int argc, char** argv)
 			{
 				std::cout << "***************" << nl << ":" << i << "**************\n";
 				// generate a graph
-				ConnectedGraph_t g(25, 25, nl, 0.3);
-				int start = random_generate_integer(0, 25*25-1);
-				int goal = random_generate_integer(0, 25*25-1);
+				ConnectedGraph_t g(50, 50, nl, 0.5);
+				int start = random_generate_integer(0, 50*50-1);
+				int goal = random_generate_integer(0, 50*50-1);
 				while (start == goal)
 				{
-					start = random_generate_integer(0, 25*25-1);
-					goal = random_generate_integer(0, 25*25-1);
+					start = random_generate_integer(0, 50*50-1);
+					goal = random_generate_integer(0, 50*50-1);
 				}
 				//g.write_graph();//
 

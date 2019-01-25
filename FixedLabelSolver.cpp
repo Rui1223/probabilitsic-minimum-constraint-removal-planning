@@ -31,8 +31,11 @@ Comparator compFunctor1 =
 
 FixedLabelSolver_t::FixedLabelSolver_t(ConnectedGraph_t &g, int start, int goal)
 {
+	Timer tt;
+	tt.reset();
 	// problem formulation specified at the beginning of the solver
 	m_lgraph = g;
+	std::cout << "Time to load the graph for Fsolver: " << tt.elapsed() << " seconds\n";
 	assert(start >=0);
 	assert(goal >=0);
 	m_start = start;

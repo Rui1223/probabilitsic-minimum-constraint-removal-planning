@@ -19,6 +19,7 @@ in our problem formulation*/
 #include <random>
 
 #include "ConnectedGraph.hpp"
+#include "Timer.hpp"
 
 Comparator compFunctor = 
 		[](std::pair<std::vector<int>, double> elem1, std::pair<std::vector<int>, double> elem2)
@@ -28,6 +29,8 @@ Comparator compFunctor =
 
 ConnectedGraph_t::ConnectedGraph_t(int row, int col, int nlabels, double probPerLabel)
 {
+	Timer tt;
+	tt.reset();
 	printf("--------------------------------------------------\n");
 	// specify the size of the graph
 	assert(row > 0);
@@ -36,6 +39,7 @@ ConnectedGraph_t::ConnectedGraph_t(int row, int col, int nlabels, double probPer
 	m_col = col;
 	m_nNodes = m_row * m_col;
 	m_nEdges = (m_col-1)*m_row + (m_row-1)*m_col;
+	std::cout << "m_nEdges: " << m_nEdges << std::endl;
 	
 	// label information
 	m_nlabels = nlabels;
@@ -44,9 +48,10 @@ ConnectedGraph_t::ConnectedGraph_t(int row, int col, int nlabels, double probPer
 	std::cout << "probPerLabel: " << m_probPerLabel << std::endl;
 	// based on the probability that a label is assigned to an edge, compute how many expansions 
 	// per label are needed 
-	m_nExpansion = round(m_nEdges * (1 - pow(1 - m_probPerLabel, m_nlabels))) / m_nlabels;
+	// m_nExpansion = round(m_nEdges * (1 - pow(1 - m_probPerLabel, m_nlabels))) / m_nlabels;
+	m_nExpansion = round(m_nEdges * probPerLabel *1.0 / m_nlabels);
 	std::cout << "n_expansion: " << m_nExpansion << "\n";
-	std::cout << "Expected density: " << 1-pow(1 - m_probPerLabel, m_nlabels) << "\n";
+	std::cout << "Expected density: " << probPerLabel << "\n";
 	m_nmarked = 0;
 	// specify the number of labels and their corresponding weights
 	// Based on weighted labels, build the labelMap which maps a set of labels to weights
@@ -56,6 +61,8 @@ ConnectedGraph_t::ConnectedGraph_t(int row, int col, int nlabels, double probPer
 
 	// construct the graph 
 	load_graph();
+
+	std::cout << "Time to build and label the graph: " << tt.elapsed() << " seconds\n";
 
 	printf("--------------------------------------------------\n");
 	//print_labelMap();
@@ -317,7 +324,10 @@ void ConnectedGraph_t::cal_powerSet()
 
 	// first determines the size of the powerset that you will have
 	// for each one's derivation we will do bitwise operation
+	//std::cout << "Start Computing powerset\n";
 	int powerSet_size = pow(2, m_labels.size()); // 2^n combinations
+	//std::cout << "can I compute the powerSet_size?\n";
+	std::cout << powerSet_size << "\n";
 	for (int counter = 0; counter < powerSet_size; counter++)
 	{
 		std::vector<int> labels; // labels for a single combination
@@ -330,6 +340,7 @@ void ConnectedGraph_t::cal_powerSet()
 		}
 		m_labelCombinations.push_back(labels);
 	}
+	std::cout << "Finally get powerSet\n";
 }
 
 std::map<std::vector<int>, double> ConnectedGraph_t::zip_combinations(std::vector<double>& b)
