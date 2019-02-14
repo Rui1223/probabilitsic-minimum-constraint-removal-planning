@@ -1,0 +1,38 @@
+/*This cpp file test the effectiveness of the GrowingTree algorithm on a toy problem*/
+
+// #include "LabeledGraph.hpp"
+// #include "ConnectedGraph.hpp"
+// #include "ConnectedNonOverlapGraph.hpp"
+#include "ToyGraph.hpp"
+// #include "PmcrGreedySolver.hpp"
+// #include "FixedLabelSolver.hpp"
+// #include "GrowingTreeSolver.hpp"
+//#include "Timer.hpp"
+
+#include <cstdio>
+#include <cassert>
+#include <cmath>  // pow(), sqrt()
+#include <iostream> 
+#include <fstream> // stream class to write on files
+#include <cstdio> // printf() 
+#include <vector> // std::vector
+#include <algorithm> // std::set_union, std::sort
+#include <bitset> // for bitwise operation
+#include <map> // std::map
+#include <functional>
+#include <set>
+#include <cstdlib> // for std::srand()
+#include <string> // std::string, std::to_string
+#include <queue>
+#include <random>
+
+int main(int argc, char** argv)
+{
+	// Please specify #labels per label
+	std::vector<int> nlabelsPerObs;
+	nlabelsPerObs.push_back(2);
+	nlabelsPerObs.push_back(2);
+	ToyGraph_t toy_graph(2, 6, nlabelsPerObs);
+
+	return 0;
+}
