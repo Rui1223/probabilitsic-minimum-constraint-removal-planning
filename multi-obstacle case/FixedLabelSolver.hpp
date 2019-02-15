@@ -8,34 +8,35 @@
 #include <cstring>
 
 #include "HeuristicSearchSolver.hpp"
-#include "LabeledGraph.hpp"
-#include "ConnectedGraph.hpp"
-#include "ConnectedNonOverlapGraph.hpp"
+// #include "LabeledGraph.hpp"
+// #include "ConnectedGraph.hpp"
+// #include "ConnectedNonOverlapGraph.hpp"
+#include "ToyGraph.hpp"
 
 // Declaring the type of Predicate that accept two pairs and return a bool
-typedef std::function<bool(std::pair<std::vector<int>, double>, 
-	std::pair<std::vector<int>, double>)> Comparator1;
+// typedef std::function<bool(std::pair<std::vector<int>, double>, 
+// 	std::pair<std::vector<int>, double>)> Comparator1;
 
 class FixedLabelSolver_t
 {
-	ConnectedGraph_t m_lgraph;
+	ToyGraph_t m_lgraph;
 	int m_start;
 	int m_goal;
 
 	std::vector<int> m_currentLabels;
-	double m_currentWeight;
+	double m_currentSurvival;
 	std::vector<int> m_path;
 
 	HeuristicSearchSolver_t m_heuristic_search_solver;
 
 public:
 	FixedLabelSolver_t() {}
-	FixedLabelSolver_t(ConnectedGraph_t &g, int start, int goal);
+	FixedLabelSolver_t(ToyGraph_t &g, int start, int goal);
 
 	~FixedLabelSolver_t() {}
 
 	std::vector<int> cal_sgLabel(int start, int goal);
-	std::set<std::pair<std::vector<int>, double>, Comparator1> cal_subLabelMap(std::vector<int>);
+	std::vector<std::pair<std::vector<int>, double>> cal_subLabelMap(std::vector<int>);
 
 	// The function to search for a path in a fixed label scenario
 	void fixedLabel_search();
@@ -49,7 +50,7 @@ public:
 
 	// getters
 	std::vector<int> getCurrentLabels() { return m_currentLabels; }
-	double getCurrentWeight() { return m_currentWeight; }
+	double getCurrentSurvival() { return m_currentSurvival; }
 
 };
 

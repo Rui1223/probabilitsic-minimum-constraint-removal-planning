@@ -10,13 +10,14 @@
 #include <string> // std::string, std::to_string
 
 #include "HeuristicSearchSolver.hpp"
-#include "LabeledGraph.hpp"
-#include "ConnectedGraph.hpp"
-#include "ConnectedNonOverlapGraph.hpp"
+// #include "LabeledGraph.hpp"
+// #include "ConnectedGraph.hpp"
+// #include "ConnectedNonOverlapGraph.hpp"
+#include "ToyGraph.hpp"
 #include "Timer.hpp"
 
 
-HeuristicSearchSolver_t::HeuristicSearchSolver_t(ConnectedGraph_t &g, int start, 
+HeuristicSearchSolver_t::HeuristicSearchSolver_t(ToyGraph_t &g, int start, 
 	int goal) : m_lgraph(g), m_start(start), m_goal(goal)
 {
 	//m_open.push(new HeuristicNode_t(m_start, computeH(m_start), nullptr));
@@ -37,7 +38,7 @@ bool HeuristicSearchSolver_t::Heuristic_search()
 		{
 			std::cout << "Goal is connected all the way to the start\n";
 			std::cout << "current labels: " << m_currentLabels << "\n";
-			std::cout << "current weight: " << m_currentWeight << "\n";
+			std::cout << "current survivability: " << m_currentSurvival << "\n";
 			back_track_path(); // construct your path
 			print_path();
 			return true;

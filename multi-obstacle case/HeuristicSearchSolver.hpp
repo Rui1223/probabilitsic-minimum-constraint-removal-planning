@@ -2,9 +2,10 @@
 #ifndef HEURISTICSEARCHSOLVER_H
 #define HEURISTICSEARCHSOLVER_H
 
-#include "LabeledGraph.hpp"
-#include "ConnectedGraph.hpp"
-#include "ConnectedNonOverlapGraph.hpp"
+// #include "LabeledGraph.hpp"
+// #include "ConnectedGraph.hpp"
+// #include "ConnectedNonOverlapGraph.hpp"
+#include "ToyGraph.hpp"
 
 struct HeuristicNode_t
 {
@@ -25,11 +26,11 @@ struct HeuristicNode_comparison
 
 class HeuristicSearchSolver_t
 {
-	ConnectedGraph_t m_lgraph;
+	ToyGraph_t m_lgraph;
 	int m_start;
 	int m_goal;
 	std::vector<int> m_currentLabels;
-	double m_currentWeight;
+	double m_currentSurvival;
 
 	std::priority_queue<HeuristicNode_t*, std::vector<HeuristicNode_t*>, 
 					HeuristicNode_comparison> m_open;
@@ -39,7 +40,7 @@ class HeuristicSearchSolver_t
 public:
 	// constructor
 	HeuristicSearchSolver_t() {}
-	HeuristicSearchSolver_t(ConnectedGraph_t &g, int start, int goal);
+	HeuristicSearchSolver_t(ToyGraph_t &g, int start, int goal);
 
 	bool Heuristic_search();
 
@@ -58,13 +59,13 @@ public:
 	void print_closedList();
 
 	// getters
-	double getCurrentWeight() { return m_currentWeight; }
+	double getCurrentSurvival() { return m_currentSurvival; }
 	std::vector<int> getCurrentLabels() { return m_currentLabels; }
 	std::vector<int> getPath() { return m_path; }
 
 	// setters
 	void setCurrentLabels(std::vector<int> labels) { m_currentLabels = labels; }
-	void setCurrentWeight(double currentWeight) { m_currentWeight = currentWeight; }
+	void setCurrentSurvival(double currentSurvival) { m_currentSurvival = currentSurvival; }
 
 	// destructor used to free space before exit
 	~HeuristicSearchSolver_t();	

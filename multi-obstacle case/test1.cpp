@@ -5,7 +5,7 @@
 // #include "ConnectedNonOverlapGraph.hpp"
 #include "ToyGraph.hpp"
 #include "PmcrGreedySolver.hpp"
-// #include "FixedLabelSolver.hpp"
+#include "FixedLabelSolver.hpp"
 // #include "GrowingTreeSolver.hpp"
 #include "Timer.hpp"
 
@@ -37,9 +37,18 @@ int main(int argc, char** argv)
 	int start = 0;
 	int goal = 5;
 	// try greedy search approach
+	std::cout << "**************Greedy Search*************";
 	PmcrGreedySolver_t pmcr_greedy_solver(toy_graph, start, goal);
 	Timer t;
 	pmcr_greedy_solver.greedy_search();
 	std::cout << "Time for greedy search on this easy toy problem: " << t.elapsed() << " seconds\n";
+
+
+	std::cout << "************FixedLabel Search*************";
+	FixedLabelSolver_t fixedlabel_solver(toy_graph, start, goal);
+	t.reset();
+	fixedlabel_solver.fixedLabel_search();
+	std::cout << "Time for FixedLabel search on this easy toy problem: " << t.elapsed() << " seconds\n";
+
 	return 0;
 }

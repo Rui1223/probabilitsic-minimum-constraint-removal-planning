@@ -18,18 +18,26 @@
 
 #include "FixedLabelSolver.hpp"
 #include "HeuristicSearchSolver.hpp"
-#include "LabeledGraph.hpp"
-#include "ConnectedGraph.hpp"
-#include "ConnectedNonOverlapGraph.hpp"
+// #include "LabeledGraph.hpp"
+// #include "ConnectedGraph.hpp"
+// #include "ConnectedNonOverlapGraph.hpp"
+#include "ToyGraph.hpp"
 #include "Timer.hpp"
 
-Comparator compFunctor1 = 
-		[](std::pair<std::vector<int>, double> elem1, std::pair<std::vector<int>, double> elem2)
-		{
-			return elem1.second <= elem2.second; // compare weights, prefer less weight  
-		};
+// Comparator compFunctor1 = 
+// 		[](std::pair<std::vector<int>, double> elem1, std::pair<std::vector<int>, double> elem2)
+// 		{
+// 			return elem1.second <= elem2.second; // compare weights, prefer less weight  
+// 		};
+// Driver function to sort the vector elements 
+// by second element of pairs 
+// bool sortbysec1(const std::pair<std::vector<int>, double> &p1, 
+// 				const std::pair<std::vector<int>, double> &p2)
+// {
+// 	return (p1.second >= p2.second);
+// }
 
-FixedLabelSolver_t::FixedLabelSolver_t(ConnectedGraph_t &g, int start, int goal)
+FixedLabelSolver_t::FixedLabelSolver_t(ToyGraph_t &g, int start, int goal)
 {
 	Timer tt;
 	tt.reset();
@@ -55,7 +63,7 @@ void FixedLabelSolver_t::fixedLabel_search()
 	// Given start and goal, figure out whether start and goal are already 
 	// in a region where labels are assigned (doomed)
 	std::vector<int> sgLabels = cal_sgLabel(m_start, m_goal);
-	std::set<std::pair<std::vector<int>, double>, Comparator> subLabelMap = cal_subLabelMap(sgLabels);
+	std::vector<std::pair<std::vector<int>, double>> subLabelMap = cal_subLabelMap(sgLabels);
 
 	// std::cout << "sgLabels:\n";
 	// for (auto const &l : sgLabels)
@@ -82,7 +90,7 @@ void FixedLabelSolver_t::fixedLabel_search()
 	for (auto const &pair : subLabelMap)
 	{
 		m_currentLabels = pair.first;
-		m_currentWeight = pair.second;
+		m_currentSurvival = pair.second;
 		//std::cout << "current set of labels: " << m_currentLabels << "\n";
 		//std::cout << "currrent weight: " << m_currentWeight << "\n"; 
 		std::cout << "start the " << k << "th search\n";
@@ -108,7 +116,7 @@ bool FixedLabelSolver_t::HeuristicSearch()
 	//HeuristicSearchSolver_t heuristic_search_solver(m_lgraph, m_start, m_goal,
 													//m_currentLabels, m_currentWeight);
 	m_heuristic_search_solver.setCurrentLabels(m_currentLabels);
-	m_heuristic_search_solver.setCurrentWeight(m_currentWeight);
+	m_heuristic_search_solver.setCurrentSurvival(m_currentSurvival);
 	bool goalFound = m_heuristic_search_solver.Heuristic_search();
 	if (goalFound)
 	{
@@ -129,7 +137,7 @@ void FixedLabelSolver_t::write_solution(std::string file_dir, double t)
 		}
 		file_ << "\n";
 		// write the label and weight for the solution
-		file_ << m_currentWeight << "\n";
+		file_ << m_currentSurvival << "\n";
 		
 		if (!m_currentLabels.empty())
 		{
@@ -183,20 +191,34 @@ std::vector<int> FixedLabelSolver_t::cal_sgLabel(int start, int goal)
 }
 
 
-std::set<std::pair<std::vector<int>, double>, Comparator> FixedLabelSolver_t::cal_subLabelMap(
+std::vector<std::pair<std::vector<int>, double>> FixedLabelSolver_t::cal_subLabelMap(
 																		std::vector<int> sgLabels)
 {
-	std::map<std::vector<int>, double> sub_m;
-	for (auto const &e : m_lgraph.getLabelMap())
+	// std::map<std::vector<int>, double> sub_m;
+	// for (auto const &e : m_lgraph.getLabelMap())
+	// {
+	// 	if (check_subset(e.first, sgLabels))
+	// 	{
+	// 		sub_m[e.first] = e.second;
+	// 	}
+	// }
+	// std::set<std::pair<std::vector<int>, double>, Comparator> subLabelMap;
+	// subLabelMap = std::set<std::pair<std::vector<int>, double>, Comparator>(
+	// 	sub_m.begin(), sub_m.end(), compFunctor1);
+
+	std::vector<std::pair<std::vector<int>, double>> subLabelMap;
+
+	for (auto const &e: m_lgraph.getLabelMap())
 	{
 		if (check_subset(e.first, sgLabels))
 		{
-			sub_m[e.first] = e.second;
+			subLabelMap.push_back(e);
 		}
 	}
-	std::set<std::pair<std::vector<int>, double>, Comparator> subLabelMap;
-	subLabelMap = std::set<std::pair<std::vector<int>, double>, Comparator>(
-		sub_m.begin(), sub_m.end(), compFunctor1);
+
+	// sort (actually I don't need sort, since it has been sorted 
+	// and by deletion the order is unchanged)
+	//sort(m_labelMap.begin(), m_labelMap.end(), sortbysec1);
 
 	return subLabelMap;
 }

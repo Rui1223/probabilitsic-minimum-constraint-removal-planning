@@ -320,7 +320,7 @@ void ToyGraph_t::cal_labelMap()
 																	survivalCombinations[kkk]));
 	}
 
-	sort(m_labelMap.begin(), m_labelMap.end(), sortbysec);	
+	sort(m_labelMap.begin(), m_labelMap.end(), sortbysec);
 }
 
 void ToyGraph_t::print_labelMap()
