@@ -57,7 +57,7 @@ ToyGraph_t::ToyGraph_t(int row, int col, std::vector<int> nlabelsPerObs)
 
 	// construct the graph 
 	load_graph();
-	print_graph();
+	//print_graph();
 
 	printf("--------------------------------------------------\n");
 

@@ -7,14 +7,14 @@
 PmcrNode_t::PmcrNode_t() {}
 
 PmcrNode_t::PmcrNode_t(int id, int H, std::vector<int> labels, 
-	PmcrNode_t *parent, double weight)
+	PmcrNode_t *parent, double survival)
 {
 	assert(id >= 0);
 	m_id = id;
 	m_H = H;
 	m_labels = labels;
 	m_labelCardinality = labels.size();
-	m_weight = weight;
+	m_survival = survival;
 	m_parent = parent;
 	
 }
@@ -29,7 +29,7 @@ void PmcrNode_t::print()
 	}
 	std::cout << " ";
 	std::cout << m_labelCardinality << " ";
-	std::cout << m_weight << " ";
+	std::cout << m_survival << " ";
 }
 
 

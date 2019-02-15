@@ -7,14 +7,15 @@
 #include <fstream>
 #include <string> // std::string, std::to_string
 
-#include "LabeledGraph.hpp"
-#include "ConnectedGraph.hpp"
-#include "ConnectedNonOverlapGraph.hpp"
+// #include "LabeledGraph.hpp"
+// #include "ConnectedGraph.hpp"
+// #include "ConnectedNonOverlapGraph.hpp"
+#include "ToyGraph.hpp"
 #include "PmcrGreedySolver.hpp"
 #include "PmcrNode.hpp"
 #include "Timer.hpp"
 
-PmcrGreedySolver_t::PmcrGreedySolver_t(ConnectedGraph_t &g, int start, int goal)
+PmcrGreedySolver_t::PmcrGreedySolver_t(ToyGraph_t &g, int start, int goal)
 {
 	Timer tt;
 	tt.reset();
@@ -24,9 +25,10 @@ PmcrGreedySolver_t::PmcrGreedySolver_t(ConnectedGraph_t &g, int start, int goal)
 	assert(goal >=0);
 	m_start = start;
 	m_goal = goal;
-	m_open.push(new PmcrNode_t(m_start, computeH(m_start), {}, nullptr, m_lgraph.compute_weight({})));
+	m_open.push(new PmcrNode_t(m_start, computeH(m_start), {}, nullptr, 
+		m_lgraph.compute_survival_currentLabels({})));
 	m_path = std::vector<int>();
-	m_lowestWeights = std::vector<double>(m_lgraph.getnNodes(), 1.0);
+	m_highestSurvival = std::vector<double>(m_lgraph.getnNodes(), 0.0);
 	// m_expanded = std::vector<bool>(m_lgraph.getnNodes(), false);
 	// m_expanded[m_start] = true;
 }
@@ -44,23 +46,23 @@ PmcrGreedySolver_t::~PmcrGreedySolver_t()
 
 void PmcrGreedySolver_t::greedy_search()
 {
-	// need a list to record the lowest weight so far for each node
-	m_lowestWeights[m_start] = 0.0;
+	// need a list to record the highest survivability so far for each node
+	m_highestSurvival[m_start] = 1.0;
 
 	while(!m_open.empty())
 	{
 		PmcrNode_t *current = m_open.top();
 		m_open.pop();
-		// Now check if the current node has the smallest recorded weight
-		if (current->getWeight() > m_lowestWeights[current->getID()])
+		// Now check if the current node has the highest recorded survivability
+		if (current->getSurvival() < m_highestSurvival[current->getID()])
 		{
 			// This node has been beated by some nodes with the same id but less weight
 			// No need to put it into the closed list
 			delete current;
 			continue;
 		}
-		// This node has the smallest recorded weight
-		m_currentWeight = current->getWeight();
+		// This node has the highest recorded survivability
+		m_currentSurvival = current->getSurvival();
 		m_currentLabels = current->getLabels();
 		m_closed.push_back(current);
 
@@ -68,7 +70,7 @@ void PmcrGreedySolver_t::greedy_search()
 		{
 			printf("goal found!\n");
 			// print the labels & weights for the found path
-			std::cout << "The weight of the path is " << m_currentWeight << "\n";
+			std::cout << "The survivability of the path is " << m_currentSurvival << "\n";
 			std::cout << "<";
 			for (auto const &e : m_currentLabels)
 			{
@@ -94,22 +96,23 @@ void PmcrGreedySolver_t::greedy_search()
 			std::vector<int> currentLabels = 
 				label_union(current->getLabels(), 
 					m_lgraph.getEdgeLabels(current->getID(), neighbor));
-			double currentWeight = m_lgraph.compute_weight(currentLabels);
+			double currentSurvival = m_lgraph.compute_survival_currentLabels(currentLabels);
 
 
-			// check whether we need to prune this neighbor (based on weight)
-			// If the neighbor has less weight, update lowest weight record put into open
+			// check whether we need to prune this neighbor (based on survivability)
+			// If the neighbor has higher survivability, update the highest survivability
+			// record and put into open
 			// Otherwise, discard
-			if (currentWeight < m_lowestWeights[neighbor])
+			if (currentSurvival > m_highestSurvival[neighbor])
 			{
-				m_lowestWeights[neighbor] = currentWeight;
+				m_highestSurvival[neighbor] = currentSurvival;
 				m_open.push(new PmcrNode_t(neighbor, computeH(neighbor), currentLabels, 
-																		current, currentWeight));
+																		current, currentSurvival));
 			}
 		}
 	}
 	// You are reaching here because the m_open is empty and you haven't reached the goal
-	m_currentWeight = 1.0;
+	m_currentSurvival = 0.0;
 	printf("failed to find a solution in this problem!\n");
 }
 
@@ -175,7 +178,7 @@ void PmcrGreedySolver_t::print_closedList()
 	{
 		if(node->getID() != m_start)
 		{
-			std::cout << node->getID() << "\t" << node->getWeight() << "\t"
+			std::cout << node->getID() << "\t" << node->getSurvival() << "\t"
 				<< node->getParent()->getID();
 			std::cout << std::endl;	
 		}
@@ -196,8 +199,8 @@ void PmcrGreedySolver_t::write_solution(std::string file_dir, double t)
 			file_ << waypoint << " ";
 		}
 		file_ << "\n";
-		// write the label and weight for the solution
-		file_ << m_currentWeight << "\n";
+		// write the label and survivability for the solution
+		file_ << m_currentSurvival << "\n";
 		
 		if (!m_currentLabels.empty())
 		{
