@@ -8,14 +8,14 @@
 #include <string> // std::string, std::to_string
 
 // #include "LabeledGraph.hpp"
-// #include "ConnectedGraph.hpp"
+#include "ConnectedGraph.hpp"
 // #include "ConnectedNonOverlapGraph.hpp"
-#include "ToyGraph.hpp"
+// #include "ToyGraph.hpp"
 #include "PmcrGreedySolver.hpp"
 #include "PmcrNode.hpp"
 #include "Timer.hpp"
 
-PmcrGreedySolver_t::PmcrGreedySolver_t(ToyGraph_t &g, int start, int goal)
+PmcrGreedySolver_t::PmcrGreedySolver_t(ConnectedGraph_t &g, int start, int goal)
 {
 	Timer tt;
 	tt.reset();

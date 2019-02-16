@@ -1,9 +1,9 @@
 /*This cpp file test the effectiveness of the GrowingTree algorithm on a toy problem*/
 
 // #include "LabeledGraph.hpp"
-// #include "ConnectedGraph.hpp"
+#include "ConnectedGraph.hpp"
 // #include "ConnectedNonOverlapGraph.hpp"
-#include "ToyGraph.hpp"
+//#include "ToyGraph.hpp"
 #include "PmcrGreedySolver.hpp"
 #include "FixedLabelSolver.hpp"
 // #include "GrowingTreeSolver.hpp"

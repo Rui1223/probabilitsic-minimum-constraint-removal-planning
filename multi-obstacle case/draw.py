@@ -134,63 +134,64 @@ if __name__ == "__main__":
 			solution_weight = line[0]
 		else:
 			if len(line) == 0:
-				solution_labels = " ";
+				solution_labels = " "
 			else:
 				solution_labels = line[0]
 
-	#plot the optimal path 
-	counter = 0
-	while (counter != (len(path)-1)):
-		v1 = path[counter]
-		v2 = path[counter+1]
-		ax.plot(cal_co(v1,col,row)[0], cal_co(v1,col,row)[1], "co")
-		ax.plot([cal_co(v1,col,row)[0], cal_co(v2,col,row)[0]], 
-				[cal_co(v1,col,row)[1], cal_co(v2,col,row)[1]], "c--")
-		counter += 1
-	ax.plot(cal_co(v2,col,row)[0], cal_co(v2,col,row)[1], "co")
+	#plot the optimal path
+	if (path):
+		counter = 0
+		while (counter != (len(path)-1)):
+			v1 = path[counter]
+			v2 = path[counter+1]
+			ax.plot(cal_co(v1,col,row)[0], cal_co(v1,col,row)[1], "co")
+			ax.plot([cal_co(v1,col,row)[0], cal_co(v2,col,row)[0]], 
+					[cal_co(v1,col,row)[1], cal_co(v2,col,row)[1]], "c--")
+			counter += 1
+		ax.plot(cal_co(v2,col,row)[0], cal_co(v2,col,row)[1], "co")
 
-	# plot solution labels and weights
-	ax.text(col+3-3, -2+2.0, "G time:"+solution_time, color="c", fontsize=10)
-	ax.text(col+3-3, -2+2.5, "G weight:"+solution_weight, color="c", fontsize=10)
-	ax.text(col+3-3, -2+3.0, "G labels:"+solution_labels, color="c", fontsize=10)
+		# plot solution labels and weights
+		ax.text(col+3-3, -2+2.0, "G time:"+solution_time, color="c", fontsize=10)
+		ax.text(col+3-3, -2+2.5, "G weight:"+solution_weight, color="c", fontsize=10)
+		ax.text(col+3-3, -2+3.0, "G labels:"+solution_labels, color="c", fontsize=10)
 
 
 	# ##Now plot the solution for GrowingTree Algorithm
 	# ##################################################################
-	f_growingTree = open("./" + sys.argv[1] + "/GrowingTree_solution" + str(n) + ".txt", "r")
-	n_line = 0;
-	for line in f_growingTree:
-		line = line.split()
-		n_line += 1
-		if (n_line == 1):
-			start = int(line[0])
-			goal = int(line[1])
-			solution_time = line[2]
-		elif (n_line == 2):
-			path = map(int, line)
-		elif (n_line == 3):
-			solution_weight = line[0]
-		else:
-			if len(line) == 0:
-				solution_labels = " ";
-			else:
-				solution_labels = line[0]
+	# f_growingTree = open("./" + sys.argv[1] + "/GrowingTree_solution" + str(n) + ".txt", "r")
+	# n_line = 0;
+	# for line in f_growingTree:
+	# 	line = line.split()
+	# 	n_line += 1
+	# 	if (n_line == 1):
+	# 		start = int(line[0])
+	# 		goal = int(line[1])
+	# 		solution_time = line[2]
+	# 	elif (n_line == 2):
+	# 		path = map(int, line)
+	# 	elif (n_line == 3):
+	# 		solution_weight = line[0]
+	# 	else:
+	# 		if len(line) == 0:
+	# 			solution_labels = " ";
+	# 		else:
+	# 			solution_labels = line[0]
 
-	#plot the optimal path 
-	counter = 0
-	while (counter != (len(path)-1)):
-		v1 = path[counter]
-		v2 = path[counter+1]
-		ax.plot(cal_co(v1,col,row)[0], cal_co(v1,col,row)[1], "yo")
-		ax.plot([cal_co(v1,col,row)[0], cal_co(v2,col,row)[0]], 
-				[cal_co(v1,col,row)[1], cal_co(v2,col,row)[1]], "y--")
-		counter += 1
-	ax.plot(cal_co(v2,col,row)[0], cal_co(v2,col,row)[1], "yo")
+	# #plot the optimal path 
+	# counter = 0
+	# while (counter != (len(path)-1)):
+	# 	v1 = path[counter]
+	# 	v2 = path[counter+1]
+	# 	ax.plot(cal_co(v1,col,row)[0], cal_co(v1,col,row)[1], "yo")
+	# 	ax.plot([cal_co(v1,col,row)[0], cal_co(v2,col,row)[0]], 
+	# 			[cal_co(v1,col,row)[1], cal_co(v2,col,row)[1]], "y--")
+	# 	counter += 1
+	# ax.plot(cal_co(v2,col,row)[0], cal_co(v2,col,row)[1], "yo")
 
-	# plot solution labels and weights
-	ax.text(col+3-3, -2+3.5, "Gr time:"+solution_time, color="y", fontsize=10)
-	ax.text(col+3-3, -2+4.0, "Gr weight:"+solution_weight, color="y", fontsize=10)
-	ax.text(col+3-3, -2+4.5, "Gr labels:"+solution_labels, color="y", fontsize=10)
+	# # plot solution labels and weights
+	# ax.text(col+3-3, -2+3.5, "Gr time:"+solution_time, color="y", fontsize=10)
+	# ax.text(col+3-3, -2+4.0, "Gr weight:"+solution_weight, color="y", fontsize=10)
+	# ax.text(col+3-3, -2+4.5, "Gr labels:"+solution_labels, color="y", fontsize=10)
 	
 	plt.show()
 

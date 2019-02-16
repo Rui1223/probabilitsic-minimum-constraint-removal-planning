@@ -3,9 +3,9 @@
 #define HEURISTICSEARCHSOLVER_H
 
 // #include "LabeledGraph.hpp"
-// #include "ConnectedGraph.hpp"
+#include "ConnectedGraph.hpp"
 // #include "ConnectedNonOverlapGraph.hpp"
-#include "ToyGraph.hpp"
+// #include "ToyGraph.hpp"
 
 struct HeuristicNode_t
 {
@@ -26,7 +26,7 @@ struct HeuristicNode_comparison
 
 class HeuristicSearchSolver_t
 {
-	ToyGraph_t m_lgraph;
+	ConnectedGraph_t m_lgraph;
 	int m_start;
 	int m_goal;
 	std::vector<int> m_currentLabels;
@@ -40,7 +40,7 @@ class HeuristicSearchSolver_t
 public:
 	// constructor
 	HeuristicSearchSolver_t() {}
-	HeuristicSearchSolver_t(ToyGraph_t &g, int start, int goal);
+	HeuristicSearchSolver_t(ConnectedGraph_t &g, int start, int goal);
 
 	bool Heuristic_search();
 

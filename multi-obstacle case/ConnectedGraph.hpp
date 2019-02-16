@@ -1,4 +1,5 @@
-/*This hpp file declares a connected labeled graph with different weights assigned to each label. */
+/*This hpp file declares a connected labeled graph with different weights assigned to each label 
+for different obstacles. */
 /*we start with each label, expand the edges with that label based on the expected number of edge
 given to that label*/
 #ifndef CONNECTEDGRAPH_H
@@ -15,8 +16,8 @@ given to that label*/
 #include <cstring>
 
 // Declaring the type of Predicate that accept two pairs and return a bool
-typedef std::function<bool(std::pair<std::vector<int>, double>, 
-	std::pair<std::vector<int>, double>)> Comparator;
+// typedef std::function<bool(std::pair<std::vector<int>, double>, 
+// 	std::pair<std::vector<int>, double>)> Comparator;
 
 class ConnectedGraph_t
 {
@@ -28,11 +29,11 @@ class ConnectedGraph_t
 
 	// specify the weights for labels
 	std::vector<int> m_nlabelsPerObs;
-	// for each label idx, we store the obs idx it belongs and its corresponding weight
+	// for each label idx, we store the obs idx it belongs to and its corresponding weight
 	std::map<int, std::pair<int, double>> m_labelWeights;
 	// #obstacles
 	int m_nobstacles;
-
+	int m_nTotallabels;
 
 	// specify neighbors (edges) and labels of the edge 
 	std::vector<std::vector<int>> m_nodeNeighbors;
@@ -48,7 +49,7 @@ class ConnectedGraph_t
 
 	// all label combinations
 	std::vector<std::vector<int>> m_labelCombinations;
-	std::set<std::pair<std::vector<int>, double>, Comparator> m_labelMap;
+	std::vector<std::pair<std::vector<int>, double>> m_labelMap;
 
 public:
 	// Constructor
@@ -61,26 +62,33 @@ public:
 	// function to label the graph
 	void label_graph();
 
-	// function to specify all possible labels
-	void load_labels();
+	// function to get the location of a node given the index
+	std::pair<int, int> getLoc(int node_idx);
 
-	// function to assign weight for the labels
-	void load_weights();
+	// function to check if a node is close to any of the centroid of all previous obstacles
+	bool is_close(std::pair<int, int> &a, std::vector<std::pair<double, double>> &b, 
+															int obs, double threshold);
+
+	// function to return the distance of two nodes (on grid graph)
+	double dist(std::pair<int, int> &a, std::pair<int, int> b);
+
+	// function to assign weight for the labels of the same obstacle
+	std::vector<double> load_weights(int nlabels);
+
+	// function to assign weight to each label
+	void assign_weight_per_label();
 
 	// function for printing (test) purpose only
 	void print_graph();
 
-	// function to compute weight for a set of labels
-	double compute_weight(std::vector<int> labels);
+	// function to compute the survivability for a single set of labels
+	double compute_survival_currentLabels(std::vector<int> labels);
 
-	// function to compute weight for a power set
-	std::vector<double> compute_weights();
+	// function to compute survivability for a power set
+	std::vector<double> compute_survival();
 
 	// function to compute a powerset given a set of labels
 	void cal_powerSet();
-
-	// function to zip labelCombination and another vector b into a map
-	std::map<std::vector<int>, double> zip_combinations(std::vector<double>& b);
 
 	// function to calculate labelMap
 	void cal_labelMap();
@@ -100,9 +108,8 @@ public:
 	std::vector<int> getNodeNeighbors(int id) { return m_nodeNeighbors[id]; }
 	std::vector<int> getEdgeLabels(int id1, int id2) 
 														{ return m_edgeLabels[id1][id2]; } 
-	//std::vector<double> getLabelWeights() { return m_labelWeights; }
-	//std::vector<int> getLabels() { return m_labels; }
-	std::set<std::pair<std::vector<int>, double>, Comparator> getLabelMap()
+	std::pair<int, double> getLabelWeights(int label_idx) { return m_labelWeights[label_idx]; }
+	std::vector<std::pair<std::vector<int>, double>> getLabelMap()
 	{
 		return m_labelMap;
 	}

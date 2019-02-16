@@ -27,7 +27,7 @@ class ToyGraph_t
 
 	// specify the weights for labels
 	std::vector<int> m_nlabelsPerObs;
-	// for each label idx, we store the obs idx it belongs and its corresponding weight
+	// for each label idx, we store the obs idx it belongs to and its corresponding weight
 	std::map<int, std::pair<int, double>> m_labelWeights;
 	// #obstacles
 	int m_nobstacles;
@@ -39,7 +39,6 @@ class ToyGraph_t
 
 	// all label combinations
 	std::vector<std::vector<int>> m_labelCombinations;
-	//std::vector<std::pair<std::vector<int>, double>, Comparator> m_labelMap;
 	std::vector<std::pair<std::vector<int>, double>> m_labelMap;
 
 

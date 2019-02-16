@@ -11,13 +11,13 @@
 
 #include "HeuristicSearchSolver.hpp"
 // #include "LabeledGraph.hpp"
-// #include "ConnectedGraph.hpp"
+#include "ConnectedGraph.hpp"
 // #include "ConnectedNonOverlapGraph.hpp"
-#include "ToyGraph.hpp"
+//#include "ToyGraph.hpp"
 #include "Timer.hpp"
 
 
-HeuristicSearchSolver_t::HeuristicSearchSolver_t(ToyGraph_t &g, int start, 
+HeuristicSearchSolver_t::HeuristicSearchSolver_t(ConnectedGraph_t &g, int start, 
 	int goal) : m_lgraph(g), m_start(start), m_goal(goal)
 {
 	//m_open.push(new HeuristicNode_t(m_start, computeH(m_start), nullptr));

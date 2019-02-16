@@ -19,9 +19,9 @@
 #include "FixedLabelSolver.hpp"
 #include "HeuristicSearchSolver.hpp"
 // #include "LabeledGraph.hpp"
-// #include "ConnectedGraph.hpp"
+#include "ConnectedGraph.hpp"
 // #include "ConnectedNonOverlapGraph.hpp"
-#include "ToyGraph.hpp"
+//#include "ToyGraph.hpp"
 #include "Timer.hpp"
 
 // Comparator compFunctor1 = 
@@ -37,7 +37,7 @@
 // 	return (p1.second >= p2.second);
 // }
 
-FixedLabelSolver_t::FixedLabelSolver_t(ToyGraph_t &g, int start, int goal)
+FixedLabelSolver_t::FixedLabelSolver_t(ConnectedGraph_t &g, int start, int goal)
 {
 	Timer tt;
 	tt.reset();
@@ -70,7 +70,7 @@ void FixedLabelSolver_t::fixedLabel_search()
 	// {
 	// 	std::cout << l << "\t";
 	// }
-	std::cout << std::endl;
+	// std::cout << std::endl;
 
 	// printf("*********sub labelMap************\n");
 	// //Iterate over the set you just come up with
@@ -87,10 +87,10 @@ void FixedLabelSolver_t::fixedLabel_search()
 	// std::cout << "*************************\n";
 
 	int k = 1;
-	for (auto const &pair : subLabelMap)
+	for (int lc=subLabelMap.size()-1; lc>=0; lc--)
 	{
-		m_currentLabels = pair.first;
-		m_currentSurvival = pair.second;
+		m_currentLabels = subLabelMap[lc].first;
+		m_currentSurvival = subLabelMap[lc].second;
 		//std::cout << "current set of labels: " << m_currentLabels << "\n";
 		//std::cout << "currrent weight: " << m_currentWeight << "\n"; 
 		std::cout << "start the " << k << "th search\n";

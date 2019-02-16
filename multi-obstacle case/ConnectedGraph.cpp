@@ -21,13 +21,17 @@ in our problem formulation*/
 #include "ConnectedGraph.hpp"
 #include "Timer.hpp"
 
-Comparator compFunctor = 
-		[](std::pair<std::vector<int>, double> elem1, std::pair<std::vector<int>, double> elem2)
-		{
-			return elem1.second <= elem2.second; // compare weights, prefer less weight  
-		};
 
-ConnectedGraph_t::ConnectedGraph_t(int row, int col, int nlabels, double probPerLabel)
+// Driver function to sort the vector elements 
+// by second element of pairs 
+bool sortbysec_connectedGraph(const std::pair<std::vector<int>, double> &p1, 
+				const std::pair<std::vector<int>, double> &p2)
+{
+	return (p1.second < p2.second);
+}
+
+ConnectedGraph_t::ConnectedGraph_t(int row, int col, std::vector<int> nlabelsPerObs, 
+																			double probPerLabel)
 {
 	Timer tt;
 	tt.reset();
@@ -42,30 +46,37 @@ ConnectedGraph_t::ConnectedGraph_t(int row, int col, int nlabels, double probPer
 	std::cout << "m_nEdges: " << m_nEdges << std::endl;
 	
 	// label information
-	m_nlabels = nlabels;
+	m_nlabelsPerObs = nlabelsPerObs;
+	m_nobstacles = m_nlabelsPerObs.size();
+	m_nTotallabels = 0;
+	for (auto const &e : m_nlabelsPerObs)
+	{
+		m_nTotallabels += e;
+	}	
 	m_probPerLabel = probPerLabel;
 
 	std::cout << "probPerLabel: " << m_probPerLabel << std::endl;
 	// based on the probability that a label is assigned to an edge, compute how many expansions 
 	// per label are needed 
 	// m_nExpansion = round(m_nEdges * (1 - pow(1 - m_probPerLabel, m_nlabels))) / m_nlabels;
-	m_nExpansion = round(m_nEdges * probPerLabel *1.0 / m_nlabels);
+	m_nExpansion = round(m_nEdges * probPerLabel *1.0 / m_nTotallabels);
 	std::cout << "n_expansion: " << m_nExpansion << "\n";
 	std::cout << "Expected density: " << probPerLabel << "\n";
 	m_nmarked = 0;
-	// specify the number of labels and their corresponding weights
-	// Based on weighted labels, build the labelMap which maps a set of labels to weights
-	load_labels();
-	load_weights();
+
+	// given #labels per obstacle, assign weight to each label
+	// so that we end up knowing which obs a label belongs to and its corresponding weight 
+	assign_weight_per_label();
 	cal_labelMap();
+	//print_labelMap();
 
 	// construct the graph 
 	load_graph();
+	//print_graph();
 
 	std::cout << "Time to build and label the graph: " << tt.elapsed() << " seconds\n";
 
 	printf("--------------------------------------------------\n");
-	//print_labelMap();
 }
 
 void ConnectedGraph_t::load_graph()
@@ -135,16 +146,107 @@ void ConnectedGraph_t::load_graph()
 
 }
 
+std::pair<int, int> ConnectedGraph_t::getLoc(int node_idx)
+{
+	return std::pair<int, int>(node_idx / m_col, node_idx % m_col);
+}
+
+bool ConnectedGraph_t::is_close(std::pair<int, int> &a, 
+					std::vector<std::pair<double, double>> &b, int obs, double threshold)
+{
+	bool isClose = false;
+	for (int pp=0; pp < obs; pp++)
+	{
+		if ( dist(a, b[pp]) < threshold)
+		{
+			isClose = true;
+			break;
+		}
+	} 
+	return isClose;
+}
+
+double ConnectedGraph_t::dist(std::pair<int, int> &a, std::pair<int, int> b)
+{
+	return sqrt(pow(a.first-b.first, 2) + pow(a.second-b.second, 2));
+}
+
+
 void ConnectedGraph_t::label_graph()
 {
 	// for each label
-	for (auto const &l : m_labels)
+	//for (auto const &l : m_nTotallabels)
+
+	// for (int ll=0; ll < m_nTotallabels; ll++)
+	// {
+	// 	// random pick up a node to expand (in a BFS search)
+	// 	int BF_start = random_generate_integer(0, m_nNodes-1);
+	// 	//std::cout << "start per label: " << BF_start << "\n"; 
+	// 	BFSearch(BF_start, ll);
+	// }
+	int current_label_idx = 0;
+	std::vector<std::pair<int, int>> mean_obs(m_nobstacles, std::pair<int, int>(0, 0));
+	bool firstTimeObs;
+	int BF_start;
+	std::pair<int, int> BF_start_loc;
+	double dist_threshold1 = m_nExpansion / 10;
+	double dist_threshold2 = m_nExpansion / 6;
+	for (int obs=0; obs < m_nobstacles; obs++)
 	{
-		// random pick up a node to expand (in a BFS search)
-		int BF_start = random_generate_integer(0, m_nNodes-1);
-		//std::cout << "start per label: " << BF_start << "\n"; 
-		BFSearch(BF_start, l);
+		// we are dealing with a new obstacle
+		int temp_nlabels = m_nlabelsPerObs[obs];
+		firstTimeObs = true;
+		std::pair<int, int> temp_BF_loc{0, 0};
+		//dist_threshold2 -= m_nExpansion / 30;
+
+		for (int ii=0; ii<temp_nlabels; ii++)
+		{
+			if (current_label_idx==0) // the 1st label of the first obstacle
+			{
+				BF_start = random_generate_integer(0, m_nNodes-1);
+				BF_start_loc = getLoc(BF_start);
+				firstTimeObs = false;
+				temp_BF_loc = BF_start_loc;
+			}
+			else if (firstTimeObs) // first time entering an obstacle (except the 1st obstacle)
+			{
+				// we want the obs not close to previous ones
+				do
+				{
+					BF_start = random_generate_integer(0, m_nNodes-1);
+					BF_start_loc = getLoc(BF_start);
+				}
+				while ( is_close(BF_start_loc, mean_obs, obs, dist_threshold2) );
+
+				firstTimeObs = false;
+				temp_BF_loc = BF_start_loc;
+			}
+			else // working among label (not the first one of any obstacles)
+			{
+				// we want labels of the same obstacle to be close to each other
+				do
+				{
+					BF_start = random_generate_integer(0, m_nNodes-1);
+					BF_start_loc = getLoc(BF_start);
+				}
+				while ( dist(BF_start_loc, temp_BF_loc) > dist_threshold1 );
+			}
+
+			// please print the BF_start
+			std::cout << current_label_idx << ": " << "(" << BF_start_loc.first << "," 
+																<< BF_start_loc.second << ")\n";
+
+			mean_obs[obs].first += BF_start_loc.first;
+			mean_obs[obs].second += BF_start_loc.second;
+			// Now it's the time for calling BFSearch() with our well tested BF_start
+			BFSearch(BF_start, current_label_idx);
+			current_label_idx++;
+		}
+		mean_obs[obs].first /= temp_nlabels;
+		mean_obs[obs].second /= temp_nlabels;
 	}
+
+
 }
 
 void ConnectedGraph_t::BFSearch(int BF_start, int l)
@@ -191,7 +293,7 @@ void ConnectedGraph_t::BFSearch(int BF_start, int l)
 
 void ConnectedGraph_t::write_graph(std::string file_dir)
 {
-	// This function write the constructed graph into a text file so as to be loaded by a python
+	// This functions write the constructed graph into a text file so as to be loaded by a python
 	// script so as to visualize using matplotlib
 
 	// to write in a text file (ostream)
@@ -202,9 +304,9 @@ void ConnectedGraph_t::write_graph(std::string file_dir)
 		// Write in the 1st line the size and the density of the grid graph
 		file_ << m_row << " " << m_col << " " << double(m_nmarked) / m_nEdges <<"\n";
 		// Write in the 2nd line label information
-		for (int tt=0; tt < m_nlabels; tt++)
+		for (int tt=0; tt < m_nTotallabels; tt++)
 		{
-			file_ << m_labels[tt] << ":" << m_labelWeights[tt] << " ";
+			file_ << tt << ":" << m_labelWeights[tt].second << " ";
 		}
 		file_ << "\n";
 		// start to write in every edge information (edge & labels)
@@ -237,15 +339,8 @@ void ConnectedGraph_t::write_graph(std::string file_dir)
 	} 
 }
 
-void ConnectedGraph_t::load_labels()
-{
-	for (int ii=1; ii <= m_nlabels; ii++)
-	{
-		m_labels.push_back(ii);
-	}
-}
 
-void ConnectedGraph_t::load_weights()
+std::vector<double> ConnectedGraph_t::load_weights(int nlabels)
 {
 	std::random_device rd{};
 	std::mt19937 gen{rd()};
@@ -253,15 +348,37 @@ void ConnectedGraph_t::load_weights()
 
 	std::normal_distribution<> d{5.0,5.0};
 
-	for (int kk = 0; kk < m_nlabels; kk++)
+	std::vector<double> temp_weights; 
+
+	for (int kk = 0; kk < nlabels; kk++)
 	{
 		double temp = d(gen);
 		while (temp <= 0) { temp = d(gen); }
-		m_labelWeights.push_back(temp);
+		temp_weights.push_back(temp);
 		r += temp;
 	}
 	// normalize
-	m_labelWeights /= r;
+	temp_weights /= r;
+	return temp_weights;
+}
+
+void ConnectedGraph_t::assign_weight_per_label()
+{
+	// fill in the m_labelWeights
+	int current_label_idx = 0;
+	for (int obs=0; obs < m_nobstacles; obs++)
+	{
+		///////// for each obstacle /////////
+		// first get #labels the current obstacle has
+		int nlabels = m_nlabelsPerObs[obs];
+		std::vector<double> weightsObs = load_weights(nlabels);
+		for (auto const w: weightsObs)
+		{
+			m_labelWeights[current_label_idx] = std::pair<int, double>(obs, w);
+			current_label_idx++;
+		}
+
+	} 
 }
 
 void ConnectedGraph_t::print_graph() 
@@ -294,27 +411,33 @@ void ConnectedGraph_t::print_graph()
 	
 }
 
-double ConnectedGraph_t::compute_weight(std::vector<int> currentLabels)
+double ConnectedGraph_t::compute_survival_currentLabels(std::vector<int> currentLabels)
 {
-	double currentWeights = 0.0;
+	double currentSurvival = 1.0;
+	std::vector<double> CollisionPerObs(m_nobstacles, 0.0);
 	for (auto const &label : currentLabels)
 	{
-		currentWeights += m_labelWeights[label-1]; 
+		CollisionPerObs[getLabelWeights(label).first] += getLabelWeights(label).second;
 	}
-	return currentWeights;
+	for (auto const &collision_prob : CollisionPerObs)
+	{
+		currentSurvival *= (1 - collision_prob); 
+	}
+
+	return currentSurvival;
 
 }
 
-std::vector<double> ConnectedGraph_t::compute_weights()
+std::vector<double> ConnectedGraph_t::compute_survival()
 {
-	std::vector<double> weightCombinations;
+	std::vector<double> survivalCombinations;
 	for (auto const &set : m_labelCombinations)
 	{
-		double weight = compute_weight(set);
-		weightCombinations.push_back(weight);
+		double survival = compute_survival_currentLabels(set);
+		survivalCombinations.push_back(survival);
 	}
 
-	return weightCombinations;
+	return survivalCombinations;
 }
 
 void ConnectedGraph_t::cal_powerSet()
@@ -324,47 +447,34 @@ void ConnectedGraph_t::cal_powerSet()
 
 	// first determines the size of the powerset that you will have
 	// for each one's derivation we will do bitwise operation
-	//std::cout << "Start Computing powerset\n";
-	int powerSet_size = pow(2, m_labels.size()); // 2^n combinations
-	//std::cout << "can I compute the powerSet_size?\n";
-	std::cout << powerSet_size << "\n";
+	int powerSet_size = pow(2, m_nTotallabels); // 2^n combinations
 	for (int counter = 0; counter < powerSet_size; counter++)
 	{
 		std::vector<int> labels; // labels for a single combination
-		for (int j=0; j < m_labels.size(); j++)
+		for (int j=0; j < m_nTotallabels; j++)
 		{
 			if ( counter & (1<<j) )
 			{
-				labels.push_back(m_labels[j]);
+				labels.push_back(j);
 			}
 		}
 		m_labelCombinations.push_back(labels);
 	}
-	std::cout << "Finally get powerSet\n";
-}
 
-std::map<std::vector<int>, double> ConnectedGraph_t::zip_combinations(std::vector<double>& b)
-{
-	std::map<std::vector<int>, double> m;
-	//assert(a.size() == b.size());
-	for (int i=0; i < m_labelCombinations.size(); ++i)
-	{
-		m[m_labelCombinations[i]] = b[i];
-	}
-	return m;	
 }
 
 void ConnectedGraph_t::cal_labelMap()
 {
 	cal_powerSet();
-	std::vector<double> weightCombinations = compute_weights();
+	std::vector<double> survivalCombinations = compute_survival();
 
-	// zip label and weight combination
-	std::map<std::vector<int>, double> map_combinations 
-		= zip_combinations(weightCombinations);
+	for (int kkk=0; kkk < survivalCombinations.size(); kkk++)
+	{
+		m_labelMap.push_back(std::pair<std::vector<int>, double>(m_labelCombinations[kkk], 
+																	survivalCombinations[kkk]));
+	}
 
-	m_labelMap = std::set<std::pair<std::vector<int>, double>, Comparator>(
-		map_combinations.begin(), map_combinations.end(), compFunctor);
+	sort(m_labelMap.begin(), m_labelMap.end(), sortbysec_connectedGraph);
 }
 
 void ConnectedGraph_t::print_labelMap()
@@ -380,7 +490,8 @@ void ConnectedGraph_t::print_labelMap()
 		}
 		std::cout << "> :\t\t";
 		std::cout << e.second << std::endl;
-	}	
+	}
+	printf("***************************\n");
 }
 
 
