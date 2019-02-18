@@ -21,7 +21,7 @@ int main(int argc, char** argv)
 	int row = 20;
 	int col = 30;
 	std::vector<int> nLabelsPerObs{3,2,3,2};
-	double probPerLabel = 0.8;
+	double probPerLabel = 0.6;
 	Timer t;
 	std::srand(std::time(0));
 	double t1;

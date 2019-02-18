@@ -59,7 +59,7 @@ ConnectedGraph_t::ConnectedGraph_t(int row, int col, std::vector<int> nlabelsPer
 	// based on the probability that a label is assigned to an edge, compute how many expansions 
 	// per label are needed 
 	// m_nExpansion = round(m_nEdges * (1 - pow(1 - m_probPerLabel, m_nlabels))) / m_nlabels;
-	m_nExpansion = round(m_nEdges * probPerLabel *1.0 / m_nTotallabels);
+	m_nExpansion = round(m_nEdges * probPerLabel *1.0 / m_nTotallabels) *1.5;
 	std::cout << "n_expansion: " << m_nExpansion << "\n";
 	std::cout << "Expected density: " << probPerLabel << "\n";
 	m_nmarked = 0;
@@ -152,7 +152,7 @@ std::pair<int, int> ConnectedGraph_t::getLoc(int node_idx)
 }
 
 bool ConnectedGraph_t::is_close(std::pair<int, int> &a, 
-					std::vector<std::pair<double, double>> &b, int obs, double threshold)
+					std::vector<std::pair<int, int>> &b, int obs, double threshold)
 {
 	bool isClose = false;
 	for (int pp=0; pp < obs; pp++)
@@ -189,14 +189,14 @@ void ConnectedGraph_t::label_graph()
 	bool firstTimeObs;
 	int BF_start;
 	std::pair<int, int> BF_start_loc;
-	double dist_threshold1 = m_nExpansion / 10;
-	double dist_threshold2 = m_nExpansion / 6;
+	double dist_threshold1 = m_nExpansion / 15;
+	double dist_threshold2 = m_nExpansion / 12;
 	for (int obs=0; obs < m_nobstacles; obs++)
 	{
 		// we are dealing with a new obstacle
 		int temp_nlabels = m_nlabelsPerObs[obs];
 		firstTimeObs = true;
-		std::pair<int, int> temp_BF_loc{0, 0};
+		//std::pair<int, int> temp_BF_loc{0, 0};
 		//dist_threshold2 -= m_nExpansion / 30;
 
 		for (int ii=0; ii<temp_nlabels; ii++)
@@ -206,7 +206,8 @@ void ConnectedGraph_t::label_graph()
 				BF_start = random_generate_integer(0, m_nNodes-1);
 				BF_start_loc = getLoc(BF_start);
 				firstTimeObs = false;
-				temp_BF_loc = BF_start_loc;
+				//temp_BF_loc = BF_start_loc;
+				mean_obs[obs] = BF_start_loc;
 			}
 			else if (firstTimeObs) // first time entering an obstacle (except the 1st obstacle)
 			{
@@ -219,7 +220,8 @@ void ConnectedGraph_t::label_graph()
 				while ( is_close(BF_start_loc, mean_obs, obs, dist_threshold2) );
 
 				firstTimeObs = false;
-				temp_BF_loc = BF_start_loc;
+				//temp_BF_loc = BF_start_loc;
+				mean_obs[obs] = BF_start_loc;
 			}
 			else // working among label (not the first one of any obstacles)
 			{
@@ -229,21 +231,22 @@ void ConnectedGraph_t::label_graph()
 					BF_start = random_generate_integer(0, m_nNodes-1);
 					BF_start_loc = getLoc(BF_start);
 				}
-				while ( dist(BF_start_loc, temp_BF_loc) > dist_threshold1 );
+				while ( dist(BF_start_loc, mean_obs[obs]) > dist_threshold1 );
 			}
 
 			// please print the BF_start
 			std::cout << current_label_idx << ": " << "(" << BF_start_loc.first << "," 
 																<< BF_start_loc.second << ")\n";
 
-			mean_obs[obs].first += BF_start_loc.first;
-			mean_obs[obs].second += BF_start_loc.second;
+			//mean_obs[obs].first += BF_start_loc.first;
+			//mean_obs[obs].second += BF_start_loc.second;
+
 			// Now it's the time for calling BFSearch() with our well tested BF_start
 			BFSearch(BF_start, current_label_idx);
 			current_label_idx++;
 		}
-		mean_obs[obs].first /= temp_nlabels;
-		mean_obs[obs].second /= temp_nlabels;
+		//mean_obs[obs].first /= temp_nlabels;
+		//mean_obs[obs].second /= temp_nlabels;
 	}
 
 
@@ -307,6 +310,12 @@ void ConnectedGraph_t::write_graph(std::string file_dir)
 		for (int tt=0; tt < m_nTotallabels; tt++)
 		{
 			file_ << tt << ":" << m_labelWeights[tt].second << " ";
+		}
+		file_ << "\n";
+		// write in the 3rd line the label belongings in terms of obstacles
+		for (int tt=0; tt < m_nTotallabels; tt++)
+		{
+			file_ << tt << " " << m_labelWeights[tt].first << " ";
 		}
 		file_ << "\n";
 		// start to write in every edge information (edge & labels)

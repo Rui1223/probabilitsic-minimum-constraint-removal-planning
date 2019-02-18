@@ -13,6 +13,8 @@ def cal_co(indx, col, row):
 
 if __name__ == "__main__":
 
+	color_pool = ['green', 'blue', 'purple', 'orange', 'yellow', 'brown', 'black']
+
 	n = sys.argv[2];
 
 	## write in my text file
@@ -36,28 +38,62 @@ if __name__ == "__main__":
 			ax.set_ylim(-2, row+3)
 			plt.gca().set_aspect('equal', adjustable='box')
 
-		## The third line specifies the weight for each label
+		## The third line specifies the weight for each label and the obstacle it belongs to
 		elif (n_line == 2):
 			label_weights = line ## it's a list
-
+		elif (n_line == 3):
+			## make this label_belongings a dict
+			label_belongings = dict()
+			for vv in xrange(0, len(line)-1, 2):
+				label_belongings[line[vv]] = int(line[vv+1])
 		else:
-			## The lines starting from the third line are the lines storing edges and labels
-			if (n_line >= 3):
+			## The lines starting from the 4th line are the lines storing edges and labels
+			if (n_line >= 4):
 				v1 = line[0];
 				v2 = line[1];
 				if len(line) == 3: ## there is a label information
 					labels = line[2]
+					# if (len(labels)==1):
+					# 	labels=list(labels)
+					# else:
+					# 	IPython.embed()
+					# 	if (v1=='171' and v2=='172'):
+					# 		## partition the string labels if the length of labels > 1
+					# 		labels = list(labels.partition(','))
+					# 	IPython.embed()
+					# 		##IPython.embed()
 					#plot the label as "beautiful" as possible
 					if (cal_co(v1,col,row)[0] == cal_co(v2,col,row)[0]):
 						## vertical line
-						ax.text(cal_co(v1,col,row)[0]-0.06, 
-								(cal_co(v1,col,row)[1]+cal_co(v2,col,row)[1])/2, 
-								labels, fontsize=8, rotation=90)
+						incr = 0
+						for label in labels:
+							if (label == ','):
+								ax.text(cal_co(v1,col,row)[0]-0.06, 
+									(cal_co(v1,col,row)[1]+cal_co(v2,col,row)[1])/2+incr, 
+									label, fontsize=8, rotation=90)
+							else:
+								##print label
+								ax.text(cal_co(v1,col,row)[0]-0.06, 
+									(cal_co(v1,col,row)[1]+cal_co(v2,col,row)[1])/2+incr, 
+									label, color=color_pool[label_belongings[label]],
+																	 fontsize=8, rotation=90)
+							incr += 0.15
 					else:
 						## horizontal line
-						ax.text(min(cal_co(v1,col,row)[0], cal_co(v2,col,row)[0]) 
-							+ 1.0/(len(labels)+1), 
-							cal_co(v1,col,row)[1]+0.01, labels, fontsize=8)
+						incr = 0
+						for label in labels:
+							if (label == ','):
+								ax.text(min(cal_co(v1,col,row)[0], cal_co(v2,col,row)[0]) 
+									+ 1.0/(len(labels)+1) + incr, 
+									cal_co(v1,col,row)[1]+0.01, label, fontsize=8)
+							else:
+								##print label
+								ax.text(min(cal_co(v1,col,row)[0], cal_co(v2,col,row)[0]) 
+									+ 1.0/(len(labels)+1) + incr, 
+									cal_co(v1,col,row)[1]+0.01, label,
+										color=color_pool[label_belongings[label]], fontsize=8)
+							incr += 0.15							
+				
 				#plot current edge
 				ax.plot([cal_co(v1,col,row)[0], cal_co(v2,col,row)[0]], 
 						[cal_co(v1,col,row)[1], cal_co(v2,col,row)[1]], 'k')
@@ -86,7 +122,7 @@ if __name__ == "__main__":
 		elif (n_line == 2):
 			path = map(int, line)
 		elif (n_line == 3):
-			solution_weight = line[0]
+			solution_survival = line[0]
 		else:
 			if len(line) == 0:
 				solution_labels = " ";
@@ -112,7 +148,7 @@ if __name__ == "__main__":
 
 	# plot solution labels & weights & time
 	ax.text(col+3-3, -2+0.5, "F time:"+solution_time, color="r", fontsize=10)
-	ax.text(col+3-3, -2+1, "F weight:"+solution_weight, color="r", fontsize=10)
+	ax.text(col+3-3, -2+1, "F survival:"+solution_survival, color="r", fontsize=10)
 	ax.text(col+3-3, -2+1.5, "F labels:"+solution_labels, color="r", fontsize=10)
 
 
@@ -131,7 +167,7 @@ if __name__ == "__main__":
 		elif (n_line == 2):
 			path = map(int, line)
 		elif (n_line == 3):
-			solution_weight = line[0]
+			solution_survival = line[0]
 		else:
 			if len(line) == 0:
 				solution_labels = " "
@@ -152,7 +188,7 @@ if __name__ == "__main__":
 
 		# plot solution labels and weights
 		ax.text(col+3-3, -2+2.0, "G time:"+solution_time, color="c", fontsize=10)
-		ax.text(col+3-3, -2+2.5, "G weight:"+solution_weight, color="c", fontsize=10)
+		ax.text(col+3-3, -2+2.5, "G survival:"+solution_survival, color="c", fontsize=10)
 		ax.text(col+3-3, -2+3.0, "G labels:"+solution_labels, color="c", fontsize=10)
 
 
@@ -170,7 +206,7 @@ if __name__ == "__main__":
 	# 	elif (n_line == 2):
 	# 		path = map(int, line)
 	# 	elif (n_line == 3):
-	# 		solution_weight = line[0]
+	# 		solution_survival = line[0]
 	# 	else:
 	# 		if len(line) == 0:
 	# 			solution_labels = " ";
@@ -190,9 +226,7 @@ if __name__ == "__main__":
 
 	# # plot solution labels and weights
 	# ax.text(col+3-3, -2+3.5, "Gr time:"+solution_time, color="y", fontsize=10)
-	# ax.text(col+3-3, -2+4.0, "Gr weight:"+solution_weight, color="y", fontsize=10)
+	# ax.text(col+3-3, -2+4.0, "Gr weight:"+solution_survival, color="y", fontsize=10)
 	# ax.text(col+3-3, -2+4.5, "Gr labels:"+solution_labels, color="y", fontsize=10)
 	
 	plt.show()
-
-

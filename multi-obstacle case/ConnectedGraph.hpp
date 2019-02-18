@@ -66,7 +66,7 @@ public:
 	std::pair<int, int> getLoc(int node_idx);
 
 	// function to check if a node is close to any of the centroid of all previous obstacles
-	bool is_close(std::pair<int, int> &a, std::vector<std::pair<double, double>> &b, 
+	bool is_close(std::pair<int, int> &a, std::vector<std::pair<int, int>> &b, 
 															int obs, double threshold);
 
 	// function to return the distance of two nodes (on grid graph)
