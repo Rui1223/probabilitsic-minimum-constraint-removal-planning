@@ -13,9 +13,10 @@ def cal_co(indx, col, row):
 
 if __name__ == "__main__":
 
-	color_pool = ['green', 'blue', 'purple', 'orange', 'yellow', 'brown', 'black']
+	color_pool = ['green', 'blue', 'purple', 'orange', 'pink', 'olive', 'gray', 'brown', 
+																			'yellow', 'black']
 
-	n = sys.argv[2];
+	n = sys.argv[2]
 
 	## write in my text file
 	f = open("./" + sys.argv[1] + "/graph" + str(n) + ".txt", "r")
@@ -46,13 +47,16 @@ if __name__ == "__main__":
 			label_belongings = dict()
 			for vv in xrange(0, len(line)-1, 2):
 				label_belongings[line[vv]] = int(line[vv+1])
+			# print label_belongings
+
 		else:
 			## The lines starting from the 4th line are the lines storing edges and labels
 			if (n_line >= 4):
 				v1 = line[0];
 				v2 = line[1];
 				if len(line) == 3: ## there is a label information
-					labels = line[2]
+					labels = line[2] # which is a string
+					labels = labels.split(',') # now labels is a list of labels
 					# if (len(labels)==1):
 					# 	labels=list(labels)
 					# else:
@@ -77,7 +81,7 @@ if __name__ == "__main__":
 									(cal_co(v1,col,row)[1]+cal_co(v2,col,row)[1])/2+incr, 
 									label, color=color_pool[label_belongings[label]],
 																	 fontsize=8, rotation=90)
-							incr += 0.15
+							incr += 0.25
 					else:
 						## horizontal line
 						incr = 0
@@ -92,7 +96,7 @@ if __name__ == "__main__":
 									+ 1.0/(len(labels)+1) + incr, 
 									cal_co(v1,col,row)[1]+0.01, label,
 										color=color_pool[label_belongings[label]], fontsize=8)
-							incr += 0.15							
+							incr += 0.25					
 				
 				#plot current edge
 				ax.plot([cal_co(v1,col,row)[0], cal_co(v2,col,row)[0]], 

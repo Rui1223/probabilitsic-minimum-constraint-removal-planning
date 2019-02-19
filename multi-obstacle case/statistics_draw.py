@@ -21,8 +21,8 @@ if __name__ == '__main__':
 	solution_G = []
 	time_F = []
 	solution_F = []
-	time_Gr = []
-	solution_Gr = []
+	# time_Gr = []
+	# solution_Gr = []
 
 	_counter = 0;
 
@@ -35,24 +35,24 @@ if __name__ == '__main__':
 		solution_G.append(line[2])
 		time_F.append(line[3])
 		solution_F.append(line[4])
-		time_Gr.append(line[5])
-		solution_Gr.append(line[6])
+		# time_Gr.append(line[5])
+		# solution_Gr.append(line[6])
 
 	## Let's plot the figures
 	plt.figure(1)
 	plt.plot(labelCoverage, time_G, 'bs', label='Greedy Search') 
 	plt.plot(labelCoverage, time_F, 'g^', label='FixedLabel Search')
-	plt.plot(labelCoverage, time_Gr, 'ro', label='GrowingTree Search')
+	##plt.plot(labelCoverage, time_Gr, 'ro', label='GrowingTree Search')
 	plt.legend(loc='upper left')
 	plt.xlabel("labelCoverage(%)")
 	plt.xlim((30, 70))
 	plt.ylabel("Computation time(s)")
-	plt.ylim((0, 2))
+	plt.ylim((0, 1))
 
 	plt.figure(2)
 	plt.plot(labelCoverage, solution_G, 'bs', label='Greedy Search') 
 	plt.plot(labelCoverage, solution_F, 'g^', label='FixedLabel Search')
-	plt.plot(labelCoverage, solution_Gr, 'ro', label='GrowingTree Search')
+	##plt.plot(labelCoverage, solution_Gr, 'ro', label='GrowingTree Search')
 	plt.legend(loc='upper left')
 	plt.xlabel("labelCoverage(%)")
 	plt.xlim((30, 70))
@@ -78,24 +78,24 @@ if __name__ == '__main__':
 		solution_G.append(line[2])
 		time_F.append(line[3])
 		solution_F.append(line[4])
-		time_Gr.append(line[5])
-		solution_Gr.append(line[6])
+		# time_Gr.append(line[5])
+		# solution_Gr.append(line[6])
 
 	## Let's plot the figures
 	plt.figure(3)
 	plt.plot(gridSize, time_G, 'bs', label='Greedy Search') 
 	plt.plot(gridSize, time_F, 'g^', label='FixedLabel Search')
-	plt.plot(gridSize, time_Gr, 'ro', label='GrowingTree Search')
+	##plt.plot(gridSize, time_Gr, 'ro', label='GrowingTree Search')
 	plt.legend(loc='upper left')
 	plt.xlabel("gridSize(n)")
 	plt.xlim((30, 110))
 	plt.ylabel("Computation time(s)")
-	plt.ylim((0, 2))
+	plt.ylim((0, 0.05))
 
 	plt.figure(4)
 	plt.plot(gridSize, solution_G, 'bs', label='Greedy Search') 
 	plt.plot(gridSize, solution_F, 'g^', label='FixedLabel Search')
-	plt.plot(gridSize, solution_Gr, 'ro', label='GrowingTree Search')
+	##plt.plot(gridSize, solution_Gr, 'ro', label='GrowingTree Search')
 	plt.legend(loc='upper left')
 	plt.xlabel("gridSize(n)")
 	plt.xlim((30, 110))
@@ -120,23 +120,23 @@ if __name__ == '__main__':
 		solution_G.append(line[2])
 		time_F.append(line[3])
 		solution_F.append(line[4])
-		time_Gr.append(line[5])
-		solution_Gr.append(line[6])
+		# time_Gr.append(line[5])
+		# solution_Gr.append(line[6])
 
 	## Let's plot the figures
 	plt.figure(5)
 	plt.plot(nLabels, time_G, 'bs', label='Greedy Search') 
 	plt.plot(nLabels, time_F, 'g^', label='FixedLabel Search')
-	plt.plot(nLabels, time_Gr, 'ro', label='GrowingTree Search')
+	#plt.plot(nLabels, time_Gr, 'ro', label='GrowingTree Search')
 	plt.legend(loc='upper left')
 	plt.xlabel("nLabels")
 	plt.xlim((6, 24))
 	plt.ylabel("Computation time(s)")
-	plt.ylim((0, 20))
+	plt.ylim((0, 3))
 	plt.figure(6)
 	plt.plot(nLabels, solution_G, 'bs', label='Greedy Search') 
 	plt.plot(nLabels, solution_F, 'g^', label='FixedLabel Search')
-	plt.plot(nLabels, solution_Gr, 'ro', label='GrowingTree Search')
+	#plt.plot(nLabels, solution_Gr, 'ro', label='GrowingTree Search')
 	plt.legend(loc='upper left')
 	plt.xlabel("nLabels")
 	plt.xlim((6, 24))

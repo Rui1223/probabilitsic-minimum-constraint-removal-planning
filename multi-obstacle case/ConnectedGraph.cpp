@@ -188,9 +188,10 @@ void ConnectedGraph_t::label_graph()
 	std::vector<std::pair<int, int>> mean_obs(m_nobstacles, std::pair<int, int>(0, 0));
 	bool firstTimeObs;
 	int BF_start;
+	int trial;
 	std::pair<int, int> BF_start_loc;
 	double dist_threshold1 = m_nExpansion / 15;
-	double dist_threshold2 = m_nExpansion / 12;
+	double dist_threshold2 = m_nExpansion / 9;
 	for (int obs=0; obs < m_nobstacles; obs++)
 	{
 		// we are dealing with a new obstacle
@@ -211,13 +212,15 @@ void ConnectedGraph_t::label_graph()
 			}
 			else if (firstTimeObs) // first time entering an obstacle (except the 1st obstacle)
 			{
+				trial = 0;
 				// we want the obs not close to previous ones
 				do
 				{
 					BF_start = random_generate_integer(0, m_nNodes-1);
 					BF_start_loc = getLoc(BF_start);
+					trial++;
 				}
-				while ( is_close(BF_start_loc, mean_obs, obs, dist_threshold2) );
+				while ( is_close(BF_start_loc, mean_obs, obs, dist_threshold2) and trial < 20 );
 
 				firstTimeObs = false;
 				//temp_BF_loc = BF_start_loc;
