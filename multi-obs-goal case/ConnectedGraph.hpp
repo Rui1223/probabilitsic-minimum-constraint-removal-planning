@@ -121,8 +121,12 @@ public:
 	std::vector<int> getEdgeLabels(int id1, int id2) 
 														{ return m_edgeLabels[id1][id2]; } 
 	std::pair<int, double> getLabelWeights(int label_idx) { return m_labelWeights[label_idx]; }
+	
 	int getmStart() { return m_start; }
 	std::vector<int> getmGoalSet() { return m_goalSet; }
+	int getmTargetObs() { return m_targetObs; }
+	std::vector<int> getmTargetPoses() { return m_targetPoses; }
+
 	// std::vector<std::pair<std::vector<int>, double>> getLabelMap()
 	// {
 	// 	return m_labelMap;

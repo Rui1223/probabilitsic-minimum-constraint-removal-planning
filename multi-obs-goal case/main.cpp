@@ -27,21 +27,14 @@ int random_generate_integer(int min, int max)
 
 int main()
 {
-	std::deque<int> aDeque;
+	std::vector<int> v1{8,4,6,7,1};
+	std::vector<int>::iterator it;
 
-	aDeque.push_back(1);
-	aDeque.push_back(2);
-	aDeque.push_back(3);
-
-	std::cout << aDeque[1] << "\n";
-
-	std::cout << aDeque.front() << "\n";
-
-	aDeque.pop_front();
-
-	std::cout << aDeque.front() << "\n";
-
-	std::cout << aDeque[1] << "\n";
+	for (auto const &v : v1)
+	{
+		std::cout << v << " ";
+	}
+	std::cout << "\n";
 
 	return 0;
 }

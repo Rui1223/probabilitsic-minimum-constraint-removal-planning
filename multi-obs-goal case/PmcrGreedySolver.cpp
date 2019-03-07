@@ -17,19 +17,28 @@
 
 PmcrGreedySolver_t::PmcrGreedySolver_t(ConnectedGraph_t &g)
 {
+	// load the graph
 	Timer tt;
 	tt.reset();
 	m_lgraph = g;
 	std::cout << "Time to load the graph for Gsolver: " << tt.elapsed() << " seconds\n";
 	m_start = m_lgraph.getmStart();
-	m_goal = m_lgraph.getmGoalSet()[0];
+	m_goalSet = m_lgraph.getmGoalSet();
+	m_targetObs = m_lgraph.getmTargetObs();
+	m_targetPoses = m_lgraph.getmTargetPoses();
+
+	// essential elements for greedy search
 	m_open.push(new PmcrNode_t(m_start, computeFGH(m_start), {}, nullptr, 
 		m_lgraph.compute_survival_currentLabels({})));
 	m_path = std::vector<int>();
-
 	m_highestSurvival = std::vector<double>(m_lgraph.getnNodes(), -1.0);
 	m_highestSurvival[m_start] = 1.0;
 	m_expanded = std::vector<bool>(m_lgraph.getnNodes(), false);
+
+	// Initialize 3 key variables we will be using
+	m_MaxSurvival = 1.0;
+	m_highestSuccess = 0.0;
+	m_lowestReachability = m_highestSuccess*1.0 / m_MaxSurvival; 
 }
 
 PmcrGreedySolver_t::~PmcrGreedySolver_t()
@@ -46,7 +55,7 @@ PmcrGreedySolver_t::~PmcrGreedySolver_t()
 void PmcrGreedySolver_t::greedy_search()
 {
 
-	while(!m_open.empty())
+	while(!m_goalSet.empty())
 	{
 		PmcrNode_t *current = m_open.top();
 		m_open.pop();
@@ -58,27 +67,34 @@ void PmcrGreedySolver_t::greedy_search()
 			delete current;
 			continue;
 		}
-		// This node has the highest recorded survivability and have not been expanded
+		// get the current node's labels and survivability
 		m_currentSurvival = current->getSurvival();
 		m_currentLabels = current->getLabels();
+		// update highest_survival & lowest_reachability
+		m_MaxSurvival = m_currentSurvival;
+		m_lowestReachability = m_highestSuccess*1.0 / m_MaxSurvival;
+		// Prune goals in goalSet which have lower reachability than what we required in order to
+		// acheive a higher success rate
+		prune_goalSet();
+
 		m_closed.push_back(current);
 		m_expanded[current->getID()] = true;
 
-		if (current->getID() == m_goal)
-		{
-			printf("goal found!\n");
-			// print the labels & weights for the found path
-			std::cout << "The survivability of the path is " << m_currentSurvival << "\n";
-			std::cout << "<";
-			for (auto const &e : m_currentLabels)
-			{
-				std::cout << e << " ";
-			}
-			std::cout << ">\n";
-			// should return a path here
-			back_track_path();
-			return;
-		}
+		// if (current->getID() == m_goalSet)
+		// {
+		// 	printf("goal found!\n");
+		// 	// print the labels & weights for the found path
+		// 	std::cout << "The survivability of the path is " << m_currentSurvival << "\n";
+		// 	std::cout << "<";
+		// 	for (auto const &e : m_currentLabels)
+		// 	{
+		// 		std::cout << e << " ";
+		// 	}
+		// 	std::cout << ">\n";
+		// 	// should return a path here
+		// 	back_track_path();
+		// 	return;
+		// }
 		// look at each neighbor of the current node
 		std::vector<int> neighbors = m_lgraph.getNodeNeighbors(current->getID());
 		for (auto const &neighbor : neighbors)
@@ -111,6 +127,23 @@ void PmcrGreedySolver_t::greedy_search()
 	printf("failed to find a solution in this problem!\n");
 }
 
+void PmcrGreedySolver_t::prune_goalSet()
+{
+	std::vector<int> prune_goal_list;
+	for (int gg=0; gg < m_goalSet.size(); gg++)
+	{
+		if (m_lgraph.getLabelWeights(m_targetPoses[gg]).second < lowest_reachability)
+		{
+			prune_goal_list.push_back(gg);
+		}
+	}
+	for (auto const &idx : prune_goal_list)
+	{
+		m_goalSet.erase(m_goalSet.begin() + idx );
+		m_targetPoses.erase(m_targetPoses.begin() + idx);
+	}
+}
+
 
 std::vector<int> PmcrGreedySolver_t::label_union(std::vector<int> s1, std::vector<int> s2)
 {
@@ -137,8 +170,8 @@ std::vector<int> PmcrGreedySolver_t::computeFGH(int indx)
 	int indx_col = indx % col;
 	int start_row = m_start / col;
 	int start_col = m_start % col;
-	int goal_row = m_goal / col;
-	int goal_col = m_goal % col;
+	int goal_row = m_goalSet / col;
+	int goal_col = m_goalSet % col;
 	// manhattan distance as distance metric
 	int h = abs(indx_row - goal_row) + abs(indx_col - goal_col);
 	int g = abs(indx_row - start_row) + abs(indx_col - start_col);

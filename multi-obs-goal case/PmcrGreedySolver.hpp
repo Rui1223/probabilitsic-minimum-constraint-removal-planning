@@ -36,21 +36,30 @@ class PmcrGreedySolver_t
 	// Input that a greedy solver needs
 	ConnectedGraph_t m_lgraph; 
 	int m_start; // the id of the start node
-	int m_goal; // the id of the goal node
+	std::vector<int> m_goalSet; // the ids of all goal nodes
+	int m_targetObs; //obs idx for target
+	std::vector<int> m_targetPoses;
 
 	std::vector<int> m_currentLabels;
 	double m_currentSurvival;
 	std::vector<double> m_highestSurvival;
-	std::vector<int> m_path;
+	std::vector<std::vector<int>> m_path;
 
 	std::priority_queue<PmcrNode_t*, std::vector<PmcrNode_t*>, PmcrNode_comparison> m_open;
 	std::vector<PmcrNode_t*> m_closed;
 	std::vector<bool> m_expanded;
 
+	// 3 key variables
+	double m_MaxSurvival;
+	double m_highestSuccess;
+	double m_lowestReachability;
+	std::vector<double> m_pathSuccess;
+
 public:
 	PmcrGreedySolver_t(ConnectedGraph_t &g);
 	~PmcrGreedySolver_t();
 	void greedy_search();
+	void prune_goalSet();
 	void back_track_path();
 	std::vector<int> label_union(std::vector<int> s1, std::vector<int> s2);
 	// The functopm to compute the f,g,h value of a node(indx) for a given start & goal
