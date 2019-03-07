@@ -2,10 +2,12 @@
 /*save graphs and several corresponding solutions, respectively*/
 
 // #include "LabeledGraph.hpp"
-#include "ConnectedGraph.hpp"
+// #include "ConnectedGraph.hpp"
 // #include "ConnectedNonOverlapGraph.hpp"
+#include "ToyGraph.hpp"
+
 #include "PmcrGreedySolver.hpp"
-#include "FixedLabelSolver.hpp"
+// #include "FixedLabelSolver.hpp"
 // #include "GrowingTreeSolver.hpp"
 #include "Timer.hpp"
 
@@ -18,9 +20,9 @@
 int main(int argc, char** argv)
 {
 	int nExperiments = 1;
-	int row = 20;
-	int col = 30;
-	std::vector<int> nLabelsPerObs{4,4,4,4};
+	int row = 8;
+	int col = 8;
+	std::vector<int> nLabelsPerObs{4};
 	double probPerLabel = 0.6;
 	Timer t;
 	std::srand(std::time(0));
@@ -42,9 +44,10 @@ int main(int argc, char** argv)
 		// 														+ std::to_string(ii) + ".txt";
 
 		// generate a grpah
-		ConnectedGraph_t g(row, col, nLabelsPerObs, probPerLabel);
+		// ConnectedGraph_t g(row, col, nLabelsPerObs, probPerLabel);
+		ToyGraph_t g(row, col, nLabelsPerObs);
 
-		g.write_graph(file_dir1);
+		// g.write_graph(file_dir1);
 		std::cout << std::endl;
 
 		// work out on solutions
@@ -60,7 +63,7 @@ int main(int argc, char** argv)
 		std::cout << "----------start the greedy search-------------\n";
 		PmcrGreedySolver_t pmcr_greedy_solver(g);
 		t.reset();
-		std::cout << "Start to compute time\n";
+		//std::cout << "Start to compute time\n";
 		pmcr_greedy_solver.greedy_search();
 		t1 = t.elapsed();
 		std::cout << "Greedy time: " << t1 << " seconds\n\n";

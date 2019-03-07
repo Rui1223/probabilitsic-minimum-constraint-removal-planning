@@ -7,9 +7,9 @@
 #include <cstring>
 
 // #include "LabeledGraph.hpp"
-#include "ConnectedGraph.hpp"
+// #include "ConnectedGraph.hpp"
 // #include "ConnectedNonOverlapGraph.hpp"
-// #include "ToyGraph.hpp"
+#include "ToyGraph.hpp"
 #include "PmcrNode.hpp"
 
 struct PmcrNode_comparison
@@ -34,16 +34,18 @@ struct PmcrNode_comparison
 class PmcrGreedySolver_t
 {
 	// Input that a greedy solver needs
-	ConnectedGraph_t m_lgraph; 
+	ToyGraph_t m_lgraph; 
 	int m_start; // the id of the start node
 	std::vector<int> m_goalSet; // the ids of all goal nodes
 	int m_targetObs; //obs idx for target
 	std::vector<int> m_targetPoses;
+	int m_optimalGoal;
+	int m_optimalPose;
 
 	std::vector<int> m_currentLabels;
 	double m_currentSurvival;
 	std::vector<double> m_highestSurvival;
-	std::vector<std::vector<int>> m_path;
+	std::vector<std::vector<int>> m_paths;
 
 	std::priority_queue<PmcrNode_t*, std::vector<PmcrNode_t*>, PmcrNode_comparison> m_open;
 	std::vector<PmcrNode_t*> m_closed;
@@ -56,7 +58,7 @@ class PmcrGreedySolver_t
 	std::vector<double> m_pathSuccess;
 
 public:
-	PmcrGreedySolver_t(ConnectedGraph_t &g);
+	PmcrGreedySolver_t(ToyGraph_t &g);
 	~PmcrGreedySolver_t();
 	void greedy_search();
 	void prune_goalSet();
@@ -65,10 +67,7 @@ public:
 	// The functopm to compute the f,g,h value of a node(indx) for a given start & goal
 	std::vector<int> computeFGH(int indx);
 	//bool check_prune(int neighborID, double weights);
-	//bool search_closedList(int neighborID, double weights, bool isPrune);
-	//bool search_openList(int neighborID, double weights, bool isPrune);
-	//void push_virtualOpen();
-	void print_path();
+	//void print_path();
 	void write_solution(std::string file_dir, double t);
 	void print_closedList();
 

@@ -1,7 +1,5 @@
-// test how to generate several number with large variance
-
-// normal distribution
 #include <iostream> 
+#include <fstream>
 //#include <cmath>
 #include <algorithm> // std::sort
 #include <cstring>
@@ -27,15 +25,67 @@ int random_generate_integer(int min, int max)
 
 int main()
 {
-	std::vector<int> v1{8,4,6,7,1};
-	std::vector<int>::iterator it;
+	// int a = 3;
+	// int b = 5;
+	// int c = 4;
+	// int d = 6;
+	// std::string file_dir = "./justatest.txt";
+	// std::ofstream file_(file_dir);
+	// if (file_.is_open())
+	// {
+	// 	file_ << a << " " << b << "\n";
+	// }
 
-	for (auto const &v : v1)
+	// if(file_.is_open())
+	// {
+	// 	file_ << c << " " << d << "\n";
+	// }
+
+	int a = 5;
+	int b;
+	if (a==5)
 	{
-		std::cout << v << " ";
+		b = a+1;
+
 	}
-	std::cout << "\n";
+
+	std::cout << b << "\n";
+
 
 	return 0;
+	// std::vector<int> v1{50,90,40,90,80,60,70};
+	// std::vector<int>::iterator it;
+
+	// int a = 40;
+
+	// if ( std::find(v1.begin(), v1.end(), a) != v1.end() )
+	// {
+	// 	std::cout << std::distance(v1.begin(), std::find(v1.begin(), v1.end(), a)) << "\n";
+	// }
+
+	// for (auto const &v : v1)
+	// {
+	// 	std::cout << v << " ";
+	// }
+	// std::cout << "\n";
+
+	// int deletion_counter = 0;
+
+	// for (int gg=0; gg < v1.size(); gg++)
+	// {
+	// 	if (gg==1 or gg==2 or gg==4)
+	// 	{
+	// 		v1.erase(v1.begin() + gg - deletion_counter);
+	// 		deletion_counter++;
+	// 	}
+	// }
+
+	// std::cout << "-------------------\n";
+
+	// for (auto const &v : v1)
+	// {
+	// 	std::cout << v << " ";
+	// }
+	// std::cout << "\n";	
 }
 

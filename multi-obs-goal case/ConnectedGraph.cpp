@@ -78,7 +78,7 @@ ConnectedGraph_t::ConnectedGraph_t(int row, int col, std::vector<int> nlabelsPer
 
 	std::cout << "Time to build and label the graph: " << tt.elapsed() << " seconds\n";
 
-	printf("--------------------------------------------------\n");
+	printf("--------------------------------------------------\n\n");
 }
 
 void ConnectedGraph_t::load_graph()
