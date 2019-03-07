@@ -48,13 +48,14 @@ class ConnectedGraph_t
 	int m_nExpansion;
 
 	// all label combinations
-	std::vector<std::vector<int>> m_labelCombinations;
-	std::vector<std::pair<std::vector<int>, double>> m_labelMap;
+	//std::vector<std::vector<int>> m_labelCombinations;
+	//std::vector<std::pair<std::vector<int>, double>> m_labelMap;
 
 	// multiple goals scenarios
 	// since goal is now attached to the obstacle
 	std::vector<int> m_goalSet;
-	int m_target;
+	int m_targetObs;
+	std::vector<int> m_targetPoses;
 	int m_start;
 
 
@@ -91,11 +92,11 @@ public:
 	// function to compute the survivability for a single set of labels
 	double compute_survival_currentLabels(std::vector<int> labels);
 
-	// function to compute survivability for a power set
-	std::vector<double> compute_survival();
+	// // function to compute survivability for a power set
+	// std::vector<double> compute_survival();
 
-	// function to compute a powerset given a set of labels
-	void cal_powerSet();
+	// // function to compute a powerset given a set of labels
+	// void cal_powerSet();
 
 	// function to calculate labelMap
 	//void cal_labelMap();
@@ -120,10 +121,13 @@ public:
 	std::vector<int> getEdgeLabels(int id1, int id2) 
 														{ return m_edgeLabels[id1][id2]; } 
 	std::pair<int, double> getLabelWeights(int label_idx) { return m_labelWeights[label_idx]; }
-	std::vector<std::pair<std::vector<int>, double>> getLabelMap()
-	{
-		return m_labelMap;
-	}
+	int getmStart() { return m_start; }
+	std::vector<int> getmGoalSet() { return m_goalSet; }
+	// std::vector<std::pair<std::vector<int>, double>> getLabelMap()
+	// {
+	// 	return m_labelMap;
+	// }
+
 
 	// Destructor
 	~ConnectedGraph_t();

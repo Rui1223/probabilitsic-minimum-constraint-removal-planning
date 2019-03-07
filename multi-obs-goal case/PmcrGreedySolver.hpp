@@ -48,7 +48,7 @@ class PmcrGreedySolver_t
 	std::vector<bool> m_expanded;
 
 public:
-	PmcrGreedySolver_t(ConnectedGraph_t &g, int start, int goal);
+	PmcrGreedySolver_t(ConnectedGraph_t &g);
 	~PmcrGreedySolver_t();
 	void greedy_search();
 	void back_track_path();

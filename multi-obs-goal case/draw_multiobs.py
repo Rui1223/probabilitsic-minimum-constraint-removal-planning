@@ -48,59 +48,64 @@ if __name__ == "__main__":
 			for vv in xrange(0, len(line)-1, 2):
 				label_belongings[line[vv]] = int(line[vv+1])
 			# print label_belongings
+		elif (n_line == 4):
+			targetPoses = line
+		elif (n_line == 5):
+			start = int(line[0]);
+			# plot the start location
+			ax.text(cal_co(start,col,row)[0]-0.2, cal_co(start,col,row)[1]+0.05, 
+				"start", fontweight='bold', fontsize=8)
+		elif (n_line == 6):
+			# plot the goal location
+			goalSet = line;
+			for g in goalSet:
+				g = int(g);
+				ax.text(cal_co(g,col,row)[0]-0.2, cal_co(g,col,row)[1]+0.05, 
+					"goal", fontweight='bold', fontsize=8)
 
 		else:
-			## The lines starting from the 4th line are the lines storing edges and labels
-			if (n_line >= 4):
-				v1 = line[0];
-				v2 = line[1];
-				if len(line) == 3: ## there is a label information
-					labels = line[2] # which is a string
-					labels = labels.split(',') # now labels is a list of labels
-					# if (len(labels)==1):
-					# 	labels=list(labels)
-					# else:
-					# 	IPython.embed()
-					# 	if (v1=='171' and v2=='172'):
-					# 		## partition the string labels if the length of labels > 1
-					# 		labels = list(labels.partition(','))
-					# 	IPython.embed()
-					# 		##IPython.embed()
-					#plot the label as "beautiful" as possible
-					if (cal_co(v1,col,row)[0] == cal_co(v2,col,row)[0]):
-						## vertical line
-						incr = 0
-						for label in labels:
-							if (label == ','):
-								ax.text(cal_co(v1,col,row)[0]-0.06, 
-									(cal_co(v1,col,row)[1]+cal_co(v2,col,row)[1])/2+incr, 
-									label, fontsize=8, rotation=90)
-							else:
-								##print label
-								ax.text(cal_co(v1,col,row)[0]-0.06, 
-									(cal_co(v1,col,row)[1]+cal_co(v2,col,row)[1])/2+incr, 
-									label, color=color_pool[label_belongings[label]],
-																	 fontsize=8, rotation=90)
-							incr += 0.25
-					else:
-						## horizontal line
-						incr = 0
-						for label in labels:
-							if (label == ','):
-								ax.text(min(cal_co(v1,col,row)[0], cal_co(v2,col,row)[0]) 
-									+ 1.0/(len(labels)+1) + incr, 
-									cal_co(v1,col,row)[1]+0.01, label, fontsize=8)
-							else:
-								##print label
-								ax.text(min(cal_co(v1,col,row)[0], cal_co(v2,col,row)[0]) 
-									+ 1.0/(len(labels)+1) + incr, 
-									cal_co(v1,col,row)[1]+0.01, label,
-										color=color_pool[label_belongings[label]], fontsize=8)
-							incr += 0.25					
-				
-				#plot current edge
-				ax.plot([cal_co(v1,col,row)[0], cal_co(v2,col,row)[0]], 
-						[cal_co(v1,col,row)[1], cal_co(v2,col,row)[1]], 'k')
+			## starting lines storing edges and labels
+			v1 = line[0];
+			v2 = line[1];
+			if len(line) == 3: ## there is a label information
+				labels = line[2] # which is a string
+				labels = labels.split(',') # now labels is a list of labels
+
+				#plot the label as "beautiful" as possible
+				if (cal_co(v1,col,row)[0] == cal_co(v2,col,row)[0]):
+					## vertical line
+					incr = 0
+					for label in labels:
+						if (label == ','):
+							ax.text(cal_co(v1,col,row)[0]-0.06, 
+								(cal_co(v1,col,row)[1]+cal_co(v2,col,row)[1])/2+incr, 
+								label, fontsize=8, rotation=90)
+						else:
+							##print label
+							ax.text(cal_co(v1,col,row)[0]-0.06, 
+								(cal_co(v1,col,row)[1]+cal_co(v2,col,row)[1])/2+incr, 
+								label, color=color_pool[label_belongings[label]],
+																 fontsize=8, rotation=90)
+						incr += 0.25
+				else:
+					## horizontal line
+					incr = 0
+					for label in labels:
+						if (label == ','):
+							ax.text(min(cal_co(v1,col,row)[0], cal_co(v2,col,row)[0]) 
+								+ 1.0/(len(labels)+1) + incr, 
+								cal_co(v1,col,row)[1]+0.01, label, fontsize=8)
+						else:
+							##print label
+							ax.text(min(cal_co(v1,col,row)[0], cal_co(v2,col,row)[0]) 
+								+ 1.0/(len(labels)+1) + incr, 
+								cal_co(v1,col,row)[1]+0.01, label,
+									color=color_pool[label_belongings[label]], fontsize=8)
+						incr += 0.25					
+			
+			#plot current edge
+			ax.plot([cal_co(v1,col,row)[0], cal_co(v2,col,row)[0]], 
+					[cal_co(v1,col,row)[1], cal_co(v2,col,row)[1]], 'k')
 
 	# plot label weights
 	for ii in xrange(len(label_weights)):
@@ -109,6 +114,8 @@ if __name__ == "__main__":
 	# plot density of graph
 	ax.text(col+3-3, row+3-0.5-0.4*len(label_weights), "density:", fontsize=10)
 	ax.text(col+3-3, row+3-0.5-0.4*(len(label_weights)+1), density, fontsize=10)
+	ax.text(col+3-3, row+3-0.5-0.4*(len(label_weights)+2), "target pose", fontsize=10)
+	ax.text(col+3-3, row+3-0.5-0.4*(len(label_weights)+3), targetPoses, fontsize=10)
 
 	
 	# ##Now plot the solution for FixedLabel Algorithm
@@ -159,9 +166,7 @@ if __name__ == "__main__":
 		line = line.split()
 		n_line += 1
 		if (n_line == 1):
-			start = int(line[0])
-			goal = int(line[1])
-			solution_time = line[2]
+			solution_time = line[0]
 		elif (n_line == 2):
 			path = map(int, line)
 		elif (n_line == 3):
@@ -171,12 +176,6 @@ if __name__ == "__main__":
 				solution_labels = " "
 			else:
 				solution_labels = line[0]
-
-	# First plot the start and goal location
-	ax.text(cal_co(start,col,row)[0]-0.2, cal_co(start,col,row)[1]+0.05, 
-		"start", fontweight='bold', fontsize=8)
-	ax.text(cal_co(goal,col,row)[0]-0.2, cal_co(goal,col,row)[1]+0.05, 
-		"goal", fontweight='bold', fontsize=8)
 
 	#plot the optimal path
 	if (path):

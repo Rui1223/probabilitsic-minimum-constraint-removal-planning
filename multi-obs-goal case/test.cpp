@@ -20,7 +20,7 @@ int main(int argc, char** argv)
 	int nExperiments = 1;
 	int row = 20;
 	int col = 30;
-	std::vector<int> nLabelsPerObs{4,4,4,4,4,4,4,4};
+	std::vector<int> nLabelsPerObs{4,4,4,4};
 	double probPerLabel = 0.6;
 	Timer t;
 	std::srand(std::time(0));
@@ -34,8 +34,8 @@ int main(int argc, char** argv)
 	for (int ii = 0; ii < nExperiments; ii++)
 	{
 		std::string file_dir1 = "./" + folder_dir + "/graph" + std::to_string(ii) + ".txt";
-		std::string file_dir2 = "./" + folder_dir + "/FixedLabel_solution" 
-															+ std::to_string(ii) + ".txt";
+		// std::string file_dir2 = "./" + folder_dir + "/FixedLabel_solution" 
+		// 													+ std::to_string(ii) + ".txt";
 		std::string file_dir3 = "./" + folder_dir + "/GreedySearch_solution" 
 																+ std::to_string(ii) + ".txt";		
 		// std::string file_dir4 = "./" + folder_dir + "/GrowingTree_solution" 
@@ -44,30 +44,6 @@ int main(int argc, char** argv)
 		// generate a grpah
 		ConnectedGraph_t g(row, col, nLabelsPerObs, probPerLabel);
 
-		// instead of a random start, we want a collision start
-		bool NoCollision;
-		do
-		{
-			start = random_generate_integer(0, row*col-1);
-			start_neighbors = g.getNodeNeighbors(start);
-			NoCollision = false;
-			for (auto const &neighbor : start_neighbors)
-			{
-				if (g.getEdgeLabels(start, neighbor).empty())// collison free
-				{
-					NoCollision = true;
-					break;
-				}
-			}
-		}
-		while(!NoCollision);	
-
-		goal = random_generate_integer(0, row*col-1);
-		while (start == goal)
-		{
-			//start = random_generate_integer(0, row*col-1);
-			goal = random_generate_integer(0, row*col-1);
-		}
 		g.write_graph(file_dir1);
 		std::cout << std::endl;
 
@@ -82,7 +58,7 @@ int main(int argc, char** argv)
 		// fixedlabel_solver.write_solution(file_dir2, t1);
 
 		std::cout << "----------start the greedy search-------------\n";
-		PmcrGreedySolver_t pmcr_greedy_solver(g, start, goal);
+		PmcrGreedySolver_t pmcr_greedy_solver(g);
 		t.reset();
 		std::cout << "Start to compute time\n";
 		pmcr_greedy_solver.greedy_search();
