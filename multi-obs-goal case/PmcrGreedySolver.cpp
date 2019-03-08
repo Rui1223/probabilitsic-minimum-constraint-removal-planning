@@ -8,15 +8,13 @@
 #include <fstream>
 #include <string> // std::string, std::to_string
 
-// #include "LabeledGraph.hpp"
-// #include "ConnectedGraph.hpp"
-// #include "ConnectedNonOverlapGraph.hpp"
-#include "ToyGraph.hpp"
+#include "ConnectedGraph.hpp"
+// #include "ToyGraph.hpp"
 #include "PmcrGreedySolver.hpp"
 #include "PmcrNode.hpp"
 #include "Timer.hpp"
 
-PmcrGreedySolver_t::PmcrGreedySolver_t(ToyGraph_t &g)
+PmcrGreedySolver_t::PmcrGreedySolver_t(ConnectedGraph_t &g)
 {
 	// load the graph
 	Timer tt;
@@ -117,6 +115,9 @@ void PmcrGreedySolver_t::greedy_search()
 		{
 			std::cout << "Encounter a goal\n";
 			goal_idx = std::distance(m_goalSet.begin(), it);
+			// print the goal & its corresponding target pose
+			std::cout << "Goal: " << current->getID() << "\n";
+			std::cout << "Target Pose: " << m_targetPoses[goal_idx] << "\n";
 			// check if the labels the path from start to current carries contains the label of the
 			// goal you are reaching. If it is, it fails. (Since you cannot reach the goal without
 			// colliding it.)
@@ -124,7 +125,7 @@ void PmcrGreedySolver_t::greedy_search()
 																			!= m_currentLabels.end() )
 			{
 				// directly prune the goal
-				std::cout << "has to reach the goal while colliding with that goal pose,prune.\n";
+				std::cout << "has to reach the goal while colliding with that goal pose,prune.\n\n";
 				m_goalSet.erase(it);
 				m_targetPoses.erase(m_targetPoses.begin()+goal_idx);
 				continue;
@@ -135,9 +136,6 @@ void PmcrGreedySolver_t::greedy_search()
 			m_highestSuccess = 
 				m_currentSurvival * m_lgraph.getLabelWeights(m_targetPoses[goal_idx]).second * 1.0;
 			m_lowestReachability = m_highestSuccess*1.0 / m_MaxSurvival; 
-			// print the goal & its corresponding target pose
-			std::cout << "Goal: " << current->getID() << "\n";
-			std::cout << "Target Pose: " << m_targetPoses[goal_idx] << "\n";
 			// print the success rate, survivability & labels for the found path
 			std::cout << "Success rate of the path: " << m_highestSuccess << "\n";
 			std::cout << "Survivability of the path: " << m_currentSurvival << "\n";
@@ -285,7 +283,7 @@ void PmcrGreedySolver_t::write_solution(std::string file_dir, double t)
 	if (file_.is_open())
 	{
 		file_ << t << " " << m_highestSuccess << " " << m_currentSurvival
-						<< " " << m_optimalGoal << " " << m_optimalPose << "\n";
+				<< " " << m_optimalGoal << " " << m_optimalPose << " " << m_paths.size() << "\n";
 
 		if (!m_currentLabels.empty())
 		{

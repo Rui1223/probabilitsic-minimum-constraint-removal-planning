@@ -44,7 +44,7 @@ ConnectedGraph_t::ConnectedGraph_t(int row, int col, std::vector<int> nlabelsPer
 	m_col = col;
 	m_nNodes = m_row * m_col;
 	m_nEdges = (m_col-1)*m_row + (m_row-1)*m_col;
-	std::cout << "m_nEdges: " << m_nEdges << std::endl;
+	//std::cout << "m_nEdges: " << m_nEdges << std::endl;
 	
 	// label information
 	m_nlabelsPerObs = nlabelsPerObs;
@@ -192,7 +192,7 @@ void ConnectedGraph_t::label_graph()
 	// Based on the m_nExpansion, calculate the estimated radius of each obstacle (diamond)
 	int obs_r;
 	obs_r = ceil( ( 1 + sqrt(1-2*(1-m_nExpansion)) ) / 2.0 ) / 2;
-	std::cout << "obs_r: " << obs_r << "\n";
+	// std::cout << "obs_r: " << obs_r << "\n";
 	// we can set up the inner boundary for limiting the center of the obstacles
 	int lower_row = obs_r;
 	int upper_row = m_row-obs_r;
@@ -215,6 +215,8 @@ void ConnectedGraph_t::label_graph()
 
 	// pick the target object
 	m_targetObs = random_generate_integer(0, m_nobstacles-1);
+	std::cout << "Target Obstalce: " << m_targetObs << "\n";
+
 	// figure out target poses based on the target obstalces
 	int temp_counter = 0;
 	for (int ll=0; ll < m_targetObs; ll++)

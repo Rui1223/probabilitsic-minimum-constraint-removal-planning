@@ -6,10 +6,7 @@
 #include <queue>
 #include <cstring>
 
-// #include "LabeledGraph.hpp"
-// #include "ConnectedGraph.hpp"
-// #include "ConnectedNonOverlapGraph.hpp"
-#include "ToyGraph.hpp"
+#include "ConnectedGraph.hpp"
 #include "PmcrNode.hpp"
 
 struct PmcrNode_comparison
@@ -34,7 +31,7 @@ struct PmcrNode_comparison
 class PmcrGreedySolver_t
 {
 	// Input that a greedy solver needs
-	ToyGraph_t m_lgraph; 
+	ConnectedGraph_t m_lgraph; 
 	int m_start; // the id of the start node
 	std::vector<int> m_goalSet; // the ids of all goal nodes
 	int m_targetObs; //obs idx for target
@@ -58,7 +55,7 @@ class PmcrGreedySolver_t
 	std::vector<double> m_pathSuccess;
 
 public:
-	PmcrGreedySolver_t(ToyGraph_t &g);
+	PmcrGreedySolver_t(ConnectedGraph_t &g);
 	~PmcrGreedySolver_t();
 	void greedy_search();
 	void prune_goalSet();

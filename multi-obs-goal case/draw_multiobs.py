@@ -13,8 +13,8 @@ def cal_co(indx, col, row):
 
 if __name__ == "__main__":
 
-	color_pool = ['green', 'blue', 'purple', 'orange', 'pink', 'olive', 'gray', 'brown', 
-																			'yellow', 'black']
+	color_pool = ['green', 'blue', 'purple', 'orange', 'pink', 'olive', 'brown', 
+																	'yellow', 'black']
 
 	n = sys.argv[2]
 
@@ -105,7 +105,7 @@ if __name__ == "__main__":
 			
 			#plot current edge
 			ax.plot([cal_co(v1,col,row)[0], cal_co(v2,col,row)[0]], 
-					[cal_co(v1,col,row)[1], cal_co(v2,col,row)[1]], 'k')
+					[cal_co(v1,col,row)[1], cal_co(v2,col,row)[1]], color='lightgray', linestyle='dashed')
 
 	# plot label weights
 	for ii in xrange(len(label_weights)):
@@ -167,32 +167,61 @@ if __name__ == "__main__":
 		n_line += 1
 		if (n_line == 1):
 			solution_time = line[0]
+			success_optimum = line[1]
+			survival_optimum = line[2]
+			goal_optimum = line[3]
+			goal_optimum = int(goal_optimum)
+			pose_optimum = line[4]
+			nPaths = int(line[5])
+		# line 2 stores the labels
 		elif (n_line == 2):
-			path = map(int, line)
-		elif (n_line == 3):
-			solution_survival = line[0]
-		else:
 			if len(line) == 0:
-				solution_labels = " "
+				labels_optimum = " "
 			else:
-				solution_labels = line[0]
+				labels_optimum = line[0]
+		else:
+			# start plotting the paths
+			if (nPaths != 1):
+				# we are plotting suboptimal path
+				path = map(int, line)
+				if (path):
+					counter = 0
+					while (counter != (len(path)-1)):
+						v1 = path[counter]
+						v2 = path[counter+1]
+						ax.plot(cal_co(v1,col,row)[0], cal_co(v1,col,row)[1], "co")
+						ax.plot([cal_co(v1,col,row)[0], cal_co(v2,col,row)[0]], 
+								[cal_co(v1,col,row)[1], cal_co(v2,col,row)[1]], "c--")
+						counter += 1
+					ax.plot(cal_co(v2,col,row)[0], cal_co(v2,col,row)[1], "co")
+			else:
+				# we are plotting optimal path
+				path = map(int, line)
+				if (path):
+					counter = 0
+					while (counter != (len(path)-1)):
+						v1 = path[counter]
+						v2 = path[counter+1]
+						ax.plot(cal_co(v1,col,row)[0], cal_co(v1,col,row)[1], "c*")
+						ax.plot([cal_co(v1,col,row)[0], cal_co(v2,col,row)[0]], 
+								[cal_co(v1,col,row)[1], cal_co(v2,col,row)[1]], "c*")
+						counter += 1
+					ax.plot(cal_co(v2,col,row)[0], cal_co(v2,col,row)[1], "c*")
 
-	#plot the optimal path
-	if (path):
-		counter = 0
-		while (counter != (len(path)-1)):
-			v1 = path[counter]
-			v2 = path[counter+1]
-			ax.plot(cal_co(v1,col,row)[0], cal_co(v1,col,row)[1], "co")
-			ax.plot([cal_co(v1,col,row)[0], cal_co(v2,col,row)[0]], 
-					[cal_co(v1,col,row)[1], cal_co(v2,col,row)[1]], "c--")
-			counter += 1
-		ax.plot(cal_co(v2,col,row)[0], cal_co(v2,col,row)[1], "co")
+					# plot labels
+					ax.text(col+3-3, -2+4.0, "G Time:"+solution_time, color="c", fontsize=10)
+					ax.text(col+3-3, -2+3.5, "G OptPose:"+pose_optimum, color="c", fontsize=10)
+					ax.text(col+3-3, -2+3.0, "G Success:"+success_optimum, color="c", fontsize=10)
+					ax.text(col+3-3, -2+2.5, "G Survival:"+survival_optimum, color="c", fontsize=10)
+					ax.text(col+3-3, -2+2.0, "G Labels:"+labels_optimum, color="c", fontsize=10)
 
-		# plot solution labels and weights
-		ax.text(col+3-3, -2+2.0, "G time:"+solution_time, color="c", fontsize=10)
-		ax.text(col+3-3, -2+2.5, "G survival:"+solution_survival, color="c", fontsize=10)
-		ax.text(col+3-3, -2+3.0, "G labels:"+solution_labels, color="c", fontsize=10)
+					## highlight the goal
+					ax.text(cal_co(goal_optimum,col,row)[0]-0.2, cal_co(goal_optimum,col,row)[1]+0.05, 
+							"goal", color="r", fontweight='bold', fontsize=8)
+
+			nPaths -= 1;
+
+
 
 
 	# ##Now plot the solution for GrowingTree Algorithm

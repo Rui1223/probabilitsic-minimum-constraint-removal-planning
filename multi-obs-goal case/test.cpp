@@ -1,10 +1,8 @@
 /*The cpp file do several experiements on greedy ahnd fixedLabel search*/
 /*save graphs and several corresponding solutions, respectively*/
 
-// #include "LabeledGraph.hpp"
-// #include "ConnectedGraph.hpp"
-// #include "ConnectedNonOverlapGraph.hpp"
-#include "ToyGraph.hpp"
+#include "ConnectedGraph.hpp"
+// #include "ToyGraph.hpp"
 
 #include "PmcrGreedySolver.hpp"
 // #include "FixedLabelSolver.hpp"
@@ -20,9 +18,9 @@
 int main(int argc, char** argv)
 {
 	int nExperiments = 1;
-	int row = 8;
-	int col = 8;
-	std::vector<int> nLabelsPerObs{4};
+	int row = 20;
+	int col = 20;
+	std::vector<int> nLabelsPerObs{7,7,7,7,7,7};
 	double probPerLabel = 0.6;
 	Timer t;
 	std::srand(std::time(0));
@@ -44,10 +42,9 @@ int main(int argc, char** argv)
 		// 														+ std::to_string(ii) + ".txt";
 
 		// generate a grpah
-		// ConnectedGraph_t g(row, col, nLabelsPerObs, probPerLabel);
-		ToyGraph_t g(row, col, nLabelsPerObs);
+		ConnectedGraph_t g(row, col, nLabelsPerObs, probPerLabel);
 
-		// g.write_graph(file_dir1);
+		g.write_graph(file_dir1);
 		std::cout << std::endl;
 
 		// work out on solutions
