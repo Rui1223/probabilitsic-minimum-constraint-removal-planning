@@ -1,16 +1,16 @@
 /*This hpp file declares a connected labeled graph with different weights assigned to each label 
 for different obstacles. */
-/*we start with each label, expand the edges with that label based on the expected number of edge
+/*we start with each label, expand the edges with that label based on the expected number of edges
 given to that label*/
 #ifndef CONNECTEDGRAPH_H
 #define CONNECTEDGRAPH_H
 
 #include <vector>
-//#include <cmath> // pow()
-//#include <algorithm> // std::set_union, std::sort
-//#include <bitset> // for bitwise operation
+#include <cmath> // pow()
+#include <algorithm> // std::set_union, std::sort
+#include <bitset> // for bitwise operation
 #include <map>
-//#include <cassert>
+#include <cassert>
 #include <functional>
 #include <set>
 #include <cstring>
@@ -117,9 +117,11 @@ public:
 	// lots of getters
 	int getnCol() { return m_col; }
 	int getnNodes() { return m_nNodes; }
+	int getnTotallabels() { return m_nTotallabels; } 
 	std::vector<int> getNodeNeighbors(int id) { return m_nodeNeighbors[id]; }
 	std::vector<int> getEdgeLabels(int id1, int id2) 
-														{ return m_edgeLabels[id1][id2]; } 
+														{ return m_edgeLabels[id1][id2]; }
+	std::map<int, std::pair<int, double>> getLabelWeights() { return m_labelWeights; }
 	std::pair<int, double> getLabelWeights(int label_idx) { return m_labelWeights[label_idx]; }
 	
 	int getmStart() { return m_start; }

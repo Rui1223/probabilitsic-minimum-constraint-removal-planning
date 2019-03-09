@@ -204,7 +204,7 @@ if __name__ == "__main__":
 						v2 = path[counter+1]
 						ax.plot(cal_co(v1,col,row)[0], cal_co(v1,col,row)[1], "c*")
 						ax.plot([cal_co(v1,col,row)[0], cal_co(v2,col,row)[0]], 
-								[cal_co(v1,col,row)[1], cal_co(v2,col,row)[1]], "c*")
+								[cal_co(v1,col,row)[1], cal_co(v2,col,row)[1]], "c--")
 						counter += 1
 					ax.plot(cal_co(v2,col,row)[0], cal_co(v2,col,row)[1], "c*")
 
@@ -217,7 +217,7 @@ if __name__ == "__main__":
 
 					## highlight the goal
 					ax.text(cal_co(goal_optimum,col,row)[0]-0.2, cal_co(goal_optimum,col,row)[1]+0.05, 
-							"goal", color="r", fontweight='bold', fontsize=8)
+							"goal", color="fuchsia", fontweight='bold', fontsize=8)
 
 			nPaths -= 1;
 

@@ -178,16 +178,6 @@ int ConnectedGraph_t::dist(std::pair<int, int> &a, std::pair<int, int> b)
 
 void ConnectedGraph_t::label_graph()
 {
-	// for each label
-	//for (auto const &l : m_nTotallabels)
-
-	// for (int ll=0; ll < m_nTotallabels; ll++)
-	// {
-	// 	// random pick up a node to expand (in a BFS search)
-	// 	int BF_start = random_generate_integer(0, m_nNodes-1);
-	// 	//std::cout << "start per label: " << BF_start << "\n"; 
-	// 	BFSearch(BF_start, ll);
-	// }
 
 	// Based on the m_nExpansion, calculate the estimated radius of each obstacle (diamond)
 	int obs_r;
@@ -198,10 +188,6 @@ void ConnectedGraph_t::label_graph()
 	int upper_row = m_row-obs_r;
 	int lower_col = obs_r;
 	int upper_col = m_col-obs_r;
-	// std::cout << "lower_row:" << lower_row << "\n";
-	// std::cout << "upper_row:" << upper_row << "\n";
-	// std::cout << "lower_col:" << lower_col << "\n";
-	// std::cout << "upper_col:" << upper_col << "\n";
 
 	int current_label_idx = 0;
 	std::vector<std::pair<int, int>> centers_obs(m_nobstacles, std::pair<int, int>(0, 0));
@@ -544,7 +530,7 @@ double ConnectedGraph_t::compute_survival_currentLabels(std::vector<int> current
 	std::vector<double> CollisionPerObs(m_nobstacles, 0.0);
 	for (auto const &label : currentLabels)
 	{
-		CollisionPerObs[getLabelWeights(label).first] += getLabelWeights(label).second;
+		CollisionPerObs[m_labelWeights[label].first] += m_labelWeights[label].second;
 	}
 	for (auto const &collision_prob : CollisionPerObs)
 	{

@@ -12,7 +12,7 @@
 #include <fstream>
 #include <cstring> // std::string, std::to_string
 #include <map>
-//#include <cassert>
+#include <cassert>
 #include <functional>
 #include <set>
 
@@ -37,60 +37,69 @@
 // 	return (p1.second >= p2.second);
 // }
 
-FixedLabelSolver_t::FixedLabelSolver_t(ConnectedGraph_t &g, int start, int goal)
+// Driver function to sort the vector elements 
+// by second element of pairs 
+bool sortbysec_fixedlabel(const std::pair<std::vector<int>, double> &p1, 
+				const std::pair<std::vector<int>, double> &p2)
+{
+	return (p1.second < p2.second);
+}
+
+FixedLabelSolver_t::FixedLabelSolver_t(ConnectedGraph_t &g)
 {
 	Timer tt;
 	tt.reset();
-	// problem formulation specified at the beginning of the solver
 	m_lgraph = g;
-	std::cout << "Time to load the graph for Fsolver: " << tt.elapsed() << " seconds\n";
-	assert(start >=0);
-	assert(goal >=0);
-	m_start = start;
-	m_goal = goal;
-	m_heuristic_search_solver = HeuristicSearchSolver_t(g, start, goal);
+	std::cout << "Time to load the graph for Fsolver: " << tt.elapsed() << " seconds\n\n";
+	m_start = m_lgraph.getmStart();
+	m_goalSet = m_lgraph.getmGoalSet();
+	m_targetObs = m_lgraph.getmTargetObs();
+	m_targetPoses = m_lgraph.getmTargetPoses();
+
+	m_nTotallabels = m_lgraph.getnTotallabels();
+	m_labelWeights = m_lgraph.getLabelWeights();
+
+	// construct labelMap here.
+	cal_labelMap();
+	// print_labelMap();
+
+	// Initialize 3 key variables we will be using
+	m_highestSuccess = 0.0;
+	m_lowestReachability = 0.0;
+	// m_heuristic_search_solver = HeuristicSearchSolver_t(g, start, goal);
 }
 
 void FixedLabelSolver_t::fixedLabel_search()
 {
-	// The search method takes advantage of the labelMap obtained from the given graph.
 	// Then for each set of labels and corresponding weight in the labelMap, construct a subgraph
 	// which only contains edges which carry a subset of the current set of labels being looped on. 
-	// A breast-first search is performed on the subgraph to see whether the start and the goal
-	// forms a connected component. If it is, return the path, then the path is optimal. Otherwise, 
-	// switch to next set of labels in the labelMap (with ascending order with respect to weight).
+	// An A* search is performed on the subgraph to see whether we can reach any one of the goal 
+	// from the start. If it is, return the path to be the optimal so far. Otherwise
+	// switch to next set of labels in the labelMap (with ascending order with respect to 
+	// survivability).
 
-	// Given start and goal, figure out whether start and goal are already 
-	// in a region where labels are assigned (doomed)
-	std::vector<int> sgLabels = cal_sgLabel(m_start, m_goal);
-	std::vector<std::pair<std::vector<int>, double>> subLabelMap = cal_subLabelMap(sgLabels);
+	int k = 0;
 
-	// std::cout << "sgLabels:\n";
-	// for (auto const &l : sgLabels)
-	// {
-	// 	std::cout << l << "\t";
-	// }
-	// std::cout << std::endl;
-
-	// printf("*********sub labelMap************\n");
-	// //Iterate over the set you just come up with
-	// for (auto const &e : subLabelMap)
-	// {
-	// 	std::cout << "<";
-	// 	for (auto const &l : e.first)
-	// 	{
-	// 		std::cout << l << ",";
-	// 	}
-	// 	std::cout << "> :\t\t";
-	// 	std::cout << e.second << std::endl;
-	// }	
-	// std::cout << "*************************\n";
-
-	int k = 1;
-	for (int lc=subLabelMap.size()-1; lc>=0; lc--)
+	while (!m_goalSet.empty())
 	{
-		m_currentLabels = subLabelMap[lc].first;
-		m_currentSurvival = subLabelMap[lc].second;
+		k++;
+
+	}
+}
+
+
+void FixedLabelSolver_t::fixedLabel_search()
+{
+	// Then for each set of labels and corresponding weight in the labelMap, construct a subgraph
+	// which only contains edges which carry a subset of the current set of labels being looped on. 
+	// An A* search is performed on the subgraph to see whether we can reach any one of the goal 
+	// from the start. If it is, return the path to be the optimal so far. Otherwise
+	// switch to next set of labels in the labelMap (with ascending order with respect to survivability).
+	int k = 1;
+	for (int lc=m_labelMap.size()-1; lc>=0; lc--)
+	{
+		m_currentLabels = m_labelMap[lc].first;
+		m_currentSurvival = m_labelMap[lc].second;
 		//std::cout << "current set of labels: " << m_currentLabels << "\n";
 		//std::cout << "currrent weight: " << m_currentWeight << "\n"; 
 		std::cout << "start the " << k << "th search\n";
@@ -125,6 +134,8 @@ bool FixedLabelSolver_t::HeuristicSearch()
 	return goalFound;
 }
 
+
+
 void FixedLabelSolver_t::write_solution(std::string file_dir, double t)
 {
 	std::ofstream file_(file_dir);
@@ -155,73 +166,140 @@ void FixedLabelSolver_t::write_solution(std::string file_dir, double t)
 }
 
 
-std::vector<int> FixedLabelSolver_t::cal_sgLabel(int start, int goal)
+
+void FixedLabelSolver_t::cal_labelMap()
 {
-	std::vector<int> start_neighbors = m_lgraph.getNodeNeighbors(start);
-	std::vector<int> goal_neighbors = m_lgraph.getNodeNeighbors(goal);
-	std::vector<std::vector<int>> start_setsLabels;
-	std::vector<std::vector<int>> goal_setsLabels;
-	for (auto const &neighbor : start_neighbors)
+	cal_powerSet();
+	std::vector<double> survivalCombinations = compute_survival();
+
+	for (int kkk=0; kkk < survivalCombinations.size(); kkk++)
 	{
-		start_setsLabels.push_back(m_lgraph.getEdgeLabels(start, neighbor));
-	}
-	for (auto const &neighbor : goal_neighbors)
-	{
-		goal_setsLabels.push_back(m_lgraph.getEdgeLabels(goal, neighbor));
+		m_labelMap.push_back(std::pair<std::vector<int>, double>(m_labelCombinations[kkk], 
+																	survivalCombinations[kkk]));
 	}
 
-	std::vector<int> start_labels = start_setsLabels[0];
-	std::vector<int> goal_labels = goal_setsLabels[0];
-	for (int kk=1; kk < start_setsLabels.size(); kk++)
-	{
-		start_labels = label_intersection(start_labels, start_setsLabels[kk]);
-	}
-	for (int kk=1; kk < goal_setsLabels.size(); kk++)
-	{
-		goal_labels = label_intersection(goal_labels, goal_setsLabels[kk]);
-	}
-	std::cout << "start_labels: " << start_labels << "\n";
-	std::cout << "goal_labels: " << goal_labels << "\n";
+	sort(m_labelMap.begin(), m_labelMap.end(), sortbysec_fixedlabel);
+}	
 
-	// So far we have compute start_labels and goal_labels
-	// We need to compute the union of start_labels & goal_labels
-	std::vector<int> sgLabels = label_union(start_labels, goal_labels);
-
-	return sgLabels;
-}
-
-
-std::vector<std::pair<std::vector<int>, double>> FixedLabelSolver_t::cal_subLabelMap(
-																		std::vector<int> sgLabels)
+void FixedLabelSolver_t::cal_powerSet()
 {
-	// std::map<std::vector<int>, double> sub_m;
-	// for (auto const &e : m_lgraph.getLabelMap())
-	// {
-	// 	if (check_subset(e.first, sgLabels))
-	// 	{
-	// 		sub_m[e.first] = e.second;
-	// 	}
-	// }
-	// std::set<std::pair<std::vector<int>, double>, Comparator> subLabelMap;
-	// subLabelMap = std::set<std::pair<std::vector<int>, double>, Comparator>(
-	// 	sub_m.begin(), sub_m.end(), compFunctor1);
+	// This function takes a set and then compute the powerset of the set
+	// which is a vector of sets (std::vector<std::vector<int>>)
 
-	std::vector<std::pair<std::vector<int>, double>> subLabelMap;
-
-	for (auto const &e: m_lgraph.getLabelMap())
+	// first determines the size of the powerset that you will have
+	// for each one's derivation we will do bitwise operation
+	int powerSet_size = pow(2, m_nTotallabels); // 2^n combinations
+	for (int counter = 0; counter < powerSet_size; counter++)
 	{
-		if (check_subset(e.first, sgLabels))
+		std::vector<int> labels; // labels for a single combination
+		for (int j=0; j < m_nTotallabels; j++)
 		{
-			subLabelMap.push_back(e);
+			if ( counter & (1<<j) )
+			{
+				labels.push_back(j);
+			}
 		}
+		m_labelCombinations.push_back(labels);
+	}
+}
+
+std::vector<double> FixedLabelSolver_t::compute_survival()
+{
+	std::vector<double> survivalCombinations;
+	for (auto const &set : m_labelCombinations)
+	{
+		double survival = m_lgraph.compute_survival_currentLabels(set);
+		survivalCombinations.push_back(survival);
 	}
 
-	// sort (actually I don't need sort, since it has been sorted 
-	// and by deletion the order is unchanged)
-	//sort(m_labelMap.begin(), m_labelMap.end(), sortbysec1);
-
-	return subLabelMap;
+	return survivalCombinations;
 }
+
+void FixedLabelSolver_t::print_labelMap()
+{
+	printf("*********labelMap************\n");
+	//Iterate over the set you just come up with
+	for (auto const &e : m_labelMap)
+	{
+		std::cout << "<";
+		for (auto const &l : e.first)
+		{
+			std::cout << l << ",";
+		}
+		std::cout << "> :\t\t";
+		std::cout << e.second << std::endl;
+	}
+	printf("***************************\n");
+}
+
+
+// std::vector<int> FixedLabelSolver_t::cal_sgLabel(int start, int goal)
+// {
+// 	std::vector<int> start_neighbors = m_lgraph.getNodeNeighbors(start);
+// 	std::vector<int> goal_neighbors = m_lgraph.getNodeNeighbors(goal);
+// 	std::vector<std::vector<int>> start_setsLabels;
+// 	std::vector<std::vector<int>> goal_setsLabels;
+// 	for (auto const &neighbor : start_neighbors)
+// 	{
+// 		start_setsLabels.push_back(m_lgraph.getEdgeLabels(start, neighbor));
+// 	}
+// 	for (auto const &neighbor : goal_neighbors)
+// 	{
+// 		goal_setsLabels.push_back(m_lgraph.getEdgeLabels(goal, neighbor));
+// 	}
+
+// 	std::vector<int> start_labels = start_setsLabels[0];
+// 	std::vector<int> goal_labels = goal_setsLabels[0];
+// 	for (int kk=1; kk < start_setsLabels.size(); kk++)
+// 	{
+// 		start_labels = label_intersection(start_labels, start_setsLabels[kk]);
+// 	}
+// 	for (int kk=1; kk < goal_setsLabels.size(); kk++)
+// 	{
+// 		goal_labels = label_intersection(goal_labels, goal_setsLabels[kk]);
+// 	}
+// 	std::cout << "start_labels: " << start_labels << "\n";
+// 	std::cout << "goal_labels: " << goal_labels << "\n";
+
+// 	// So far we have compute start_labels and goal_labels
+// 	// We need to compute the union of start_labels & goal_labels
+// 	std::vector<int> sgLabels = label_union(start_labels, goal_labels);
+
+// 	return sgLabels;
+// }
+
+
+// std::vector<std::pair<std::vector<int>, double>> FixedLabelSolver_t::cal_subLabelMap(
+// 																		std::vector<int> sgLabels)
+// {
+// 	// std::map<std::vector<int>, double> sub_m;
+// 	// for (auto const &e : m_lgraph.getLabelMap())
+// 	// {
+// 	// 	if (check_subset(e.first, sgLabels))
+// 	// 	{
+// 	// 		sub_m[e.first] = e.second;
+// 	// 	}
+// 	// }
+// 	// std::set<std::pair<std::vector<int>, double>, Comparator> subLabelMap;
+// 	// subLabelMap = std::set<std::pair<std::vector<int>, double>, Comparator>(
+// 	// 	sub_m.begin(), sub_m.end(), compFunctor1);
+
+// 	std::vector<std::pair<std::vector<int>, double>> subLabelMap;
+
+// 	for (auto const &e: m_lgraph.getLabelMap())
+// 	{
+// 		if (check_subset(e.first, sgLabels))
+// 		{
+// 			subLabelMap.push_back(e);
+// 		}
+// 	}
+
+// 	// sort (actually I don't need sort, since it has been sorted 
+// 	// and by deletion the order is unchanged)
+// 	//sort(m_labelMap.begin(), m_labelMap.end(), sortbysec1);
+
+// 	return subLabelMap;
+// }
 
 std::vector<int> label_intersection(std::vector<int> v1, std::vector<int> v2)
 {

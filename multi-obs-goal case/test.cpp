@@ -19,8 +19,8 @@ int main(int argc, char** argv)
 {
 	int nExperiments = 1;
 	int row = 20;
-	int col = 20;
-	std::vector<int> nLabelsPerObs{7,7,7,7,7,7};
+	int col = 30;
+	std::vector<int> nLabelsPerObs{4,4,4,4,4,4};
 	double probPerLabel = 0.6;
 	Timer t;
 	std::srand(std::time(0));

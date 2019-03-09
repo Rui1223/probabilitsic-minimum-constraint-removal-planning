@@ -41,7 +41,7 @@ class PmcrGreedySolver_t
 
 	std::vector<int> m_currentLabels;
 	double m_currentSurvival;
-	std::vector<double> m_highestSurvival;
+	std::vector<double> m_highestSurvival; // keep record of highest survivability for all nodes
 	std::vector<std::vector<int>> m_paths;
 
 	std::priority_queue<PmcrNode_t*, std::vector<PmcrNode_t*>, PmcrNode_comparison> m_open;
