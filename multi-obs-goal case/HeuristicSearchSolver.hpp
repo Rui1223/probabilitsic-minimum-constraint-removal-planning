@@ -51,7 +51,7 @@ public:
 	// The function to compute the f,g,h value of a node of a given index based on start & goal
 	std::vector<int> computeFGH(int indx);
 
-	// The function to check whether a input set of labels is a subset of the m_currentLabel
+	// The function to check whether a input set of labels is a subset of the m_currentLabels
 	bool check_subset(std::vector<int> labels);
 
 	// The function to back track the path

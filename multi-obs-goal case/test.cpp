@@ -5,7 +5,7 @@
 // #include "ToyGraph.hpp"
 
 #include "PmcrGreedySolver.hpp"
-// #include "FixedLabelSolver.hpp"
+#include "FixedLabelSolver.hpp"
 // #include "GrowingTreeSolver.hpp"
 #include "Timer.hpp"
 
@@ -20,7 +20,7 @@ int main(int argc, char** argv)
 	int nExperiments = 1;
 	int row = 20;
 	int col = 30;
-	std::vector<int> nLabelsPerObs{4,4,4,4,4,4};
+	std::vector<int> nLabelsPerObs{4,4,4,4};
 	double probPerLabel = 0.6;
 	Timer t;
 	std::srand(std::time(0));
@@ -34,10 +34,10 @@ int main(int argc, char** argv)
 	for (int ii = 0; ii < nExperiments; ii++)
 	{
 		std::string file_dir1 = "./" + folder_dir + "/graph" + std::to_string(ii) + ".txt";
-		// std::string file_dir2 = "./" + folder_dir + "/FixedLabel_solution" 
-		// 													+ std::to_string(ii) + ".txt";
-		std::string file_dir3 = "./" + folder_dir + "/GreedySearch_solution" 
-																+ std::to_string(ii) + ".txt";		
+		std::string file_dir2 = "./" + folder_dir + "/GreedySearch_solution" 
+																+ std::to_string(ii) + ".txt";
+		std::string file_dir3 = "./" + folder_dir + "/FixedLabel_solution" 
+															+ std::to_string(ii) + ".txt";		
 		// std::string file_dir4 = "./" + folder_dir + "/GrowingTree_solution" 
 		// 														+ std::to_string(ii) + ".txt";
 
@@ -48,15 +48,6 @@ int main(int argc, char** argv)
 		std::cout << std::endl;
 
 		// work out on solutions
-		// std::cout << "----------start the fixedLabel search-------------\n";
-		// FixedLabelSolver_t fixedlabel_solver(g, start, goal);
-		// t.reset();
-		// std::cout << "Start to compute time\n";
-		// fixedlabel_solver.fixedLabel_search();
-		// t1 = t.elapsed();
-		// std::cout << "FixedLabel time: " << t1 << " seconds\n\n";
-		// fixedlabel_solver.write_solution(file_dir2, t1);
-
 		std::cout << "----------start the greedy search-------------\n";
 		PmcrGreedySolver_t pmcr_greedy_solver(g);
 		t.reset();
@@ -64,7 +55,17 @@ int main(int argc, char** argv)
 		pmcr_greedy_solver.greedy_search();
 		t1 = t.elapsed();
 		std::cout << "Greedy time: " << t1 << " seconds\n\n";
-		pmcr_greedy_solver.write_solution(file_dir3, t1);
+		pmcr_greedy_solver.write_solution(file_dir2, t1);
+
+
+		std::cout << "----------start the fixedLabel search-------------\n";
+		FixedLabelSolver_t fixedlabel_solver(g);
+		t.reset();
+		//std::cout << "Start to compute time\n";
+		fixedlabel_solver.fixedLabel_search();
+		t1 = t.elapsed();
+		std::cout << "FixedLabel time: " << t1 << " seconds\n\n";
+		fixedlabel_solver.write_solution(file_dir3, t1);
 
 		// std::cout << "----------start the growingtree search-------------\n";
 		// GrowingTreeSolver_t growingtree_solver(g, start, goal);

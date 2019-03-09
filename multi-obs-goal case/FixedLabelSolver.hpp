@@ -5,9 +5,19 @@
 #ifndef FIXEDLABELSOLVER_H
 #define FIXEDLABELSOLVER_H
 
-#include <cstring>
-
-#include "HeuristicSearchSolver.hpp"
+#include <cassert>
+#include <cmath>
+#include <queue>
+#include <vector>
+#include <algorithm>
+#include <iostream>
+#include <fstream>
+#include <cstring> // std::string, std::to_string
+#include <map>
+#include <cassert>
+#include <functional>
+#include <set>
+// #include "HeuristicSearchSolver.hpp"
 // #include "LabeledGraph.hpp"
 #include "ConnectedGraph.hpp"
 // #include "ConnectedNonOverlapGraph.hpp"
@@ -79,7 +89,8 @@ public:
 	FixedLabelSolver_t() {}
 	FixedLabelSolver_t(ConnectedGraph_t &g);
 
-	~FixedLabelSolver_t() {}
+	// destructor used to free space before exit
+	~FixedLabelSolver_t();
 
 	// std::vector<int> cal_sgLabel(int start, int goal);
 	// std::vector<std::pair<std::vector<int>, double>> cal_subLabelMap(std::vector<int>);
@@ -89,7 +100,19 @@ public:
 
 	// The function to perform heuristic search on a subgraph 
 	// with a certain set of labels being looped on
-	bool HeuristicSearch();
+	void HeuristicSearch();
+
+	// The functopm to compute the f,g,h value of a node(indx) for a given start & goal
+	std::vector<int> computeFGH(int indx);
+
+	// The function to prune unqualified goals in goalSet
+	void prune_goalSet();
+
+	// The function to back track the path
+	void back_track_path();
+
+	// The function to check whether a input set of labels is a subset of the m_currentLabels
+	bool check_subset(std::vector<int> labels);
 
 	// The function to write in the solution
 	void write_solution(std::string file_dir, double t);

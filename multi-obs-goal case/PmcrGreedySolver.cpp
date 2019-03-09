@@ -135,7 +135,7 @@ void PmcrGreedySolver_t::greedy_search()
 			// update m_highestSuccess & m_lowestReachability
 			m_highestSuccess = 
 				m_currentSurvival * m_lgraph.getLabelWeights(m_targetPoses[goal_idx]).second * 1.0;
-			m_lowestReachability = m_highestSuccess*1.0 / m_MaxSurvival; 
+			m_lowestReachability = m_highestSuccess*1.0 / m_MaxSurvival;
 			// print the success rate, survivability & labels for the found path
 			std::cout << "Success rate of the path: " << m_highestSuccess << "\n";
 			std::cout << "Survivability of the path: " << m_currentSurvival << "\n";
