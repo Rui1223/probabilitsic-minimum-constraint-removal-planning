@@ -38,6 +38,8 @@ class PmcrGreedySolver_t
 	std::vector<int> m_targetPoses;
 	int m_optimalGoal;
 	int m_optimalPose;
+	double m_optimalSurvival;
+	std::vector<int> m_optimalLabels;
 
 	std::vector<int> m_currentLabels;
 	double m_currentSurvival;
@@ -63,13 +65,14 @@ public:
 	std::vector<int> label_union(std::vector<int> s1, std::vector<int> s2);
 	// The functopm to compute the f,g,h value of a node(indx) for a given start & goal
 	std::vector<int> computeFGH(int indx);
-	//bool check_prune(int neighborID, double weights);
-	//void print_path();
+	// bool check_prune(int neighborID, double weights);
+	// void print_currentGoalSet();
 	void write_solution(std::string file_dir, double t);
 	void print_closedList();
 
 	//getters
 	double getCurrentSurvival() { return m_currentSurvival; }
+	double getHighestSuccess() { return m_highestSuccess; }
 };
 
 #endif

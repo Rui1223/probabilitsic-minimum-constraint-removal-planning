@@ -20,7 +20,7 @@ int main(int argc, char** argv)
 	int nExperiments = 1;
 	int row = 20;
 	int col = 30;
-	std::vector<int> nLabelsPerObs{4,4,4,4};
+	std::vector<int> nLabelsPerObs{4,4,4,4,4};
 	double probPerLabel = 0.6;
 	Timer t;
 	std::srand(std::time(0));
@@ -48,6 +48,7 @@ int main(int argc, char** argv)
 		std::cout << std::endl;
 
 		// work out on solutions
+		std::cout << "**********************************************\n";
 		std::cout << "----------start the greedy search-------------\n";
 		PmcrGreedySolver_t pmcr_greedy_solver(g);
 		t.reset();
@@ -57,7 +58,7 @@ int main(int argc, char** argv)
 		std::cout << "Greedy time: " << t1 << " seconds\n\n";
 		pmcr_greedy_solver.write_solution(file_dir2, t1);
 
-
+		std::cout << "**************************************************\n";
 		std::cout << "----------start the fixedLabel search-------------\n";
 		FixedLabelSolver_t fixedlabel_solver(g);
 		t.reset();

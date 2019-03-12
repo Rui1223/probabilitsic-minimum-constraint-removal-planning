@@ -9,55 +9,55 @@ plt.switch_backend('TKagg')
 
 if __name__ == '__main__':
 	
-	file_dir1 = "./" + sys.argv[1] + "/labelCoverage_performance.txt";
+	##file_dir1 = "./" + sys.argv[1] + "/labelCoverage_performance.txt";
 	file_dir2 = "./" + sys.argv[1] + "/gridSize_performance.txt";
 	file_dir3 = "./" + sys.argv[1] + "/nLabels_performance.txt";
 
 	## write in my first file
 	############################################################################
-	f = open(file_dir1)
-	labelCoverage = []
-	time_G = []
-	solution_G = []
-	time_F = []
-	solution_F = []
-	# time_Gr = []
-	# solution_Gr = []
+	# f = open(file_dir1)
+	# labelCoverage = []
+	# time_G = []
+	# solution_G = []
+	# time_F = []
+	# solution_F = []
+	# # time_Gr = []
+	# # solution_Gr = []
 
-	_counter = 0;
+	# _counter = 0;
 
-	for line in f:
-		_counter +=1
-		print "****" + str(_counter) + "****"
-		line = line.split()
-		labelCoverage.append(line[0])
-		time_G.append(line[1])
-		solution_G.append(line[2])
-		time_F.append(line[3])
-		solution_F.append(line[4])
-		# time_Gr.append(line[5])
-		# solution_Gr.append(line[6])
+	# for line in f:
+	# 	_counter +=1
+	# 	print "****" + str(_counter) + "****"
+	# 	line = line.split()
+	# 	labelCoverage.append(line[0])
+	# 	time_G.append(line[1])
+	# 	solution_G.append(line[2])
+	# 	time_F.append(line[3])
+	# 	solution_F.append(line[4])
+	# 	# time_Gr.append(line[5])
+	# 	# solution_Gr.append(line[6])
 
-	## Let's plot the figures
-	plt.figure(1)
-	plt.plot(labelCoverage, time_G, 'bs', label='Greedy Search') 
-	plt.plot(labelCoverage, time_F, 'g^', label='FixedLabel Search')
-	##plt.plot(labelCoverage, time_Gr, 'ro', label='GrowingTree Search')
-	plt.legend(loc='upper left')
-	plt.xlabel("labelCoverage(%)")
-	plt.xlim((30, 70))
-	plt.ylabel("Computation time(s)")
-	plt.ylim((0, 1))
+	# ## Let's plot the figures
+	# plt.figure(1)
+	# plt.plot(labelCoverage, time_G, 'bs', label='Greedy Search') 
+	# plt.plot(labelCoverage, time_F, 'g^', label='FixedLabel Search')
+	# ##plt.plot(labelCoverage, time_Gr, 'ro', label='GrowingTree Search')
+	# plt.legend(loc='upper left')
+	# plt.xlabel("labelCoverage(%)")
+	# plt.xlim((30, 70))
+	# plt.ylabel("Computation time(s)")
+	# plt.ylim((0, 1))
 
-	plt.figure(2)
-	plt.plot(labelCoverage, solution_G, 'bs', label='Greedy Search') 
-	plt.plot(labelCoverage, solution_F, 'g^', label='FixedLabel Search')
-	##plt.plot(labelCoverage, solution_Gr, 'ro', label='GrowingTree Search')
-	plt.legend(loc='upper left')
-	plt.xlabel("labelCoverage(%)")
-	plt.xlim((30, 70))
-	plt.ylabel("survivability(0-1)")
-	plt.ylim((0, 1.2))
+	# plt.figure(2)
+	# plt.plot(labelCoverage, solution_G, 'bs', label='Greedy Search') 
+	# plt.plot(labelCoverage, solution_F, 'g^', label='FixedLabel Search')
+	# ##plt.plot(labelCoverage, solution_Gr, 'ro', label='GrowingTree Search')
+	# plt.legend(loc='upper left')
+	# plt.xlabel("labelCoverage(%)")
+	# plt.xlim((30, 70))
+	# plt.ylabel("survivability(0-1)")
+	# plt.ylim((0, 1.2))
 	##############################################################################	
 
 
@@ -90,7 +90,7 @@ if __name__ == '__main__':
 	plt.xlabel("gridSize(n)")
 	plt.xlim((30, 110))
 	plt.ylabel("Computation time(s)")
-	plt.ylim((0, 0.05))
+	plt.ylim((0, 2))
 
 	plt.figure(4)
 	plt.plot(gridSize, solution_G, 'bs', label='Greedy Search') 
@@ -99,7 +99,7 @@ if __name__ == '__main__':
 	plt.legend(loc='upper left')
 	plt.xlabel("gridSize(n)")
 	plt.xlim((30, 110))
-	plt.ylabel("survivability(0-1)")
+	plt.ylabel("SuccessRate(0-1)")
 	plt.ylim((0, 1.2))	
 	#############################################################################
 
@@ -139,8 +139,8 @@ if __name__ == '__main__':
 	#plt.plot(nLabels, solution_Gr, 'ro', label='GrowingTree Search')
 	plt.legend(loc='upper left')
 	plt.xlabel("nLabels")
-	plt.xlim((6, 24))
-	plt.ylabel("survivability(0-1)")
+	plt.xlim((10, 24))
+	plt.ylabel("SuccessRate(0-1)")
 	plt.ylim((0, 1.2))
 	###########################################################################	
 

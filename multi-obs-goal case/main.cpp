@@ -25,6 +25,12 @@ int random_generate_integer(int min, int max)
 
 int main()
 {
+	std::vector<int> v1{1,2,3,4};
+	for (int gg=0; gg < 10; gg++)
+	{
+		std::cout << v1[gg] << " ";
+	}
+	std::cout << "\n";
 	// int a = 3;
 	// int b = 5;
 	// int c = 4;
@@ -41,18 +47,6 @@ int main()
 	// 	file_ << c << " " << d << "\n";
 	// }
 
-	int a = 5;
-	int b;
-	if (a==5)
-	{
-		b = a+1;
-
-	}
-
-	std::cout << b << "\n";
-
-
-	return 0;
 	// std::vector<int> v1{50,90,40,90,80,60,70};
 	// std::vector<int>::iterator it;
 
@@ -86,6 +80,8 @@ int main()
 	// {
 	// 	std::cout << v << " ";
 	// }
-	// std::cout << "\n";	
+	// std::cout << "\n";
+
+	return 0;
 }
 

@@ -78,6 +78,7 @@ ConnectedGraph_t::ConnectedGraph_t(int row, int col, std::vector<int> nlabelsPer
 
 	std::cout << "Time to build and label the graph: " << tt.elapsed() << " seconds\n";
 
+	printf("--------------------------------------------------\n");
 	printf("--------------------------------------------------\n\n");
 }
 
@@ -281,6 +282,7 @@ void ConnectedGraph_t::label_graph()
 				}
 				while ( dist(BF_start_loc, centers_obs[obs]) > dist_threshold1 or 
 						(std::find(centers.begin(), centers.end(), BF_start) != centers.end()) );
+				centers.push_back(BF_start);
 			}
 
 			// please print the BF_start
@@ -342,8 +344,15 @@ void ConnectedGraph_t::BFSearch(int BF_start, int l, int obs_idx)
 			if (obs_idx == m_targetObs)
 			{
 				// set the goal (random or deterministic)
-				goal_idx = dq[random_generate_integer(0, dq.size()-1)];
-				// goal_idx = dq[dq.size()-1];
+				// goal_idx = dq[random_generate_integer(0, dq.size()-1)]; // random
+				int rr = 0;
+				do
+				{
+					rr++;
+					goal_idx = dq[dq.size()-rr]; // deterministic
+				}
+				while ( std::find (m_goalSet.begin(), m_goalSet.end(), goal_idx) != m_goalSet.end() );
+
 				m_goalSet.push_back(goal_idx);
 			} 
 			break; 

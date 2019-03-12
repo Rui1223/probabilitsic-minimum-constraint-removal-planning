@@ -17,7 +17,6 @@
 #include <set>
 
 #include "FixedLabelSolver.hpp"
-// #include "HeuristicSearchSolver.hpp"
 // #include "LabeledGraph.hpp"
 #include "ConnectedGraph.hpp"
 // #include "ConnectedNonOverlapGraph.hpp"
@@ -69,7 +68,10 @@ FixedLabelSolver_t::FixedLabelSolver_t(ConnectedGraph_t &g)
 	// Initialize 3 key variables we will be using
 	m_highestSuccess = 0.0;
 	m_lowestReachability = 0.0;
-	// m_heuristic_search_solver = HeuristicSearchSolver_t(g, start, goal);
+
+	m_k = 0;
+
+	//print_goalSet();
 }
 
 void FixedLabelSolver_t::fixedLabel_search()
@@ -81,22 +83,22 @@ void FixedLabelSolver_t::fixedLabel_search()
 	// switch to next set of labels in the labelMap (with ascending order with respect to 
 	// survivability).
 
-	int k = 0;
-
 	while (!m_goalSet.empty())
 	{
-		k++;
-		if (k > m_labelMap.size()) 
+		m_k++;
+		if (m_k > m_labelMap.size()) 
 		{
 			std::cout << "The whole search is complete.\n"; 
 			return; 
 		}
-		std::cout << "start the " << k << "th search...\n";
+		//std::cout << "start the " << k << "th search...\n";
 		// get current labels and corresponding survivability
-		m_currentLabels = m_labelMap[m_labelMap.size() - k].first;
-		m_currentSurvival = m_labelMap[m_labelMap.size() - k].second;
+		m_currentLabels = m_labelMap[m_labelMap.size() - m_k].first;
+		m_currentSurvival = m_labelMap[m_labelMap.size() - m_k].second;
 		HeuristicSearch();
 	}
+	std::cout << "We have performed " << m_k << " searches.\n";
+	std::cout << "No goals left in the goalSet, done.\n";
 }
 
 void FixedLabelSolver_t::HeuristicSearch()
@@ -107,8 +109,7 @@ void FixedLabelSolver_t::HeuristicSearch()
 	prune_goalSet();
 	// check if the goalSet is empty, if it is, we are done.
 	if (m_goalSet.empty()) 
-	{
-		std::cout << "No goals left in the goalSet, done.\n"; 
+	{ 
 		return; 
 	}
 
@@ -173,39 +174,46 @@ void FixedLabelSolver_t::HeuristicSearch()
 				std::cout << "has to reach the goal while colliding with that goal pose,prune.\n\n";
 				m_goalSet.erase(it);
 				m_targetPoses.erase(m_targetPoses.begin()+goal_idx);
+				//print_goalSet();
 				// check if the goalSet is empty, if it is, we are done.
 				if (m_goalSet.empty()) { return; }
 				continue;
 			}
 			// Otherwise it is a valid goal and let's back track of the path
-			std::cout << "It's a valid goal\n";	
+			std::cout << "It's a valid goal\n";
 			// update m_highestSuccess & m_lowestReachability					
 			m_highestSuccess = 
-				m_currentSurvival * m_lgraph.getLabelWeights(m_targetPoses[goal_idx]).second * 1.0;
-			m_lowestReachability = m_highestSuccess*1.0 / m_MaxSurvival;			
+				m_MaxSurvival * m_lgraph.getLabelWeights(m_targetPoses[goal_idx]).second * 1.0;
+			m_lowestReachability = m_highestSuccess*1.0 / m_MaxSurvival;	
 			// print the success rate, survivability & labels for the found path
 			std::cout << "Success rate of the path: " << m_highestSuccess << "\n";
-			std::cout << "Survivability of the path: " << m_currentSurvival << "\n";
+			std::cout << "Survivability of the path: " << m_MaxSurvival << "\n";
 			std::cout << "Labels of the path: " << "<";
 			for (auto const &e : m_currentLabels)
 			{
 				std::cout << e << " ";
 			}
 			std::cout << ">\n";
+
 			// should return a path here
 			back_track_path();
-			std::cout << "-----------------------------------------\n\n";
+			std::cout << "This is " << m_k << "th search...\n";
+
 
 			m_optimalGoal = m_goalSet[goal_idx];
 			m_optimalPose = m_targetPoses[goal_idx];
+			m_optimalSurvival = m_currentSurvival;
+			m_optimalLabels = m_currentLabels;
 
 			// delete that goal from the goalSet
 			m_goalSet.erase(it);
 			m_targetPoses.erase(m_targetPoses.begin()+goal_idx);
+			//print_goalSet();
 			// check if the goalSet is empty, if it is, we are done.
 			if (m_goalSet.empty()) { return; }
 			// Prune the goal set based on the latest computed m_lowestReachability
 			prune_goalSet();
+			std::cout << "-----------------------------------------\n\n";
 			if (m_goalSet.empty()) { return; }		
 
 		}
@@ -253,15 +261,29 @@ std::vector<int> FixedLabelSolver_t::computeFGH(int indx)
 void FixedLabelSolver_t::prune_goalSet()
 {
 	int deletions = 0;
-	for (int gg=0; gg < m_goalSet.size(); gg++)
+	for (int gg=0; gg < (m_goalSet.size()+deletions); gg++)
 	{
-		if (m_lgraph.getLabelWeights(m_targetPoses[gg]).second < m_lowestReachability)
+		if (m_lgraph.getLabelWeights(m_targetPoses[gg-deletions]).second < m_lowestReachability)
 		{
+			// std::cout << "m_lowestReachability: " << m_lowestReachability << "\n";
+			// std::cout << "prune goal: " << m_goalSet[gg - deletions] 
+			// 			<< " for pose: " << m_targetPoses[gg - deletions] << "\n";
 			m_goalSet.erase(m_goalSet.begin() + gg - deletions);
 			m_targetPoses.erase(m_targetPoses.begin() + gg - deletions);
 			deletions++;
+			//print_goalSet();
 		}
 	}
+}
+
+void FixedLabelSolver_t::print_goalSet()
+{
+	std::cout << "current m_goalSet: ";
+	for (auto const &gs : m_goalSet)
+	{
+		std::cout << gs << " "; 
+	}
+	std::cout << "\n\n";
 }
 
 bool FixedLabelSolver_t::check_subset(std::vector<int> labels)
@@ -298,72 +320,24 @@ void FixedLabelSolver_t::back_track_path()
 
 
 
-// void FixedLabelSolver_t::fixedLabel_search()
-// {
-// 	// Then for each set of labels and corresponding weight in the labelMap, construct a subgraph
-// 	// which only contains edges which carry a subset of the current set of labels being looped on. 
-// 	// An A* search is performed on the subgraph to see whether we can reach any one of the goal 
-// 	// from the start. If it is, return the path to be the optimal so far. Otherwise
-// 	// switch to next set of labels in the labelMap (with ascending order with respect to survivability).
-// 	int k = 1;
-// 	for (int lc=m_labelMap.size()-1; lc>=0; lc--)
-// 	{
-// 		m_currentLabels = m_labelMap[lc].first;
-// 		m_currentSurvival = m_labelMap[lc].second;
-// 		//std::cout << "current set of labels: " << m_currentLabels << "\n";
-// 		//std::cout << "currrent weight: " << m_currentWeight << "\n"; 
-// 		std::cout << "start the " << k << "th search\n";
-
-// 		bool goalFound = HeuristicSearch();
-// 		//print_closedList();
-// 		if (goalFound)
-// 		{
-// 			return;
-// 		}
-// 		k++;
-// 		// otherwise switch to next set of labels in the labelMap (next pair)
-// 	}
-
-// }
-
-// bool FixedLabelSolver_t::HeuristicSearch()
-// {
-// 	// HeuristicSearch() performs a greedy Best-First search based on HeuristicSearchSolver 
-// 	// with a label checking condition, which decides whether a newly propogated node 
-// 	// should be added into the priority queue
-
-// 	//HeuristicSearchSolver_t heuristic_search_solver(m_lgraph, m_start, m_goal,
-// 													//m_currentLabels, m_currentWeight);
-// 	m_heuristic_search_solver.setCurrentLabels(m_currentLabels);
-// 	m_heuristic_search_solver.setCurrentSurvival(m_currentSurvival);
-// 	bool goalFound = m_heuristic_search_solver.Heuristic_search();
-// 	if (goalFound)
-// 	{
-// 		m_path = m_heuristic_search_solver.getPath();
-// 	}
-// 	return goalFound;
-// }
-
-
-
 void FixedLabelSolver_t::write_solution(std::string file_dir, double t)
 {
 
 	std::ofstream file_(file_dir);
 	if (file_.is_open())
 	{
-		file_ << t << " " << m_highestSuccess << " " << m_currentSurvival
+		file_ << t << " " << m_highestSuccess << " " << m_optimalSurvival
 				<< " " << m_optimalGoal << " " << m_optimalPose << " " << m_paths.size() << "\n";
 
-		if (!m_currentLabels.empty())
+		if (!m_optimalLabels.empty())
 		{
 			int pp = 0;
-			while (pp < m_currentLabels.size()-1)
+			while (pp < m_optimalLabels.size()-1)
 			{
-				file_ << m_currentLabels[pp] << ",";
+				file_ << m_optimalLabels[pp] << ",";
 				pp++;
 			}
-			file_ << m_currentLabels[pp];
+			file_ << m_optimalLabels[pp];
 		}
 		file_ << "\n";
 

@@ -57,7 +57,9 @@ class FixedLabelSolver_t
 	int m_targetObs; //obs idx for target
 	std::vector<int> m_targetPoses;
 	int m_optimalGoal;
-	int m_optimalPose;	
+	int m_optimalPose;
+	double m_optimalSurvival;
+	std::vector<int> m_optimalLabels;
 
 	std::vector<int> m_currentLabels;
 	double m_currentSurvival;
@@ -83,7 +85,7 @@ class FixedLabelSolver_t
 	std::vector<std::vector<int>> m_labelCombinations;
 	std::vector<std::pair<std::vector<int>, double>> m_labelMap;
 
-
+	int m_k;
 
 public:
 	FixedLabelSolver_t() {}
@@ -111,6 +113,9 @@ public:
 	// The function to back track the path
 	void back_track_path();
 
+	// The function to print current goalSet
+	void print_goalSet();
+
 	// The function to check whether a input set of labels is a subset of the m_currentLabels
 	bool check_subset(std::vector<int> labels);
 
@@ -135,6 +140,7 @@ public:
 	// getters
 	std::vector<int> getCurrentLabels() { return m_currentLabels; }
 	double getCurrentSurvival() { return m_currentSurvival; }
+	double getHighestSuccess() { return m_highestSuccess; }
 
 };
 

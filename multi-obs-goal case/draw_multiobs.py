@@ -76,32 +76,34 @@ if __name__ == "__main__":
 					## vertical line
 					incr = 0
 					for label in labels:
-						if (label == ','):
-							ax.text(cal_co(v1,col,row)[0]-0.06, 
-								(cal_co(v1,col,row)[1]+cal_co(v2,col,row)[1])/2+incr, 
-								label, fontsize=8, rotation=90)
-						else:
-							##print label
-							ax.text(cal_co(v1,col,row)[0]-0.06, 
-								(cal_co(v1,col,row)[1]+cal_co(v2,col,row)[1])/2+incr, 
-								label, color=color_pool[label_belongings[label]],
-																 fontsize=8, rotation=90)
-						incr += 0.25
+						##print label
+						ax.text(cal_co(v1,col,row)[0]-0.06, 
+							(cal_co(v1,col,row)[1]+cal_co(v2,col,row)[1])/2+incr, 
+							label, color=color_pool[label_belongings[label]],
+															 fontsize=8, rotation=90)
+						incr += 0.35
+						# if label != labels[-1]:
+						# 	ax.text(cal_co(v1,col,row)[0]-0.06, 
+						# 		(cal_co(v1,col,row)[1]+cal_co(v2,col,row)[1])/2+incr, 
+						# 		',', fontsize=8, rotation=90)
+						#incr += 0.15
 				else:
 					## horizontal line
 					incr = 0
 					for label in labels:
-						if (label == ','):
-							ax.text(min(cal_co(v1,col,row)[0], cal_co(v2,col,row)[0]) 
-								+ 1.0/(len(labels)+1) + incr, 
-								cal_co(v1,col,row)[1]+0.01, label, fontsize=8)
-						else:
-							##print label
-							ax.text(min(cal_co(v1,col,row)[0], cal_co(v2,col,row)[0]) 
-								+ 1.0/(len(labels)+1) + incr, 
-								cal_co(v1,col,row)[1]+0.01, label,
-									color=color_pool[label_belongings[label]], fontsize=8)
-						incr += 0.25					
+						##print label
+						ax.text(min(cal_co(v1,col,row)[0], cal_co(v2,col,row)[0]) 
+							+ 1.0/(len(labels)+1) + incr, 
+							cal_co(v1,col,row)[1]+0.01, label,
+								color=color_pool[label_belongings[label]], fontsize=8)
+						incr += 0.35
+						# if label != labels[-1]:
+						# 	ax.text(min(cal_co(v1,col,row)[0], cal_co(v2,col,row)[0]) 
+						# 		+ 1.0/(len(labels)+1) + incr, 
+						# 		cal_co(v1,col,row)[1]+0.01, ',', fontsize=8)
+						# incr += 0.15
+
+
 			
 			#plot current edge
 			ax.plot([cal_co(v1,col,row)[0], cal_co(v2,col,row)[0]], 
@@ -120,6 +122,66 @@ if __name__ == "__main__":
 	
 	# ##Now plot the solution for FixedLabel Algorithm
 	# ##################################################################
+	f_fixedLabel = open("./" + sys.argv[1] + "/FixedLabel_solution" + str(n) + ".txt", "r")
+	n_line = 0;
+	for line in f_fixedLabel:
+		line = line.split()
+		n_line += 1
+		if (n_line == 1):
+			solution_time = line[0]
+			success_optimum = line[1]
+			survival_optimum = line[2]
+			goal_optimum = line[3]
+			goal_optimum = int(goal_optimum)
+			pose_optimum = line[4]
+			nPaths = int(line[5])
+		# line 2 stores the labels
+		elif (n_line == 2):
+			if len(line) == 0:
+				labels_optimum = " "
+			else:
+				labels_optimum = line[0]
+		else:
+			# start plotting the paths
+			if (nPaths != 1):
+				# we are plotting suboptimal path
+				path = map(int, line)
+				if (path):
+					counter = 0
+					while (counter != (len(path)-1)):
+						v1 = path[counter]
+						v2 = path[counter+1]
+						ax.plot(cal_co(v1,col,row)[0], cal_co(v1,col,row)[1], "ro")
+						ax.plot([cal_co(v1,col,row)[0], cal_co(v2,col,row)[0]], 
+								[cal_co(v1,col,row)[1], cal_co(v2,col,row)[1]], "r--")
+						counter += 1
+					ax.plot(cal_co(v2,col,row)[0], cal_co(v2,col,row)[1], "ro")
+			else:
+				# we are plotting optimal path
+				path = map(int, line)
+				if (path):
+					counter = 0
+					while (counter != (len(path)-1)):
+						v1 = path[counter]
+						v2 = path[counter+1]
+						ax.plot(cal_co(v1,col,row)[0], cal_co(v1,col,row)[1], "r*")
+						ax.plot([cal_co(v1,col,row)[0], cal_co(v2,col,row)[0]], 
+								[cal_co(v1,col,row)[1], cal_co(v2,col,row)[1]], "r--")
+						counter += 1
+					ax.plot(cal_co(v2,col,row)[0], cal_co(v2,col,row)[1], "r*")
+
+					# plot labels
+					ax.text(col+3-3, -2+6.5, "F Time:"+solution_time, color="r", fontsize=10)
+					ax.text(col+3-3, -2+6.0, "F OptPose:"+pose_optimum, color="r", fontsize=10)
+					ax.text(col+3-3, -2+5.5, "F Success:"+success_optimum, color="r", fontsize=10)
+					ax.text(col+3-3, -2+5.0, "F Survival:"+survival_optimum, color="r", fontsize=10)
+					ax.text(col+3-3, -2+4.5, "F Labels:"+labels_optimum, color="r", fontsize=10)
+
+					## highlight the goal
+					ax.text(cal_co(goal_optimum,col,row)[0]-0.2, cal_co(goal_optimum,col,row)[1]+0.05, 
+							"goal", color="fuchsia", fontweight='bold', fontsize=8)
+
+			nPaths -= 1;
 
 	# f_fixedLabel = open("./" + sys.argv[1] + "/FixedLabel_solution" + str(n) + ".txt", "r")
 	# n_line = 0;

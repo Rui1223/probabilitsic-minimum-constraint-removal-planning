@@ -37,7 +37,7 @@ PmcrGreedySolver_t::PmcrGreedySolver_t(ConnectedGraph_t &g)
 	// Initialize 3 key variables we will be using
 	m_MaxSurvival = 1.0;
 	m_highestSuccess = 0.0;
-	m_lowestReachability = m_highestSuccess*1.0 / m_MaxSurvival; 
+	m_lowestReachability = m_highestSuccess*1.0 / m_MaxSurvival;
 }
 
 PmcrGreedySolver_t::~PmcrGreedySolver_t()
@@ -145,12 +145,15 @@ void PmcrGreedySolver_t::greedy_search()
 				std::cout << e << " ";
 			}
 			std::cout << ">\n";
+
 			// should return a path here
 			back_track_path();
 			std::cout << "-----------------------------------------\n\n";
 
 			m_optimalGoal = m_goalSet[goal_idx];
 			m_optimalPose = m_targetPoses[goal_idx];
+			m_optimalSurvival = m_currentSurvival;
+			m_optimalLabels = m_currentLabels;
 
 			// delete that goal from the goalSet
 			m_goalSet.erase(it);
@@ -168,9 +171,9 @@ void PmcrGreedySolver_t::greedy_search()
 void PmcrGreedySolver_t::prune_goalSet()
 {
 	int deletions = 0;
-	for (int gg=0; gg < m_goalSet.size(); gg++)
+	for (int gg=0; gg < (m_goalSet.size()+deletions); gg++)
 	{
-		if (m_lgraph.getLabelWeights(m_targetPoses[gg]).second < m_lowestReachability)
+		if (m_lgraph.getLabelWeights(m_targetPoses[gg-deletions]).second < m_lowestReachability)
 		{
 			m_goalSet.erase(m_goalSet.begin() + gg - deletions);
 			m_targetPoses.erase(m_targetPoses.begin() + gg - deletions);
@@ -282,18 +285,18 @@ void PmcrGreedySolver_t::write_solution(std::string file_dir, double t)
 	std::ofstream file_(file_dir);
 	if (file_.is_open())
 	{
-		file_ << t << " " << m_highestSuccess << " " << m_currentSurvival
+		file_ << t << " " << m_highestSuccess << " " << m_optimalSurvival
 				<< " " << m_optimalGoal << " " << m_optimalPose << " " << m_paths.size() << "\n";
 
-		if (!m_currentLabels.empty())
+		if (!m_optimalLabels.empty())
 		{
 			int pp = 0;
-			while (pp < m_currentLabels.size()-1)
+			while (pp < m_optimalLabels.size()-1)
 			{
-				file_ << m_currentLabels[pp] << ",";
+				file_ << m_optimalLabels[pp] << ",";
 				pp++;
 			}
-			file_ << m_currentLabels[pp];
+			file_ << m_optimalLabels[pp];
 		}
 		file_ << "\n";
 
