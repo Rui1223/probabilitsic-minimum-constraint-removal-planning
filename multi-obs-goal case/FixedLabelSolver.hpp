@@ -83,6 +83,7 @@ class FixedLabelSolver_t
 	// for each label idx, we store the obs idx it belongs to and its corresponding weight
 	std::map<int, std::pair<int, double>> m_labelWeights;
 	std::vector<std::vector<int>> m_labelCombinations;
+	std::vector<double> m_survivalCombinations;
 	std::vector<std::pair<std::vector<int>, double>> m_labelMap;
 
 	int m_k;
@@ -126,7 +127,7 @@ public:
 	//double compute_survival_currentLabels(std::vector<int> labels);
 
 	// function to compute survivability for a powerset
-	std::vector<double> compute_survival();
+	void compute_survival();
 
 	// function to compute a powerset given a set of labels
 	void cal_powerSet();
@@ -135,7 +136,7 @@ public:
 	void cal_labelMap();
 
 	// function to print labelMap for test purpose so far
-	void print_labelMap();	
+	void print_labelMap();
 
 	// getters
 	std::vector<int> getCurrentLabels() { return m_currentLabels; }

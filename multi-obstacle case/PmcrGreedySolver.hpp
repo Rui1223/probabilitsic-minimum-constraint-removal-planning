@@ -48,18 +48,15 @@ class PmcrGreedySolver_t
 	std::vector<bool> m_expanded;
 
 public:
-	PmcrGreedySolver_t(ConnectedGraph_t &g, int start, int goal);
+	PmcrGreedySolver_t(ConnectedGraph_t &g);
 	~PmcrGreedySolver_t();
 	void greedy_search();
 	void back_track_path();
+	void print_path();
 	std::vector<int> label_union(std::vector<int> s1, std::vector<int> s2);
 	// The functopm to compute the f,g,h value of a node(indx) for a given start & goal
 	std::vector<int> computeFGH(int indx);
 	//bool check_prune(int neighborID, double weights);
-	//bool search_closedList(int neighborID, double weights, bool isPrune);
-	//bool search_openList(int neighborID, double weights, bool isPrune);
-	//void push_virtualOpen();
-	void print_path();
 	void write_solution(std::string file_dir, double t);
 	void print_closedList();
 

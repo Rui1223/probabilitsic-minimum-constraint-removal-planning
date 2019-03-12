@@ -43,7 +43,7 @@ ConnectedGraph_t::ConnectedGraph_t(int row, int col, std::vector<int> nlabelsPer
 	m_col = col;
 	m_nNodes = m_row * m_col;
 	m_nEdges = (m_col-1)*m_row + (m_row-1)*m_col;
-	std::cout << "m_nEdges: " << m_nEdges << std::endl;
+	//std::cout << "m_nEdges: " << m_nEdges << std::endl;
 	
 	// label information
 	m_nlabelsPerObs = nlabelsPerObs;
@@ -55,11 +55,13 @@ ConnectedGraph_t::ConnectedGraph_t(int row, int col, std::vector<int> nlabelsPer
 	}	
 	m_probPerLabel = probPerLabel;
 
-	std::cout << "probPerLabel: " << m_probPerLabel << std::endl;
+	// std::cout << "probPerLabel: " << m_probPerLabel << std::endl;
 	// based on the probability that a label is assigned to an edge, compute how many expansions 
 	// per label are needed 
 	// m_nExpansion = round(m_nEdges * (1 - pow(1 - m_probPerLabel, m_nlabels))) / m_nlabels;
-	m_nExpansion = round(m_nEdges * probPerLabel *1.0 / m_nTotallabels) *1.5;
+	
+	// m_nExpansion = round(m_nEdges * probPerLabel *1.0 / m_nTotallabels) *1.5;
+	m_nExpansion = round(m_nEdges * probPerLabel *1.0 / m_nTotallabels * 2);
 	std::cout << "n_expansion: " << m_nExpansion << "\n";
 	std::cout << "Expected density: " << probPerLabel << "\n";
 	m_nmarked = 0;
@@ -67,7 +69,7 @@ ConnectedGraph_t::ConnectedGraph_t(int row, int col, std::vector<int> nlabelsPer
 	// given #labels per obstacle, assign weight to each label
 	// so that we end up knowing which obs a label belongs to and its corresponding weight 
 	assign_weight_per_label();
-	cal_labelMap();
+	//cal_labelMap();
 	//print_labelMap();
 
 	// construct the graph 
@@ -77,6 +79,7 @@ ConnectedGraph_t::ConnectedGraph_t(int row, int col, std::vector<int> nlabelsPer
 	std::cout << "Time to build and label the graph: " << tt.elapsed() << " seconds\n";
 
 	printf("--------------------------------------------------\n");
+	printf("--------------------------------------------------\n\n");
 }
 
 void ConnectedGraph_t::load_graph()
@@ -142,6 +145,7 @@ void ConnectedGraph_t::load_graph()
 
 	label_graph();
 	std::cout << "Acutal density: " << double(m_nmarked) / m_nEdges << "\n";
+	pick_start_goal();
 	//printf("Finish building the graph\n");
 
 }
@@ -174,98 +178,183 @@ double ConnectedGraph_t::dist(std::pair<int, int> &a, std::pair<int, int> b)
 
 void ConnectedGraph_t::label_graph()
 {
-	// for each label
-	//for (auto const &l : m_nTotallabels)
 
-	// for (int ll=0; ll < m_nTotallabels; ll++)
-	// {
-	// 	// random pick up a node to expand (in a BFS search)
-	// 	int BF_start = random_generate_integer(0, m_nNodes-1);
-	// 	//std::cout << "start per label: " << BF_start << "\n"; 
-	// 	BFSearch(BF_start, ll);
-	// }
+	// int current_label_idx = 0;
+	// std::vector<std::pair<int, int>> mean_obs(m_nobstacles, std::pair<int, int>(0, 0));
+	// bool firstTimeObs;
+	// int BF_start;
+	// int trial;
+	// std::pair<int, int> BF_start_loc;
+	// double dist_threshold1 = m_nExpansion / 15;
+	// double dist_threshold2 = m_nExpansion / 9;
+
+	// Based on the m_nExpansion, calculate the estimated radius of each obstacle (diamond)
+	int obs_r;
+	obs_r = ceil( ( 1 + sqrt(1-2*(1-m_nExpansion)) ) / 2.0 ) / 2;
+	// std::cout << "obs_r: " << obs_r << "\n";
+	// we can set up the inner boundary for limiting the center of the obstacles
+	int lower_row = obs_r;
+	int upper_row = m_row-obs_r;
+	int lower_col = obs_r;
+	int upper_col = m_col-obs_r;
+
 	int current_label_idx = 0;
-	std::vector<std::pair<int, int>> mean_obs(m_nobstacles, std::pair<int, int>(0, 0));
+	std::vector<std::pair<int, int>> centers_obs(m_nobstacles, std::pair<int, int>(0, 0));
 	bool firstTimeObs;
 	int BF_start;
 	int trial;
+	int temp_nlabels;
 	std::pair<int, int> BF_start_loc;
-	double dist_threshold1 = m_nExpansion / 15;
-	double dist_threshold2 = m_nExpansion / 9;
+	double dist_threshold1 = 1.5*obs_r;
+	double dist_threshold2 = 2*obs_r;		
+
+
 	for (int obs=0; obs < m_nobstacles; obs++)
 	{
 		// we are dealing with a new obstacle
-		int temp_nlabels = m_nlabelsPerObs[obs];
+		std::vector<int> centers; // every time re-initialize it
+		temp_nlabels = m_nlabelsPerObs[obs];
 		firstTimeObs = true;
-		//std::pair<int, int> temp_BF_loc{0, 0};
-		//dist_threshold2 -= m_nExpansion / 30;
 
 		for (int ii=0; ii<temp_nlabels; ii++)
 		{
 			if (current_label_idx==0) // the 1st label of the first obstacle
 			{
-				BF_start = random_generate_integer(0, m_nNodes-1);
-				BF_start_loc = getLoc(BF_start);
-				firstTimeObs = false;
-				//temp_BF_loc = BF_start_loc;
-				mean_obs[obs] = BF_start_loc;
-			}
-			else if (firstTimeObs) // first time entering an obstacle (except the 1st obstacle)
-			{
-				trial = 0;
-				// we want the obs not close to previous ones
 				do
 				{
 					BF_start = random_generate_integer(0, m_nNodes-1);
 					BF_start_loc = getLoc(BF_start);
-					trial++;
 				}
-				while ( is_close(BF_start_loc, mean_obs, obs, dist_threshold2) and trial < 20 );
-
+				while(BF_start_loc.first < lower_row or BF_start_loc.first > upper_row 
+							or BF_start_loc.second < lower_col or BF_start_loc.second > upper_col);
 				firstTimeObs = false;
-				//temp_BF_loc = BF_start_loc;
-				mean_obs[obs] = BF_start_loc;
+				centers_obs[obs] = BF_start_loc;
+				centers.push_back(BF_start);
+			}
+			else if (firstTimeObs) // first time entering an obstacle (except the 1st obstacle)
+			{
+				trial = 0;
+				// 1st check: if the center is in the inner boundary
+				do
+				{
+					do
+					{
+						BF_start = random_generate_integer(0, m_nNodes-1);
+						BF_start_loc = getLoc(BF_start);						
+					}
+					while(BF_start_loc.first < lower_row or BF_start_loc.first > upper_row 
+							or BF_start_loc.second < lower_col or BF_start_loc.second > upper_col);
+					trial++;
+				// std::cout << obs << ":" << trial << "\n";
+				}
+				while ( is_close(BF_start_loc, centers_obs, obs, dist_threshold2) and trial < 10 );
+
+
+				// 2nd check: check if it is dist_threshold2 away from other centers of the obstacles
+				// while ( is_close(BF_start_loc, centers_obs, obs, dist_threshold2) and trial < 5 )
+				// {
+				// 	BF_start = random_generate_integer(0, m_nNodes-1);
+				// 	BF_start_loc = getLoc(BF_start);					
+				// }
+				firstTimeObs = false;
+				centers_obs[obs] = BF_start_loc;
+				centers.push_back(BF_start);
 			}
 			else // working among label (not the first one of any obstacles)
 			{
 				// we want labels of the same obstacle to be close to each other
 				do
 				{
-					BF_start = random_generate_integer(0, m_nNodes-1);
-					BF_start_loc = getLoc(BF_start);
+					do
+					{
+						BF_start = random_generate_integer(0, m_nNodes-1);
+						BF_start_loc = getLoc(BF_start);						
+					}
+					while(BF_start_loc.first < lower_row or BF_start_loc.first > upper_row 
+							or BF_start_loc.second < lower_col or BF_start_loc.second > upper_col);
 				}
-				while ( dist(BF_start_loc, mean_obs[obs]) > dist_threshold1 );
+				while ( dist(BF_start_loc, centers_obs[obs]) > dist_threshold1 or 
+						(std::find(centers.begin(), centers.end(), BF_start) != centers.end()) );
+				centers.push_back(BF_start);
 			}
 
 			// please print the BF_start
-			std::cout << current_label_idx << ": " << "(" << BF_start_loc.first << "," 
-																<< BF_start_loc.second << ")\n";
-
-			//mean_obs[obs].first += BF_start_loc.first;
-			//mean_obs[obs].second += BF_start_loc.second;
-
+			// std::cout << current_label_idx << ": " << "(" << BF_start_loc.first << "," 
+			// 													<< BF_start_loc.second << ")\n";
 			// Now it's the time for calling BFSearch() with our well tested BF_start
 			BFSearch(BF_start, current_label_idx);
 			current_label_idx++;
 		}
-		//mean_obs[obs].first /= temp_nlabels;
-		//mean_obs[obs].second /= temp_nlabels;
-	}
+
+	}	
+
+	// 	for (int ii=0; ii<temp_nlabels; ii++)
+	// 	{
+	// 		if (current_label_idx==0) // the 1st label of the first obstacle
+	// 		{
+	// 			BF_start = random_generate_integer(0, m_nNodes-1);
+	// 			BF_start_loc = getLoc(BF_start);
+	// 			firstTimeObs = false;
+	// 			//temp_BF_loc = BF_start_loc;
+	// 			mean_obs[obs] = BF_start_loc;
+	// 		}
+	// 		else if (firstTimeObs) // first time entering an obstacle (except the 1st obstacle)
+	// 		{
+	// 			trial = 0;
+	// 			// we want the obs not close to previous ones
+	// 			do
+	// 			{
+	// 				BF_start = random_generate_integer(0, m_nNodes-1);
+	// 				BF_start_loc = getLoc(BF_start);
+	// 				trial++;
+	// 			}
+	// 			while ( is_close(BF_start_loc, mean_obs, obs, dist_threshold2) and trial < 20 );
+
+	// 			firstTimeObs = false;
+	// 			//temp_BF_loc = BF_start_loc;
+	// 			mean_obs[obs] = BF_start_loc;
+	// 		}
+	// 		else // working among label (not the first one of any obstacles)
+	// 		{
+	// 			// we want labels of the same obstacle to be close to each other
+	// 			do
+	// 			{
+	// 				BF_start = random_generate_integer(0, m_nNodes-1);
+	// 				BF_start_loc = getLoc(BF_start);
+	// 			}
+	// 			while ( dist(BF_start_loc, mean_obs[obs]) > dist_threshold1 );
+	// 		}
+
+	// 		// please print the BF_start
+	// 		std::cout << current_label_idx << ": " << "(" << BF_start_loc.first << "," 
+	// 															<< BF_start_loc.second << ")\n";
+
+	// 		//mean_obs[obs].first += BF_start_loc.first;
+	// 		//mean_obs[obs].second += BF_start_loc.second;
+
+	// 		// Now it's the time for calling BFSearch() with our well tested BF_start
+	// 		BFSearch(BF_start, current_label_idx);
+	// 		current_label_idx++;
+	// 	}
+	// 	//mean_obs[obs].first /= temp_nlabels;
+	// 	//mean_obs[obs].second /= temp_nlabels;
+	// }
 
 
 }
 
 void ConnectedGraph_t::BFSearch(int BF_start, int l)
 {
-	std::queue<int> q;
+	//std::queue<int> q;
+	std::deque<int> dq;
 	std::vector<bool> expanded(m_nNodes, false);
-	q.push(BF_start);
+	dq.push_back(BF_start);
 
 	int counter = 0;
 	while(true)
 	{
-		int current = q.front(); // get the top of the queue
-		q.pop();
+		int current = dq.front(); // get the top of the queue
+		dq.pop_front();
 		if (expanded[current]==true)
 		{
 			// no need to expand from that current node since it has been expanded before
@@ -286,14 +375,46 @@ void ConnectedGraph_t::BFSearch(int BF_start, int l)
 				m_marked[neighbor][current] = true;
 				m_nmarked++;
 			}
-			q.push(neighbor);
+			dq.push_back(neighbor);
 			// count for each label process
 			counter++;
-			if (counter == m_nExpansion) { break; }
+			//if (counter == m_nExpansion) { break; }
 		}
-		if (counter == m_nExpansion) { break; }
 		expanded[current]=true;
+		if (counter >= m_nExpansion) { break; }
 	}
+}
+
+void ConnectedGraph_t::pick_start_goal()
+{
+	// check whether the start is collision free
+	bool NoCollision;
+	std::vector<int> start_neighbors;
+	do
+	{
+		m_start = random_generate_integer(0, m_row*m_col-1);
+
+		start_neighbors = m_nodeNeighbors[m_start];
+		NoCollision = false;
+		for (auto const &neighbor : start_neighbors)
+		{
+			if (m_edgeLabels[m_start][neighbor].empty())// collison free
+			{
+				NoCollision = true;
+				break;
+			}
+		}
+	}
+	while(!NoCollision);
+
+	// pick a goal which will NOT overlap with the start
+	do
+	{
+		m_goal = random_generate_integer(0, m_row*m_col-1);		
+	}
+	while(m_goal==m_start);
+
+
 }
 
 
@@ -321,6 +442,10 @@ void ConnectedGraph_t::write_graph(std::string file_dir)
 			file_ << tt << " " << m_labelWeights[tt].first << " ";
 		}
 		file_ << "\n";
+
+		// write in the 4th line for the start & goal index
+		file_ << m_start << " " << m_goal << "\n";
+
 		// start to write in every edge information (edge & labels)
 		for (int currentNode = 0; currentNode < m_nNodes; currentNode++)
 		{
@@ -429,7 +554,7 @@ double ConnectedGraph_t::compute_survival_currentLabels(std::vector<int> current
 	std::vector<double> CollisionPerObs(m_nobstacles, 0.0);
 	for (auto const &label : currentLabels)
 	{
-		CollisionPerObs[getLabelWeights(label).first] += getLabelWeights(label).second;
+		CollisionPerObs[m_labelWeights[label].first] += m_labelWeights[label].second;
 	}
 	for (auto const &collision_prob : CollisionPerObs)
 	{
@@ -440,71 +565,71 @@ double ConnectedGraph_t::compute_survival_currentLabels(std::vector<int> current
 
 }
 
-std::vector<double> ConnectedGraph_t::compute_survival()
-{
-	std::vector<double> survivalCombinations;
-	for (auto const &set : m_labelCombinations)
-	{
-		double survival = compute_survival_currentLabels(set);
-		survivalCombinations.push_back(survival);
-	}
+// std::vector<double> ConnectedGraph_t::compute_survival()
+// {
+// 	std::vector<double> survivalCombinations;
+// 	for (auto const &set : m_labelCombinations)
+// 	{
+// 		double survival = compute_survival_currentLabels(set);
+// 		survivalCombinations.push_back(survival);
+// 	}
 
-	return survivalCombinations;
-}
+// 	return survivalCombinations;
+// }
 
-void ConnectedGraph_t::cal_powerSet()
-{
-	// This function takes a set and then compute the powerset of the set
-	// which is a vector of sets (std::vector<std::vector<int>>)
+// void ConnectedGraph_t::cal_powerSet()
+// {
+// 	// This function takes a set and then compute the powerset of the set
+// 	// which is a vector of sets (std::vector<std::vector<int>>)
 
-	// first determines the size of the powerset that you will have
-	// for each one's derivation we will do bitwise operation
-	int powerSet_size = pow(2, m_nTotallabels); // 2^n combinations
-	for (int counter = 0; counter < powerSet_size; counter++)
-	{
-		std::vector<int> labels; // labels for a single combination
-		for (int j=0; j < m_nTotallabels; j++)
-		{
-			if ( counter & (1<<j) )
-			{
-				labels.push_back(j);
-			}
-		}
-		m_labelCombinations.push_back(labels);
-	}
+// 	// first determines the size of the powerset that you will have
+// 	// for each one's derivation we will do bitwise operation
+// 	int powerSet_size = pow(2, m_nTotallabels); // 2^n combinations
+// 	for (int counter = 0; counter < powerSet_size; counter++)
+// 	{
+// 		std::vector<int> labels; // labels for a single combination
+// 		for (int j=0; j < m_nTotallabels; j++)
+// 		{
+// 			if ( counter & (1<<j) )
+// 			{
+// 				labels.push_back(j);
+// 			}
+// 		}
+// 		m_labelCombinations.push_back(labels);
+// 	}
 
-}
+// }
 
-void ConnectedGraph_t::cal_labelMap()
-{
-	cal_powerSet();
-	std::vector<double> survivalCombinations = compute_survival();
+// void ConnectedGraph_t::cal_labelMap()
+// {
+// 	cal_powerSet();
+// 	std::vector<double> survivalCombinations = compute_survival();
 
-	for (int kkk=0; kkk < survivalCombinations.size(); kkk++)
-	{
-		m_labelMap.push_back(std::pair<std::vector<int>, double>(m_labelCombinations[kkk], 
-																	survivalCombinations[kkk]));
-	}
+// 	for (int kkk=0; kkk < survivalCombinations.size(); kkk++)
+// 	{
+// 		m_labelMap.push_back(std::pair<std::vector<int>, double>(m_labelCombinations[kkk], 
+// 																	survivalCombinations[kkk]));
+// 	}
 
-	sort(m_labelMap.begin(), m_labelMap.end(), sortbysec_connectedGraph);
-}
+// 	sort(m_labelMap.begin(), m_labelMap.end(), sortbysec_connectedGraph);
+// }
 
-void ConnectedGraph_t::print_labelMap()
-{
-	printf("*********labelMap************\n");
-	//Iterate over the set you just come up with
-	for (auto const &e : m_labelMap)
-	{
-		std::cout << "<";
-		for (auto const &l : e.first)
-		{
-			std::cout << l << ",";
-		}
-		std::cout << "> :\t\t";
-		std::cout << e.second << std::endl;
-	}
-	printf("***************************\n");
-}
+// void ConnectedGraph_t::print_labelMap()
+// {
+// 	printf("*********labelMap************\n");
+// 	//Iterate over the set you just come up with
+// 	for (auto const &e : m_labelMap)
+// 	{
+// 		std::cout << "<";
+// 		for (auto const &l : e.first)
+// 		{
+// 			std::cout << l << ",";
+// 		}
+// 		std::cout << "> :\t\t";
+// 		std::cout << e.second << std::endl;
+// 	}
+// 	printf("***************************\n");
+// }
 
 
 ConnectedGraph_t::~ConnectedGraph_t() {}

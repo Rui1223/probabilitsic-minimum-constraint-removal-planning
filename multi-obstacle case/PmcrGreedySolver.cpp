@@ -3,34 +3,37 @@
 #include <cassert>
 #include <cstdio>
 #include <algorithm>
+#include <limits>
 #include <iomanip>
 #include <fstream>
 #include <string> // std::string, std::to_string
+#include <cstdlib> // std::rand, std::srand
 
-// #include "LabeledGraph.hpp"
 #include "ConnectedGraph.hpp"
-// #include "ConnectedNonOverlapGraph.hpp"
 // #include "ToyGraph.hpp"
 #include "PmcrGreedySolver.hpp"
 #include "PmcrNode.hpp"
 #include "Timer.hpp"
 
-PmcrGreedySolver_t::PmcrGreedySolver_t(ConnectedGraph_t &g, int start, int goal)
+// random generator function:
+int myrandom (int i) { return std::rand()%i; }
+
+PmcrGreedySolver_t::PmcrGreedySolver_t(ConnectedGraph_t &g)
 {
 	Timer tt;
 	tt.reset();
 	m_lgraph = g;
 	std::cout << "Time to load the graph for Gsolver: " << tt.elapsed() << " seconds\n";
-	assert(start >=0);
-	assert(goal >=0);
-	m_start = start;
-	m_goal = goal;
+	m_start = m_lgraph.getmStart();
+	m_goal = m_lgraph.getmGoal();
+
+	// essential elements for greedy search
 	m_open.push(new PmcrNode_t(m_start, computeFGH(m_start), {}, nullptr, 
 		m_lgraph.compute_survival_currentLabels({})));
 	m_path = std::vector<int>();
 	m_highestSurvival = std::vector<double>(m_lgraph.getnNodes(), -1.0);
-	// m_expanded = std::vector<bool>(m_lgraph.getnNodes(), false);
-	// m_expanded[m_start] = true;
+	m_highestSurvival[m_start] = 1.0;
+	m_expanded = std::vector<bool>(m_lgraph.getnNodes(), false);
 }
 
 PmcrGreedySolver_t::~PmcrGreedySolver_t()
@@ -47,24 +50,26 @@ PmcrGreedySolver_t::~PmcrGreedySolver_t()
 void PmcrGreedySolver_t::greedy_search()
 {
 	// need a list to record the highest survivability so far for each node
-	m_highestSurvival[m_start] = 1.0;
+	
 
 	while(!m_open.empty())
 	{
 		PmcrNode_t *current = m_open.top();
 		m_open.pop();
-		// Now check if the current node has the highest recorded survivability
-		if (current->getSurvival() < m_highestSurvival[current->getID()])
+		// Now check if the current node has been expanded
+		if (m_expanded[current->getID()] == true)
 		{
-			// This node has been beated by some nodes with the same id but less weight
+			// This node has been expanded with the highest survivability for its id
 			// No need to put it into the closed list
 			delete current;
 			continue;
 		}
-		// This node has the highest recorded survivability
+		// get the current node's labels and survivability
 		m_currentSurvival = current->getSurvival();
 		m_currentLabels = current->getLabels();
+
 		m_closed.push_back(current);
+		m_expanded[current->getID()] = true;
 
 		if (current->getID() == m_goal)
 		{
@@ -83,35 +88,34 @@ void PmcrGreedySolver_t::greedy_search()
 		}
 		// look at each neighbor of the current node
 		std::vector<int> neighbors = m_lgraph.getNodeNeighbors(current->getID());
+		// randomly shuffle the neighbors
+		std::random_shuffle( neighbors.begin(), neighbors.end(), myrandom );
 		for (auto const &neighbor : neighbors)
 		{			
-			// no need to come back to parent, since it will
-			// always prune that parent (superset will always be pruned without check)
-			// But if current is m_start, it has no parent			
-			if (current->getID() != m_start and neighbor == current->getParent()->getID()) 
+			if (m_expanded[neighbor] == true) 
 			{ 
 				continue; 
 			}
-			// check neighbor's label
-			std::vector<int> currentLabels = 
+			// check neighbor's label and compute corresponding survivability
+			std::vector<int> neighborLabels = 
 				label_union(current->getLabels(), 
 					m_lgraph.getEdgeLabels(current->getID(), neighbor));
-			double currentSurvival = m_lgraph.compute_survival_currentLabels(currentLabels);
-
+			double neighborSurvival = m_lgraph.compute_survival_currentLabels(neighborLabels);
 
 			// check whether we need to prune this neighbor (based on survivability)
 			// If the neighbor has higher survivability, update the highest survivability
 			// record and put into open
 			// Otherwise, discard
-			if (currentSurvival > m_highestSurvival[neighbor])
+			if (neighborSurvival > m_highestSurvival[neighbor])
 			{
-				m_highestSurvival[neighbor] = currentSurvival;
-				m_open.push(new PmcrNode_t(neighbor, computeFGH(neighbor), currentLabels, 
-																		current, currentSurvival));
+				m_highestSurvival[neighbor] = neighborSurvival;
+				m_open.push(new PmcrNode_t(neighbor, computeFGH(neighbor), neighborLabels, 
+																		current, neighborSurvival));
 			}
 		}
 	}
 	// You are reaching here because the m_open is empty and you haven't reached the goal
+	// In MCR-like setting, it should not happen.
 	m_currentSurvival = 0.0;
 	printf("failed to find a solution in this problem!\n");
 }
@@ -199,15 +203,10 @@ void PmcrGreedySolver_t::write_solution(std::string file_dir, double t)
 	std::ofstream file_(file_dir);
 	if (file_.is_open())
 	{
-		file_ << m_start << " " << m_goal << " " << t << "\n";
-		for (auto const &waypoint : m_path)
-		{
-			file_ << waypoint << " ";
-		}
-		file_ << "\n";
-		// write the label and survivability for the solution
-		file_ << m_currentSurvival << "\n";
-		
+		// line 1: write in time & survivability
+		file_ << t << " " << m_currentSurvival << "\n";
+
+		// line 2: write in the labels that the optimal solution carries
 		if (!m_currentLabels.empty())
 		{
 			int pp = 0;
@@ -219,6 +218,14 @@ void PmcrGreedySolver_t::write_solution(std::string file_dir, double t)
 			file_ << m_currentLabels[pp];
 		}
 		file_ << "\n";
+
+		// line 3: write in the optimal path
+		for (auto const &waypoint : m_path)
+		{
+			file_ << waypoint << " ";
+		}
+		file_ << "\n";
+		
 		file_.close();
 	}
 

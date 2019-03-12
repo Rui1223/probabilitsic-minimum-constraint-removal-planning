@@ -6,11 +6,11 @@ given to that label*/
 #define CONNECTEDGRAPH_H
 
 #include <vector>
-//#include <cmath> // pow()
-//#include <algorithm> // std::set_union, std::sort
-//#include <bitset> // for bitwise operation
+#include <cmath> // pow()
+#include <algorithm> // std::set_union, std::sort
+#include <bitset> // for bitwise operation
 #include <map>
-//#include <cassert>
+#include <cassert>
 #include <functional>
 #include <set>
 #include <cstring>
@@ -47,9 +47,14 @@ class ConnectedGraph_t
 	int m_nmarked;
 	int m_nExpansion;
 
-	// all label combinations
-	std::vector<std::vector<int>> m_labelCombinations;
-	std::vector<std::pair<std::vector<int>, double>> m_labelMap;
+	// // all label combinations
+	// std::vector<std::vector<int>> m_labelCombinations;
+	// std::vector<std::pair<std::vector<int>, double>> m_labelMap;
+
+	// single goal scenarios
+	// But would like to make sure the m_start is collision free
+	int m_start;
+	int m_goal;
 
 public:
 	// Constructor
@@ -84,17 +89,17 @@ public:
 	// function to compute the survivability for a single set of labels
 	double compute_survival_currentLabels(std::vector<int> labels);
 
-	// function to compute survivability for a power set
-	std::vector<double> compute_survival();
+	// // function to compute survivability for a power set
+	// std::vector<double> compute_survival();
 
-	// function to compute a powerset given a set of labels
-	void cal_powerSet();
+	// // function to compute a powerset given a set of labels
+	// void cal_powerSet();
 
-	// function to calculate labelMap
-	void cal_labelMap();
+	// // function to calculate labelMap
+	// void cal_labelMap();
 
-	// function to print labelMap for test purpose so far
-	void print_labelMap();
+	// // function to print labelMap for test purpose so far
+	// void print_labelMap();
 
 	// function to write the graph into a txt file
 	void write_graph(std::string file_dir);
@@ -102,17 +107,26 @@ public:
 	// function to perform a BF-like expansion for a label
 	void BFSearch(int BF_start, int l);
 
+	// function to pick a start (in no collision) & goal (can be in collision)
+	void pick_start_goal();
+
 	// lots of getters
 	int getnCol() { return m_col; }
 	int getnNodes() { return m_nNodes; }
+	int getnTotallabels() { return m_nTotallabels; }
 	std::vector<int> getNodeNeighbors(int id) { return m_nodeNeighbors[id]; }
 	std::vector<int> getEdgeLabels(int id1, int id2) 
-														{ return m_edgeLabels[id1][id2]; } 
+														{ return m_edgeLabels[id1][id2]; }
+	std::map<int, std::pair<int, double>> getLabelWeights() { return m_labelWeights; }
 	std::pair<int, double> getLabelWeights(int label_idx) { return m_labelWeights[label_idx]; }
-	std::vector<std::pair<std::vector<int>, double>> getLabelMap()
-	{
-		return m_labelMap;
-	}
+
+	int getmStart() { return m_start; }
+	int getmGoal() { return m_goal; }
+
+	// std::vector<std::pair<std::vector<int>, double>> getLabelMap()
+	// {
+	// 	return m_labelMap;
+	// }
 
 	// Destructor
 	~ConnectedGraph_t();

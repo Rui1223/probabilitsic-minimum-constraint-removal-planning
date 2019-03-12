@@ -71,7 +71,7 @@ bool HeuristicSearchSolver_t::Heuristic_search()
 		delete e;
 		e = nullptr;
 	}
-	return false;	
+	return false;
 }
 
 std::vector<int> HeuristicSearchSolver_t::computeFGH(int indx)

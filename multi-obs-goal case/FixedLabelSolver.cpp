@@ -48,6 +48,7 @@ FixedLabelSolver_t::FixedLabelSolver_t(ConnectedGraph_t &g)
 {
 	Timer tt;
 	tt.reset();
+	// problem formulation specified at the beginning of the solver
 	m_lgraph = g;
 	std::cout << "Time to load the graph for Fsolver: " << tt.elapsed() << " seconds\n\n";
 	m_start = m_lgraph.getmStart();
@@ -357,17 +358,15 @@ void FixedLabelSolver_t::write_solution(std::string file_dir, double t)
 
 }
 
-
-
 void FixedLabelSolver_t::cal_labelMap()
 {
 	cal_powerSet();
-	std::vector<double> survivalCombinations = compute_survival();
+	compute_survival();
 
-	for (int kkk=0; kkk < survivalCombinations.size(); kkk++)
+	for (int kkk=0; kkk < m_survivalCombinations.size(); kkk++)
 	{
 		m_labelMap.push_back(std::pair<std::vector<int>, double>(m_labelCombinations[kkk], 
-																	survivalCombinations[kkk]));
+																	m_survivalCombinations[kkk]));
 	}
 
 	sort(m_labelMap.begin(), m_labelMap.end(), sortbysec_fixedlabel);
@@ -395,16 +394,14 @@ void FixedLabelSolver_t::cal_powerSet()
 	}
 }
 
-std::vector<double> FixedLabelSolver_t::compute_survival()
+void FixedLabelSolver_t::compute_survival()
 {
-	std::vector<double> survivalCombinations;
 	for (auto const &set : m_labelCombinations)
 	{
 		double survival = m_lgraph.compute_survival_currentLabels(set);
-		survivalCombinations.push_back(survival);
+		m_survivalCombinations.push_back(survival);
 	}
 
-	return survivalCombinations;
 }
 
 void FixedLabelSolver_t::print_labelMap()

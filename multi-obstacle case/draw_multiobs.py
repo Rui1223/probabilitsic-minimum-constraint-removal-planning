@@ -48,24 +48,25 @@ if __name__ == "__main__":
 			for vv in xrange(0, len(line)-1, 2):
 				label_belongings[line[vv]] = int(line[vv+1])
 			# print label_belongings
+		elif (n_line == 4):
+			# line 4 contains start & goal information
+			start = int(line[0])
+			goal = int(line[1])
+			# plot the start and goal location
+			ax.text(cal_co(start,col,row)[0]-0.2, cal_co(start,col,row)[1]+0.05, 
+				"start", fontweight='bold', fontsize=8)
+			ax.text(cal_co(goal,col,row)[0]-0.2, cal_co(goal,col,row)[1]+0.05, 
+				"goal", fontweight='bold', fontsize=8)
 
 		else:
-			## The lines starting from the 4th line are the lines storing edges and labels
-			if (n_line >= 4):
+			## The lines starting from the 5th line are the lines storing edges and labels
+			if (n_line >= 5):
 				v1 = line[0];
 				v2 = line[1];
 				if len(line) == 3: ## there is a label information
 					labels = line[2] # which is a string
 					labels = labels.split(',') # now labels is a list of labels
-					# if (len(labels)==1):
-					# 	labels=list(labels)
-					# else:
-					# 	IPython.embed()
-					# 	if (v1=='171' and v2=='172'):
-					# 		## partition the string labels if the length of labels > 1
-					# 		labels = list(labels.partition(','))
-					# 	IPython.embed()
-					# 		##IPython.embed()
+
 					#plot the label as "beautiful" as possible
 					if (cal_co(v1,col,row)[0] == cal_co(v2,col,row)[0]):
 						## vertical line
@@ -81,7 +82,7 @@ if __name__ == "__main__":
 									(cal_co(v1,col,row)[1]+cal_co(v2,col,row)[1])/2+incr, 
 									label, color=color_pool[label_belongings[label]],
 																	 fontsize=8, rotation=90)
-							incr += 0.25
+							incr += 0.35
 					else:
 						## horizontal line
 						incr = 0
@@ -96,11 +97,11 @@ if __name__ == "__main__":
 									+ 1.0/(len(labels)+1) + incr, 
 									cal_co(v1,col,row)[1]+0.01, label,
 										color=color_pool[label_belongings[label]], fontsize=8)
-							incr += 0.25					
+							incr += 0.35					
 				
-				#plot current edge
-				ax.plot([cal_co(v1,col,row)[0], cal_co(v2,col,row)[0]], 
-						[cal_co(v1,col,row)[1], cal_co(v2,col,row)[1]], 'k')
+			#plot current edge
+			ax.plot([cal_co(v1,col,row)[0], cal_co(v2,col,row)[0]], 
+					[cal_co(v1,col,row)[1], cal_co(v2,col,row)[1]], color='lightgray', linestyle='dashed')
 
 	# plot label weights
 	for ii in xrange(len(label_weights)):
@@ -120,24 +121,17 @@ if __name__ == "__main__":
 		line = line.split()
 		n_line += 1
 		if (n_line == 1):
-			start = int(line[0])
-			goal = int(line[1])
-			solution_time = line[2]
+			## time & survival
+			solution_time = line[0]
+			solution_survival = line[1]
 		elif (n_line == 2):
-			path = map(int, line)
-		elif (n_line == 3):
-			solution_survival = line[0]
-		else:
+			# all labels
 			if len(line) == 0:
 				solution_labels = " ";
 			else:
 				solution_labels = line[0]
-
-	# First plot the start and goal location
-	ax.text(cal_co(start,col,row)[0]-0.2, cal_co(start,col,row)[1]+0.05, 
-		"start", fontweight='bold', fontsize=8)
-	ax.text(cal_co(goal,col,row)[0]-0.2, cal_co(goal,col,row)[1]+0.05, 
-		"goal", fontweight='bold', fontsize=8)
+		else:
+			path = map(int, line)
 
 	#plot the optimal path 
 	counter = 0
@@ -150,7 +144,7 @@ if __name__ == "__main__":
 		counter += 1
 	ax.plot(cal_co(v2,col,row)[0], cal_co(v2,col,row)[1], "ro")
 
-	# plot solution labels & weights & time
+	# plot solution labels & survivability & time
 	ax.text(col+3-3, -2+0.5, "F time:"+solution_time, color="r", fontsize=10)
 	ax.text(col+3-3, -2+1, "F survival:"+solution_survival, color="r", fontsize=10)
 	ax.text(col+3-3, -2+1.5, "F labels:"+solution_labels, color="r", fontsize=10)
@@ -165,18 +159,17 @@ if __name__ == "__main__":
 		line = line.split()
 		n_line += 1
 		if (n_line == 1):
-			start = int(line[0])
-			goal = int(line[1])
-			solution_time = line[2]
+			## time & survival
+			solution_time = line[0]
+			solution_survival = line[1]
 		elif (n_line == 2):
-			path = map(int, line)
-		elif (n_line == 3):
-			solution_survival = line[0]
-		else:
+			# all labels
 			if len(line) == 0:
-				solution_labels = " "
+				solution_labels = " ";
 			else:
 				solution_labels = line[0]
+		else:
+			path = map(int, line)
 
 	#plot the optimal path
 	if (path):
@@ -195,42 +188,5 @@ if __name__ == "__main__":
 		ax.text(col+3-3, -2+2.5, "G survival:"+solution_survival, color="c", fontsize=10)
 		ax.text(col+3-3, -2+3.0, "G labels:"+solution_labels, color="c", fontsize=10)
 
-
-	# ##Now plot the solution for GrowingTree Algorithm
-	# ##################################################################
-	# f_growingTree = open("./" + sys.argv[1] + "/GrowingTree_solution" + str(n) + ".txt", "r")
-	# n_line = 0;
-	# for line in f_growingTree:
-	# 	line = line.split()
-	# 	n_line += 1
-	# 	if (n_line == 1):
-	# 		start = int(line[0])
-	# 		goal = int(line[1])
-	# 		solution_time = line[2]
-	# 	elif (n_line == 2):
-	# 		path = map(int, line)
-	# 	elif (n_line == 3):
-	# 		solution_survival = line[0]
-	# 	else:
-	# 		if len(line) == 0:
-	# 			solution_labels = " ";
-	# 		else:
-	# 			solution_labels = line[0]
-
-	# #plot the optimal path 
-	# counter = 0
-	# while (counter != (len(path)-1)):
-	# 	v1 = path[counter]
-	# 	v2 = path[counter+1]
-	# 	ax.plot(cal_co(v1,col,row)[0], cal_co(v1,col,row)[1], "yo")
-	# 	ax.plot([cal_co(v1,col,row)[0], cal_co(v2,col,row)[0]], 
-	# 			[cal_co(v1,col,row)[1], cal_co(v2,col,row)[1]], "y--")
-	# 	counter += 1
-	# ax.plot(cal_co(v2,col,row)[0], cal_co(v2,col,row)[1], "yo")
-
-	# # plot solution labels and weights
-	# ax.text(col+3-3, -2+3.5, "Gr time:"+solution_time, color="y", fontsize=10)
-	# ax.text(col+3-3, -2+4.0, "Gr weight:"+solution_survival, color="y", fontsize=10)
-	# ax.text(col+3-3, -2+4.5, "Gr labels:"+solution_labels, color="y", fontsize=10)
 	
 	plt.show()
