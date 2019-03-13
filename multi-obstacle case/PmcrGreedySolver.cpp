@@ -28,9 +28,12 @@ PmcrGreedySolver_t::PmcrGreedySolver_t(ConnectedGraph_t &g)
 	m_goal = m_lgraph.getmGoal();
 
 	// essential elements for greedy search
-	m_open.push(new PmcrNode_t(m_start, computeFGH(m_start), {}, nullptr, 
+	m_G = std::vector<int>(m_lgraph.getnNodes(), std::numeric_limits<int>::max());
+	m_G[m_start] = 0;
+	m_open.push(new PmcrNode_t(m_start, m_G[m_start], computeH(m_start), {}, nullptr, 
 		m_lgraph.compute_survival_currentLabels({})));
 	m_path = std::vector<int>();
+	// need a list to record the highest survivability so far for each node
 	m_highestSurvival = std::vector<double>(m_lgraph.getnNodes(), -1.0);
 	m_highestSurvival[m_start] = 1.0;
 	m_expanded = std::vector<bool>(m_lgraph.getnNodes(), false);
@@ -49,8 +52,6 @@ PmcrGreedySolver_t::~PmcrGreedySolver_t()
 
 void PmcrGreedySolver_t::greedy_search()
 {
-	// need a list to record the highest survivability so far for each node
-	
 
 	while(!m_open.empty())
 	{
@@ -109,7 +110,11 @@ void PmcrGreedySolver_t::greedy_search()
 			if (neighborSurvival > m_highestSurvival[neighbor])
 			{
 				m_highestSurvival[neighbor] = neighborSurvival;
-				m_open.push(new PmcrNode_t(neighbor, computeFGH(neighbor), neighborLabels, 
+				if (m_G[current->getID()]+1 < m_G[neighbor])
+				{
+					m_G[neighbor] = m_G[current->getID()]+1;
+				}
+				m_open.push(new PmcrNode_t(neighbor, m_G[neighbor], computeH(neighbor), neighborLabels, 
 																		current, neighborSurvival));
 			}
 		}
@@ -139,21 +144,19 @@ std::vector<int> PmcrGreedySolver_t::label_union(std::vector<int> s1, std::vecto
 }
 
 
-std::vector<int> PmcrGreedySolver_t::computeFGH(int indx)
+int PmcrGreedySolver_t::computeH(int indx)
 {
 	int col = m_lgraph.getnCol();
 	int indx_row = indx / col;
 	int indx_col = indx % col;
-	int start_row = m_start / col;
-	int start_col = m_start % col;
 	int goal_row = m_goal / col;
 	int goal_col = m_goal % col;
 	// manhattan distance as distance metric
 	int h = abs(indx_row - goal_row) + abs(indx_col - goal_col);
-	int g = abs(indx_row - start_row) + abs(indx_col - start_col);
-	int f = h + g;
-	std::vector<int> fgh{f, g, h};
-	return fgh;
+	// int g = abs(indx_row - start_row) + abs(indx_col - start_col);
+	// int f = h + g;
+	// std::vector<int> fgh{f, g, h};
+	return h;
 }
 
 void PmcrGreedySolver_t::back_track_path()

@@ -32,8 +32,14 @@ struct HeuristicNode_t
 	int m_id;
 	std::vector<int> m_FGH;
 	HeuristicNode_t *m_parent;
-	HeuristicNode_t(int id, std::vector<int> FGH, HeuristicNode_t *parent)
-		: m_id(id), m_FGH(FGH), m_parent(parent) {}
+	HeuristicNode_t(int id, int G, int H, HeuristicNode_t *parent)
+	{
+		m_id = id;
+		m_FGH.push_back(G+H);
+		m_FGH.push_back(G);
+		m_FGH.push_back(H);
+		m_parent = parent;
+	}
 };
 
 struct HeuristicNode_comparison
@@ -90,8 +96,8 @@ public:
 	// with a certain set of labels being looped on
 	bool HeuristicSearch();
 
-	// The functopm to compute the f,g,h value of a node(indx) for a given start & goal
-	std::vector<int> computeFGH(int indx);
+	// The functopm to compute the h value of a node(indx) for a given goal
+	int computeH(int indx);
 
 	// The function to back track the path
 	void back_track_path();

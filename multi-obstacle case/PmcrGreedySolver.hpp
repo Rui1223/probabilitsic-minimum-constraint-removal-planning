@@ -46,6 +46,7 @@ class PmcrGreedySolver_t
 	std::priority_queue<PmcrNode_t*, std::vector<PmcrNode_t*>, PmcrNode_comparison> m_open;
 	std::vector<PmcrNode_t*> m_closed;
 	std::vector<bool> m_expanded;
+	std::vector<int> m_G;
 
 public:
 	PmcrGreedySolver_t(ConnectedGraph_t &g);
@@ -54,8 +55,8 @@ public:
 	void back_track_path();
 	void print_path();
 	std::vector<int> label_union(std::vector<int> s1, std::vector<int> s2);
-	// The functopm to compute the f,g,h value of a node(indx) for a given start & goal
-	std::vector<int> computeFGH(int indx);
+	// The functopm to compute the h value of a node(indx) for a given goal
+	int computeH(int indx);
 	//bool check_prune(int neighborID, double weights);
 	void write_solution(std::string file_dir, double t);
 	void print_closedList();

@@ -6,12 +6,14 @@
 
 PmcrNode_t::PmcrNode_t() {}
 
-PmcrNode_t::PmcrNode_t(int id, std::vector<int> FGH, std::vector<int> labels, 
+PmcrNode_t::PmcrNode_t(int id, int G, int H, std::vector<int> labels, 
 	PmcrNode_t *parent, double survival)
 {
 	assert(id >= 0);
 	m_id = id;
-	m_FGH = FGH;
+	m_FGH.push_back(G+H);
+	m_FGH.push_back(G);
+	m_FGH.push_back(H);
 	m_labels = labels;
 	m_labelCardinality = labels.size();
 	m_survival = survival;

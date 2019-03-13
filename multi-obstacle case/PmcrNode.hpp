@@ -19,7 +19,7 @@ class PmcrNode_t
 public:
 	// constructor
 	PmcrNode_t();
-	PmcrNode_t(int id, std::vector<int> FGH, std::vector<int> labels, PmcrNode_t *parent, 
+	PmcrNode_t(int id, int G, int H, std::vector<int> labels, PmcrNode_t *parent, 
 		double survival);
 	void print();
 

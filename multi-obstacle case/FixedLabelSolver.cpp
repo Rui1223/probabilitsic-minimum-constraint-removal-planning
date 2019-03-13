@@ -16,6 +16,7 @@
 #include <functional>
 #include <set>
 #include <cstdlib> // std::rand, std::srand
+#include <iomanip>
 
 #include "FixedLabelSolver.hpp"
 // #include "LabeledGraph.hpp"
@@ -105,8 +106,10 @@ void FixedLabelSolver_t::fixedLabel_search()
 bool FixedLabelSolver_t::HeuristicSearch()
 {
 	// Let's start the current search!!
+	std::vector<int> G(m_lgraph.getnNodes(), std::numeric_limits<int>::max());
+	G[m_start] = 0;
 	m_expanded = std::vector<bool>(m_lgraph.getnNodes(), false); // must be re-initialized
-	m_open.push(new HeuristicNode_t(m_start, 0, computeH(m_start), nullptr)); // open must be clean
+	m_open.push(new HeuristicNode_t(m_start, G[m_start], computeH(m_start), nullptr)); // open must be clean
 
 	while (!m_open.empty())
 	{
@@ -145,7 +148,11 @@ bool FixedLabelSolver_t::HeuristicSearch()
 			{
 				// the neighbor is a true neighbor in the current subgraph
 				// add the neighbor to open list
-				m_open.push(new HeuristicNode_t(neighbor, computeFGH(neighbor), current));
+				if (G[current->m_id]+1 < G[neighbor])
+				{
+					G[neighbor] = G[current->m_id]+1;
+				}
+				m_open.push(new HeuristicNode_t(neighbor, G[neighbor], computeH(neighbor), current));
 			}
 		}
 	}
@@ -324,7 +331,7 @@ void FixedLabelSolver_t::print_labelMap()
 // }
 
 
-std::vector<int> FixedLabelSolver_t::computeH(int indx)
+int FixedLabelSolver_t::computeH(int indx)
 {
 	int col = m_lgraph.getnCol();
 	int indx_row = indx / col;
@@ -334,10 +341,10 @@ std::vector<int> FixedLabelSolver_t::computeH(int indx)
 	
 	// manhattan distance as distance metric
 	int h = abs(indx_row - goal_row) + abs(indx_col - goal_col);
-	int g = abs(indx_row - start_row) + abs(indx_col - start_col);
-	int f = h + g;
-	std::vector<int> fgh{f, g, h};
-	return fgh;
+	// int g = abs(indx_row - start_row) + abs(indx_col - start_col);
+	// int f = h + g;
+	// std::vector<int> fgh{f, g, h};
+	return h;
 }
 
 bool FixedLabelSolver_t::check_subset(std::vector<int> labels)
