@@ -31,8 +31,7 @@ bool sortbysec_connectedGraph(const std::pair<std::vector<int>, double> &p1,
 	return (p1.second < p2.second);
 }
 
-ConnectedGraph_t::ConnectedGraph_t(int row, int col, std::vector<int> nlabelsPerObs, 
-																			double density)
+ConnectedGraph_t::ConnectedGraph_t(int row, int col, std::vector<int> nlabelsPerObs)
 {
 	Timer tt;
 	tt.reset();
@@ -56,9 +55,10 @@ ConnectedGraph_t::ConnectedGraph_t(int row, int col, std::vector<int> nlabelsPer
 	}	
 	
 	// m_nExpansion = round(m_nEdges * density *1.0 / m_nTotallabels) *1.5;
-	m_nExpansion = round(m_nEdges * density *1.0 / m_nTotallabels * 2);
+	// m_nExpansion = round(m_nEdges * density *1.0 / m_nTotallabels * 2);
+	m_nExpansion = round(m_nEdges*1.0 / (20*1.0*m_nlabelsPerObs[0]));
 	std::cout << "n_expansion: " << m_nExpansion << "\n";
-	std::cout << "Expected density: " << density << "\n";
+	// std::cout << "Expected density: " << density << "\n";
 	m_nmarked = 0;
 
 	// given #labels per obstacle, assign weight to each label
@@ -198,10 +198,10 @@ void ConnectedGraph_t::label_graph()
 	obs_r = ceil( ( 1 + sqrt(1-2*(1-m_nExpansion)) ) / 2.0 ) / 2;
 	// std::cout << "obs_r: " << obs_r << "\n";
 	// we can set up the inner boundary for limiting the center of the obstacles
-	int lower_row = obs_r;
-	int upper_row = m_row-obs_r;
-	int lower_col = obs_r;
-	int upper_col = m_col-obs_r;
+	// int lower_row = obs_r;
+	// int upper_row = m_row-obs_r;
+	// int lower_col = obs_r;
+	// int upper_col = m_col-obs_r;
 
 	int current_label_idx = 0;
 	std::vector<std::pair<int, int>> centers_obs(m_nobstacles, std::pair<int, int>(0, 0));
@@ -210,7 +210,7 @@ void ConnectedGraph_t::label_graph()
 	int trial;
 	int temp_nlabels;
 	std::pair<int, int> BF_start_loc;
-	double dist_threshold1 = 1.5*obs_r;
+	double dist_threshold1 = 2*obs_r;
 	double dist_threshold2 = 2*obs_r;		
 
 
@@ -225,13 +225,15 @@ void ConnectedGraph_t::label_graph()
 		{
 			if (current_label_idx==0) // the 1st label of the first obstacle
 			{
-				do
-				{
-					BF_start = random_generate_integer(0, m_nNodes-1);
-					BF_start_loc = getLoc(BF_start);
-				}
-				while(BF_start_loc.first < lower_row or BF_start_loc.first > upper_row 
-							or BF_start_loc.second < lower_col or BF_start_loc.second > upper_col);
+				BF_start = random_generate_integer(0, m_nNodes-1);
+				BF_start_loc = getLoc(BF_start);
+				// do
+				// {
+				// 	BF_start = random_generate_integer(0, m_nNodes-1);
+				// 	BF_start_loc = getLoc(BF_start);
+				// }
+				// while(BF_start_loc.first < lower_row or BF_start_loc.first > upper_row 
+				// 			or BF_start_loc.second < lower_col or BF_start_loc.second > upper_col);
 				firstTimeObs = false;
 				centers_obs[obs] = BF_start_loc;
 				centers.push_back(BF_start);
@@ -242,13 +244,15 @@ void ConnectedGraph_t::label_graph()
 				// 1st check: if the center is in the inner boundary
 				do
 				{
-					do
-					{
-						BF_start = random_generate_integer(0, m_nNodes-1);
-						BF_start_loc = getLoc(BF_start);						
-					}
-					while(BF_start_loc.first < lower_row or BF_start_loc.first > upper_row 
-							or BF_start_loc.second < lower_col or BF_start_loc.second > upper_col);
+					BF_start = random_generate_integer(0, m_nNodes-1);
+					BF_start_loc = getLoc(BF_start);		
+					// do
+					// {
+					// 	BF_start = random_generate_integer(0, m_nNodes-1);
+					// 	BF_start_loc = getLoc(BF_start);						
+					// }
+					// while(BF_start_loc.first < lower_row or BF_start_loc.first > upper_row 
+					// 		or BF_start_loc.second < lower_col or BF_start_loc.second > upper_col);
 					trial++;
 				// std::cout << obs << ":" << trial << "\n";
 				}
@@ -270,13 +274,15 @@ void ConnectedGraph_t::label_graph()
 				// we want labels of the same obstacle to be close to each other
 				do
 				{
-					do
-					{
-						BF_start = random_generate_integer(0, m_nNodes-1);
-						BF_start_loc = getLoc(BF_start);						
-					}
-					while(BF_start_loc.first < lower_row or BF_start_loc.first > upper_row 
-							or BF_start_loc.second < lower_col or BF_start_loc.second > upper_col);
+					BF_start = random_generate_integer(0, m_nNodes-1);
+					BF_start_loc = getLoc(BF_start);	
+					// do
+					// {
+					// 	BF_start = random_generate_integer(0, m_nNodes-1);
+					// 	BF_start_loc = getLoc(BF_start);						
+					// }
+					// while(BF_start_loc.first < lower_row or BF_start_loc.first > upper_row 
+					// 		or BF_start_loc.second < lower_col or BF_start_loc.second > upper_col);
 				}
 				while ( dist(BF_start_loc, centers_obs[obs]) > dist_threshold1 or 
 						(std::find(centers.begin(), centers.end(), BF_start) != centers.end()) );
@@ -291,60 +297,7 @@ void ConnectedGraph_t::label_graph()
 			current_label_idx++;
 		}
 
-	}	
-
-	// 	for (int ii=0; ii<temp_nlabels; ii++)
-	// 	{
-	// 		if (current_label_idx==0) // the 1st label of the first obstacle
-	// 		{
-	// 			BF_start = random_generate_integer(0, m_nNodes-1);
-	// 			BF_start_loc = getLoc(BF_start);
-	// 			firstTimeObs = false;
-	// 			//temp_BF_loc = BF_start_loc;
-	// 			mean_obs[obs] = BF_start_loc;
-	// 		}
-	// 		else if (firstTimeObs) // first time entering an obstacle (except the 1st obstacle)
-	// 		{
-	// 			trial = 0;
-	// 			// we want the obs not close to previous ones
-	// 			do
-	// 			{
-	// 				BF_start = random_generate_integer(0, m_nNodes-1);
-	// 				BF_start_loc = getLoc(BF_start);
-	// 				trial++;
-	// 			}
-	// 			while ( is_close(BF_start_loc, mean_obs, obs, dist_threshold2) and trial < 20 );
-
-	// 			firstTimeObs = false;
-	// 			//temp_BF_loc = BF_start_loc;
-	// 			mean_obs[obs] = BF_start_loc;
-	// 		}
-	// 		else // working among label (not the first one of any obstacles)
-	// 		{
-	// 			// we want labels of the same obstacle to be close to each other
-	// 			do
-	// 			{
-	// 				BF_start = random_generate_integer(0, m_nNodes-1);
-	// 				BF_start_loc = getLoc(BF_start);
-	// 			}
-	// 			while ( dist(BF_start_loc, mean_obs[obs]) > dist_threshold1 );
-	// 		}
-
-	// 		// please print the BF_start
-	// 		std::cout << current_label_idx << ": " << "(" << BF_start_loc.first << "," 
-	// 															<< BF_start_loc.second << ")\n";
-
-	// 		//mean_obs[obs].first += BF_start_loc.first;
-	// 		//mean_obs[obs].second += BF_start_loc.second;
-
-	// 		// Now it's the time for calling BFSearch() with our well tested BF_start
-	// 		BFSearch(BF_start, current_label_idx);
-	// 		current_label_idx++;
-	// 	}
-	// 	//mean_obs[obs].first /= temp_nlabels;
-	// 	//mean_obs[obs].second /= temp_nlabels;
-	// }
-
+	}
 
 }
 
@@ -434,7 +387,8 @@ void ConnectedGraph_t::write_graph(std::string file_dir)
 	if (file_.is_open())
 	{
 		// Write in the 1st line the size and the density of the grid graph
-		file_ << m_row << " " << m_col << " " << double(m_nmarked) / m_nEdges <<"\n";
+		file_ << m_row << " " << m_col << " " << double(m_nmarked) / m_nEdges 
+												<< " " << m_nobstacles <<"\n";
 		// Write in the 2nd line label information
 		for (int tt=0; tt < m_nTotallabels; tt++)
 		{
@@ -569,72 +523,6 @@ double ConnectedGraph_t::compute_survival_currentLabels(std::vector<int> current
 	return currentSurvival;
 
 }
-
-// std::vector<double> ConnectedGraph_t::compute_survival()
-// {
-// 	std::vector<double> survivalCombinations;
-// 	for (auto const &set : m_labelCombinations)
-// 	{
-// 		double survival = compute_survival_currentLabels(set);
-// 		survivalCombinations.push_back(survival);
-// 	}
-
-// 	return survivalCombinations;
-// }
-
-// void ConnectedGraph_t::cal_powerSet()
-// {
-// 	// This function takes a set and then compute the powerset of the set
-// 	// which is a vector of sets (std::vector<std::vector<int>>)
-
-// 	// first determines the size of the powerset that you will have
-// 	// for each one's derivation we will do bitwise operation
-// 	int powerSet_size = pow(2, m_nTotallabels); // 2^n combinations
-// 	for (int counter = 0; counter < powerSet_size; counter++)
-// 	{
-// 		std::vector<int> labels; // labels for a single combination
-// 		for (int j=0; j < m_nTotallabels; j++)
-// 		{
-// 			if ( counter & (1<<j) )
-// 			{
-// 				labels.push_back(j);
-// 			}
-// 		}
-// 		m_labelCombinations.push_back(labels);
-// 	}
-
-// }
-
-// void ConnectedGraph_t::cal_labelMap()
-// {
-// 	cal_powerSet();
-// 	std::vector<double> survivalCombinations = compute_survival();
-
-// 	for (int kkk=0; kkk < survivalCombinations.size(); kkk++)
-// 	{
-// 		m_labelMap.push_back(std::pair<std::vector<int>, double>(m_labelCombinations[kkk], 
-// 																	survivalCombinations[kkk]));
-// 	}
-
-// 	sort(m_labelMap.begin(), m_labelMap.end(), sortbysec_connectedGraph);
-// }
-
-// void ConnectedGraph_t::print_labelMap()
-// {
-// 	printf("*********labelMap************\n");
-// 	//Iterate over the set you just come up with
-// 	for (auto const &e : m_labelMap)
-// 	{
-// 		std::cout << "<";
-// 		for (auto const &l : e.first)
-// 		{
-// 			std::cout << l << ",";
-// 		}
-// 		std::cout << "> :\t\t";
-// 		std::cout << e.second << std::endl;
-// 	}
-// 	printf("***************************\n");
-// }
 
 
 ConnectedGraph_t::~ConnectedGraph_t() {}

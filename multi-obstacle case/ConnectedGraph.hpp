@@ -27,7 +27,7 @@ class ConnectedGraph_t
 	int m_nNodes;
 	int m_nEdges;
 
-	// specify the weights for labels
+	// specify the number of labels for each obstacle
 	std::vector<int> m_nlabelsPerObs;
 	// for each label idx, we store the obs idx it belongs to and its corresponding weight
 	std::map<int, std::pair<int, double>> m_labelWeights;
@@ -58,7 +58,7 @@ class ConnectedGraph_t
 public:
 	// Constructor
 	ConnectedGraph_t() {}
-	ConnectedGraph_t(int row, int col, std::vector<int> nlabelsPerObs, double probPerLabel);
+	ConnectedGraph_t(int row, int col, std::vector<int> nlabelsPerObs);
 
 	// function to load a graph (manually generate a graph)
 	void load_graph();

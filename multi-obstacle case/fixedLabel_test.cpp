@@ -24,7 +24,7 @@ int main(int argc, char** argv)
 	// int g_nlabels = 15;
 	int g_nlabels_unit = 3;
 	// std::vector<int> g_nlabelsPerObs(g_nlabels/g_nlabels_unit, g_nlabels_unit);
-	double g_density = 0.6;
+	// double g_density = 0.6;
 
 	std::string folder_dir(argv[1]);
 	// std::string file_dir1 = "./" + folder_dir + "/labelCoverage_performance.txt";
@@ -53,7 +53,7 @@ int main(int argc, char** argv)
 			{
 				std::cout << "***************" << nl << ":" << i << "**************\n";
 				// generate a graph
-				ConnectedGraph_t g(g_row, g_col, nl_PerObs, g_density);
+				ConnectedGraph_t g(g_row, g_col, nl_PerObs);
 
 				std::cout << "----------start the fixedLabel search-------------\n";
 				t.reset();

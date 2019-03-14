@@ -16,10 +16,12 @@
 int main(int argc, char** argv)
 {
 	int nExperiments = 1;
-	int row = 100;
-	int col = 100;
-	std::vector<int> nLabelsPerObs{4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4};
-	double density = 0.6;
+	int row = 50;
+	int col = 50;
+	int nObstacles = 40;
+	int nPosesPerObs = 5;
+	std::vector<int> nLabelsPerObs(nObstacles, nPosesPerObs);
+	// double density = 0.6;
 	Timer t;
 	std::srand(std::time(0));
 	double t1;
@@ -37,7 +39,7 @@ int main(int argc, char** argv)
 		// 													+ std::to_string(ii) + ".txt";
 
 		// generate a grpah
-		ConnectedGraph_t g(row, col, nLabelsPerObs, density);
+		ConnectedGraph_t g(row, col, nLabelsPerObs);
 		g.write_graph(file_dir1);
 		std::cout << std::endl;
 
