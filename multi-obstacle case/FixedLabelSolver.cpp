@@ -19,24 +19,9 @@
 #include <iomanip>
 
 #include "FixedLabelSolver.hpp"
-// #include "LabeledGraph.hpp"
 #include "ConnectedGraph.hpp"
-// #include "ConnectedNonOverlapGraph.hpp"
 //#include "ToyGraph.hpp"
 #include "Timer.hpp"
-
-// Comparator compFunctor1 = 
-// 		[](std::pair<std::vector<int>, double> elem1, std::pair<std::vector<int>, double> elem2)
-// 		{
-// 			return elem1.second <= elem2.second; // compare weights, prefer less weight  
-// 		};
-// Driver function to sort the vector elements 
-// by second element of pairs 
-// bool sortbysec1(const std::pair<std::vector<int>, double> &p1, 
-// 				const std::pair<std::vector<int>, double> &p2)
-// {
-// 	return (p1.second >= p2.second);
-// }
 
 // Driver function to sort the vector elements 
 // by second element of pairs 
@@ -54,23 +39,24 @@ FixedLabelSolver_t::FixedLabelSolver_t(ConnectedGraph_t &g)
 	Timer tt;
 	tt.reset();
 	// problem formulation specified at the beginning of the solver
-	m_lgraph = g;
-	std::cout << "Time to load the graph for Fsolver: " << tt.elapsed() << " seconds\n";
-	m_start = m_lgraph.getmStart();
-	m_goal = m_lgraph.getmGoal();
+	// m_lgraph = g;
+	// std::cout << "Time to load the graph for Fsolver: " << tt.elapsed() << " seconds\n";
+	m_start = g.getmStart();
+	m_goal = g.getmGoal();
+	m_col = g.getnCol();
 
-	m_nTotallabels = m_lgraph.getnTotallabels();
-	m_labelWeights = m_lgraph.getLabelWeights();
+	m_nTotallabels = g.getnTotallabels();
+	m_labelWeights = g.getLabelWeights();
 
 	// figure out whether start and goal are already in a region where labels are assigned (doomed)
-	std::vector<int> gLabels = cal_gLabel();
-	cal_labelMap(gLabels);
+	std::vector<int> gLabels = cal_gLabel(g);
+	cal_labelMap(gLabels, g);
 	//std::vector<std::pair<std::vector<int>, double>> subLabelMap = cal_subLabelMap(gLabels);
 
 	m_k = 0;
 }
 
-void FixedLabelSolver_t::fixedLabel_search()
+void FixedLabelSolver_t::fixedLabel_search(ConnectedGraph_t &g)
 {
 	// The search method takes advantage of the labelMap obtained from the given graph.
 	// Then for each set of labels and corresponding weight in the labelMap, construct a subgraph
@@ -94,7 +80,7 @@ void FixedLabelSolver_t::fixedLabel_search()
 		//std::cout << "current set of labels: " << m_currentLabels << "\n";
 		//std::cout << "currrent weight: " << m_currentWeight << "\n"; 
 		//std::cout << "start the " << k << "th search\n";
-		goalFound = HeuristicSearch();
+		goalFound = HeuristicSearch(g);
 		if (goalFound)
 		{
 			std::cout << "We have performed " << m_k << " searches.\n\n";
@@ -103,12 +89,12 @@ void FixedLabelSolver_t::fixedLabel_search()
 
 }
 
-bool FixedLabelSolver_t::HeuristicSearch()
+bool FixedLabelSolver_t::HeuristicSearch(ConnectedGraph_t &g)
 {
 	// Let's start the current search!!
-	std::vector<int> G(m_lgraph.getnNodes(), std::numeric_limits<int>::max());
+	std::vector<int> G(g.getnNodes(), std::numeric_limits<int>::max());
 	G[m_start] = 0;
-	m_expanded = std::vector<bool>(m_lgraph.getnNodes(), false); // must be re-initialized
+	m_expanded = std::vector<bool>(g.getnNodes(), false); // must be re-initialized
 	m_open.push(new HeuristicNode_t(m_start, G[m_start], computeH(m_start), nullptr)); // open must be clean
 
 	while (!m_open.empty())
@@ -133,7 +119,7 @@ bool FixedLabelSolver_t::HeuristicSearch()
 			return true;
 		}
 		//get neighbors of the current node
-		std::vector<int> neighbors = m_lgraph.getNodeNeighbors(current->m_id);
+		std::vector<int> neighbors = g.getNodeNeighbors(current->m_id);
 		// randomly shuffle the neighbors
 		std::random_shuffle( neighbors.begin(), neighbors.end(), myrandom1 );
 		for (auto const &neighbor : neighbors)
@@ -142,17 +128,17 @@ bool FixedLabelSolver_t::HeuristicSearch()
 			if (m_expanded[neighbor]) { continue; }
 			// check whether the edge between current and neighbor node form a valid edge in the 
 			// subgraph
-			std::vector<int> EdgeLabels = m_lgraph.getEdgeLabels(current->m_id, neighbor);
-			bool isSubset = check_subset(m_lgraph.getEdgeLabels(current->m_id, neighbor));
+			std::vector<int> EdgeLabels = g.getEdgeLabels(current->m_id, neighbor);
+			bool isSubset = check_subset(g.getEdgeLabels(current->m_id, neighbor));
 			if (isSubset)
 			{
 				// the neighbor is a true neighbor in the current subgraph
 				// add the neighbor to open list
-				if (G[current->m_id]+1 < G[neighbor])
+				if (current->getG()+g.getEdgeCost(current->m_id, neighbor) < G[neighbor])
 				{
-					G[neighbor] = G[current->m_id]+1;
+					G[neighbor] = current->getG()+g.getEdgeCost(current->m_id, neighbor);
+					m_open.push(new HeuristicNode_t(neighbor, G[neighbor], computeH(neighbor), current));
 				}
-				m_open.push(new HeuristicNode_t(neighbor, G[neighbor], computeH(neighbor), current));
 			}
 		}
 	}
@@ -200,11 +186,11 @@ void FixedLabelSolver_t::write_solution(std::string file_dir, double t)
 	}
 }
 
-void FixedLabelSolver_t::cal_labelMap(std::vector<int> gLabels)
+void FixedLabelSolver_t::cal_labelMap(std::vector<int> gLabels, ConnectedGraph_t &g)
 {
 	Timer tp;
 	cal_powerSet(gLabels);
-	compute_survival();
+	compute_survival(g);
 
 	for (int kkk=0; kkk < m_survivalCombinations.size(); kkk++)
 	{
@@ -242,23 +228,23 @@ void FixedLabelSolver_t::cal_powerSet(std::vector<int> gLabels)
 
 }
 
-void FixedLabelSolver_t::compute_survival()
+void FixedLabelSolver_t::compute_survival(ConnectedGraph_t &g)
 {
 	for (auto const &set : m_labelCombinations)
 	{
-		double survival = m_lgraph.compute_survival_currentLabels(set);
+		double survival = g.compute_survival_currentLabels(set);
 		m_survivalCombinations.push_back(survival);
 	}
 }
 
-std::vector<int> FixedLabelSolver_t::cal_gLabel()
+std::vector<int> FixedLabelSolver_t::cal_gLabel(ConnectedGraph_t &g)
 {
-	std::vector<int> goal_neighbors = m_lgraph.getNodeNeighbors(m_goal);
+	std::vector<int> goal_neighbors = g.getNodeNeighbors(m_goal);
 	std::vector<std::vector<int>> goal_setsLabels;
 
 	for (auto const &neighbor : goal_neighbors)
 	{
-		goal_setsLabels.push_back(m_lgraph.getEdgeLabels(m_goal, neighbor));
+		goal_setsLabels.push_back(g.getEdgeLabels(m_goal, neighbor));
 	}
 
 	std::vector<int> goal_labels = goal_setsLabels[0];
@@ -333,11 +319,10 @@ void FixedLabelSolver_t::print_labelMap()
 
 int FixedLabelSolver_t::computeH(int indx)
 {
-	int col = m_lgraph.getnCol();
-	int indx_row = indx / col;
-	int indx_col = indx % col;
-	int goal_row = m_goal / col;
-	int goal_col = m_goal % col;
+	int indx_row = indx / m_col;
+	int indx_col = indx % m_col;
+	int goal_row = m_goal / m_col;
+	int goal_col = m_goal % m_col;
 	
 	// manhattan distance as distance metric
 	int h = abs(indx_row - goal_row) + abs(indx_col - goal_col);

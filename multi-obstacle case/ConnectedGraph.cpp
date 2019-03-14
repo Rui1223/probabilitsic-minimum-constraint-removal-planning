@@ -17,6 +17,7 @@ in our problem formulation*/
 #include <string> // std::string, std::to_string
 #include <queue>
 #include <random>
+#include <iomanip>
 
 #include "ConnectedGraph.hpp"
 #include "Timer.hpp"
@@ -31,7 +32,7 @@ bool sortbysec_connectedGraph(const std::pair<std::vector<int>, double> &p1,
 }
 
 ConnectedGraph_t::ConnectedGraph_t(int row, int col, std::vector<int> nlabelsPerObs, 
-																			double probPerLabel)
+																			double density)
 {
 	Timer tt;
 	tt.reset();
@@ -53,17 +54,11 @@ ConnectedGraph_t::ConnectedGraph_t(int row, int col, std::vector<int> nlabelsPer
 	{
 		m_nTotallabels += e;
 	}	
-	m_probPerLabel = probPerLabel;
-
-	// std::cout << "probPerLabel: " << m_probPerLabel << std::endl;
-	// based on the probability that a label is assigned to an edge, compute how many expansions 
-	// per label are needed 
-	// m_nExpansion = round(m_nEdges * (1 - pow(1 - m_probPerLabel, m_nlabels))) / m_nlabels;
 	
-	// m_nExpansion = round(m_nEdges * probPerLabel *1.0 / m_nTotallabels) *1.5;
-	m_nExpansion = round(m_nEdges * probPerLabel *1.0 / m_nTotallabels * 2);
+	// m_nExpansion = round(m_nEdges * density *1.0 / m_nTotallabels) *1.5;
+	m_nExpansion = round(m_nEdges * density *1.0 / m_nTotallabels * 2);
 	std::cout << "n_expansion: " << m_nExpansion << "\n";
-	std::cout << "Expected density: " << probPerLabel << "\n";
+	std::cout << "Expected density: " << density << "\n";
 	m_nmarked = 0;
 
 	// given #labels per obstacle, assign weight to each label
@@ -98,6 +93,7 @@ void ConnectedGraph_t::load_graph()
 		m_nodeNeighbors.push_back(std::vector<int>());
 		m_edgeLabels.push_back(std::vector<std::vector<int>>(m_nNodes,
 			 std::vector<int>()));
+		m_edgeCosts.push_back(std::vector<int>(m_nNodes, std::numeric_limits<int>::max()));
 		m_marked.push_back(std::vector<bool>(m_nNodes, false));
 		iter++;
 	}
@@ -121,6 +117,8 @@ void ConnectedGraph_t::load_graph()
 			// only add the neighbor of its bottom	
 			m_nodeNeighbors[currentID].push_back(currentID+m_col);
 			m_nodeNeighbors[currentID+m_col].push_back(currentID);
+			m_edgeCosts[currentID][currentID+m_col] = 1;
+			m_edgeCosts[currentID+m_col][currentID] = 1;
 		}
 		// if the node is a bottommost one
 		else if (currentID / m_col == m_row-1 and currentID % m_col != m_col-1)
@@ -128,7 +126,10 @@ void ConnectedGraph_t::load_graph()
 			// the node is in the bottom line of the grid graph
 			// only add the neighbor of its right
 			m_nodeNeighbors[currentID].push_back(currentID+1);
-			m_nodeNeighbors[currentID+1].push_back(currentID);		
+			m_nodeNeighbors[currentID+1].push_back(currentID);
+			m_edgeCosts[currentID][currentID+1] = 1;
+			m_edgeCosts[currentID+1][currentID] = 1;			
+
 		}
 		// if the node is a normal one (should have two neighbors)
 		else
@@ -136,8 +137,12 @@ void ConnectedGraph_t::load_graph()
 			// add the neighbor of its right and bottom
 			m_nodeNeighbors[currentID].push_back(currentID+1);
 			m_nodeNeighbors[currentID+1].push_back(currentID);
+			m_edgeCosts[currentID][currentID+1] = 1;
+			m_edgeCosts[currentID+1][currentID] = 1;
 			m_nodeNeighbors[currentID].push_back(currentID+m_col);
 			m_nodeNeighbors[currentID+m_col].push_back(currentID);
+			m_edgeCosts[currentID][currentID+m_col] = 1;
+			m_edgeCosts[currentID+m_col][currentID] = 1;
 		}
 		//std::cout << "working on next node!\n";
 		currentID++; // start working on the next node

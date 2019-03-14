@@ -40,6 +40,9 @@ struct HeuristicNode_t
 		m_FGH.push_back(H);
 		m_parent = parent;
 	}
+	int getF() const { return m_FGH[0]; }
+	int getG() const { return m_FGH[1]; }
+	int getH() const { return m_FGH[2]; }
 };
 
 struct HeuristicNode_comparison
@@ -57,7 +60,7 @@ struct HeuristicNode_comparison
 class FixedLabelSolver_t
 {
 	// Input that a fixedLabel solver needs
-	ConnectedGraph_t m_lgraph;
+	// ConnectedGraph_t m_lgraph;
 	int m_start;
 	int m_goal;
 
@@ -80,7 +83,8 @@ class FixedLabelSolver_t
 	std::vector<double> m_survivalCombinations;
 	std::vector<std::pair<std::vector<int>, double>> m_labelMap;
 
-	int m_k;	
+	int m_k;
+	int m_col;	
 
 public:
 	FixedLabelSolver_t() {}
@@ -90,11 +94,11 @@ public:
 	~FixedLabelSolver_t();
 
 	// The function to search for a path in a fixed label scenario
-	void fixedLabel_search();
+	void fixedLabel_search(ConnectedGraph_t &g);
 
 	// The function to perform heuristic search on a subgraph 
 	// with a certain set of labels being looped on
-	bool HeuristicSearch();
+	bool HeuristicSearch(ConnectedGraph_t &g);
 
 	// The functopm to compute the h value of a node(indx) for a given goal
 	int computeH(int indx);
@@ -113,17 +117,17 @@ public:
 
 	// The function to calculate the the labels that goal regions carry and
 	// calculate the subLabelMap based on that
-	std::vector<int> cal_gLabel();
+	std::vector<int> cal_gLabel(ConnectedGraph_t &g);
 	//std::vector<std::pair<std::vector<int>, double>> cal_subLabelMap(std::vector<int>);
 
 	// function to compute survivability for a powerset
-	void compute_survival();
+	void compute_survival(ConnectedGraph_t &g);
 
 	// function to compute a powerset given a set of labels
 	void cal_powerSet(std::vector<int>);
 
 	// function to calculate labelMap
-	void cal_labelMap(std::vector<int>);
+	void cal_labelMap(std::vector<int> glabels, ConnectedGraph_t &g);
 
 	// function to print labelMap for test purpose so far
 	void print_labelMap();

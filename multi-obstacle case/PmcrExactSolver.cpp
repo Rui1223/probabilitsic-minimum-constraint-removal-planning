@@ -11,35 +11,44 @@
 
 #include "ConnectedGraph.hpp"
 // #include "ToyGraph.hpp"
-#include "PmcrGreedySolver.hpp"
+#include "PmcrExactSolver.hpp"
 #include "PmcrNode.hpp"
 #include "Timer.hpp"
 
 // random generator function:
-int myrandom (int i) { return std::rand()%i; }
+int myrandom2 (int i) { return std::rand()%i; }
 
-PmcrGreedySolver_t::PmcrGreedySolver_t(ConnectedGraph_t &g)
+PmcrExactSolver_t::PmcrExactSolver_t(ConnectedGraph_t &g)
 {
 	Timer tt;
 	tt.reset();
-	// std::cout << "Time to load the graph for Gsolver: " << tt.elapsed() << " seconds\n";
 	m_start = g.getmStart();
 	m_goal = g.getmGoal();
 	m_col = g.getnCol();
 
-	// essential elements for greedy search
+	// essential elements for exact search
 	m_G = std::vector<int>(g.getnNodes(), std::numeric_limits<int>::max());
 	m_G[m_start] = 0;
 	m_open.push(new PmcrNode_t(m_start, m_G[m_start], computeH(m_start), {}, nullptr, 
 		g.compute_survival_currentLabels({})));
 	m_path = std::vector<int>();
 	// need a list to record the highest survivability so far for each node
-	m_highestSurvival = std::vector<double>(g.getnNodes(), -1.0);
-	m_highestSurvival[m_start] = 1.0;
-	m_expanded = std::vector<bool>(g.getnNodes(), false);
+	// m_highestSurvival = std::vector<double>(g.getnNodes(), -1.0);
+	// m_highestSurvival[m_start] = 1.0;
+
+	// m_expanded = std::vector<bool>(g.getnNodes(), false);
+
+	m_visited = std::vector<bool>(g.getnNodes(), false);
+	m_visited[m_start] = true;
+	int n_nodes = g.getnNodes();
+	for (int hh=0; hh < n_nodes; hh++)
+	{
+		m_recordSet.push_back(std::vector<std::vector<int>>());
+	}
+
 }
 
-PmcrGreedySolver_t::~PmcrGreedySolver_t()
+PmcrExactSolver_t::~PmcrExactSolver_t()
 {
 	while (!m_open.empty())
 	{
@@ -50,27 +59,27 @@ PmcrGreedySolver_t::~PmcrGreedySolver_t()
 	for (auto &e : m_closed) { delete e; }
 }
 
-void PmcrGreedySolver_t::greedy_search(ConnectedGraph_t &g)
+void PmcrExactSolver_t::exact_search(ConnectedGraph_t &g)
 {
 
 	while(!m_open.empty())
 	{
 		PmcrNode_t *current = m_open.top();
 		m_open.pop();
-		// Now check if the current node has been expanded
-		if (m_expanded[current->getID()] == true)
-		{
-			// This node has been expanded with the highest survivability for its id
-			// No need to put it into the closed list
-			delete current;
-			continue;
-		}
+		// // Now check if the current node has been expanded
+		// if (m_expanded[current->getID()] == true)
+		// {
+		// 	// This node has been expanded with the highest survivability for its id
+		// 	// No need to put it into the closed list
+		// 	delete current;
+		// 	continue;
+		// }
 		// get the current node's labels and survivability
 		m_currentSurvival = current->getSurvival();
 		m_currentLabels = current->getLabels();
 
 		m_closed.push_back(current);
-		m_expanded[current->getID()] = true;
+		//m_expanded[current->getID()] = true;
 
 		if (current->getID() == m_goal)
 		{
@@ -90,40 +99,45 @@ void PmcrGreedySolver_t::greedy_search(ConnectedGraph_t &g)
 		// look at each neighbor of the current node
 		std::vector<int> neighbors = g.getNodeNeighbors(current->getID());
 		// randomly shuffle the neighbors
-		std::random_shuffle( neighbors.begin(), neighbors.end(), myrandom );
+		std::random_shuffle( neighbors.begin(), neighbors.end(), myrandom2 );
 		for (auto const &neighbor : neighbors)
 		{			
-			if (m_expanded[neighbor] == true) 
-			{ 
-				continue; 
-			}
+			// if (m_expanded[neighbor] == true) 
+			// { 
+			// 	continue; 
+			// }
 			// check neighbor's label and compute corresponding survivability
 			std::vector<int> neighborLabels = 
 				label_union(current->getLabels(), 
 					g.getEdgeLabels(current->getID(), neighbor));
 			double neighborSurvival = g.compute_survival_currentLabels(neighborLabels);
 
-			// check whether we need to prune this neighbor (based on survivability)
-			// If the neighbor has higher survivability, update the highest survivability
-			// record and put into open
-			// Otherwise, discard
-			if (neighborSurvival > m_highestSurvival[neighbor])
+			// check whether we need to prune this neighbor (based on label)
+			// Every time we look at a neighbor, check if the labels it carries
+			// is a super set of any of the set in the m_recordSet
+
+			// The first time visited
+			if (m_visited[neighbor] == false)
 			{
-				m_highestSurvival[neighbor] = neighborSurvival;
-				m_G[neighbor] = current->getG()+g.getEdgeCost(current->getID(), neighbor);
-				m_open.push(new PmcrNode_t(neighbor, m_G[neighbor], 
-									computeH(neighbor), neighborLabels, current, neighborSurvival));
+				m_G[neighbor] = current->getG() + g.getEdgeCost(current->getID(), neighbor);
+				m_open.push(new PmcrNode_t(neighbor, m_G[neighbor], computeH(neighbor), neighborLabels, 
+																		current, neighborSurvival));
+				m_recordSet[neighbor].push_back(neighborLabels);
+				m_visited[neighbor] = true;
 				continue;
 			}
-			if (neighborSurvival = m_highestSurvival[neighbor])
+			else // not the first time visited
 			{
-				if (current->getG()+g.getEdgeCost(current->getID(), neighbor) < m_G[neighbor])
+				if (!check_superset(neighbor, neighborLabels))
 				{
-					m_G[neighbor] = current->getG()+g.getEdgeCost(current->getID(), neighbor);
-					m_open.push(new PmcrNode_t(neighbor, m_G[neighbor], computeH(neighbor), neighborLabels, 
-																			current, neighborSurvival));
+					// You reach the same node again with a different label set (not a superset)
+					m_open.push(new PmcrNode_t(neighbor, 
+						current->getG() + g.getEdgeCost(current->getID(), neighbor), 
+							computeH(neighbor), neighborLabels,	current, neighborSurvival));
+					m_recordSet[neighbor].push_back(neighborLabels);					
 				}
 			}
+
 		}
 	}
 	// You are reaching here because the m_open is empty and you haven't reached the goal
@@ -132,8 +146,19 @@ void PmcrGreedySolver_t::greedy_search(ConnectedGraph_t &g)
 	printf("failed to find a solution in this problem!\n");
 }
 
+bool PmcrExactSolver_t::check_superset(int neighbor, std::vector<int> neighborLabels)
+{
+	bool isSuperset = false;
+	for (auto const s: m_recordSet[neighbor])
+	{
+		if ( check_subset(neighborLabels, s) ) { return true; }
+	}
 
-std::vector<int> PmcrGreedySolver_t::label_union(std::vector<int> s1, std::vector<int> s2)
+	return isSuperset;
+}
+
+
+std::vector<int> PmcrExactSolver_t::label_union(std::vector<int> s1, std::vector<int> s2)
 {
 	// sort the sets first before applying union operation
 	std::sort(s1.begin(), s1.end());
@@ -151,7 +176,7 @@ std::vector<int> PmcrGreedySolver_t::label_union(std::vector<int> s1, std::vecto
 }
 
 
-int PmcrGreedySolver_t::computeH(int indx)
+int PmcrExactSolver_t::computeH(int indx)
 {
 	int indx_row = indx / m_col;
 	int indx_col = indx % m_col;
@@ -165,7 +190,7 @@ int PmcrGreedySolver_t::computeH(int indx)
 	return h;
 }
 
-void PmcrGreedySolver_t::back_track_path()
+void PmcrExactSolver_t::back_track_path()
 {	
 	// start from the goal
 	PmcrNode_t *current = m_closed[m_closed.size()-1];
@@ -181,7 +206,7 @@ void PmcrGreedySolver_t::back_track_path()
 }
 
 
-void PmcrGreedySolver_t::print_path()
+void PmcrExactSolver_t::print_path()
 {
 	for (auto const &waypoint : m_path)
 	{
@@ -190,7 +215,7 @@ void PmcrGreedySolver_t::print_path()
 	std::cout << "\n";
 }
 
-void PmcrGreedySolver_t::print_closedList()
+void PmcrExactSolver_t::print_closedList()
 {
 	printf("Check whether there is something in the closed list\n");
 	for (auto &node : m_closed)
@@ -206,7 +231,7 @@ void PmcrGreedySolver_t::print_closedList()
 
 }
 
-void PmcrGreedySolver_t::write_solution(std::string file_dir, double t)
+void PmcrExactSolver_t::write_solution(std::string file_dir, double t)
 {
 
 	std::ofstream file_(file_dir);
@@ -238,5 +263,10 @@ void PmcrGreedySolver_t::write_solution(std::string file_dir, double t)
 		file_.close();
 	}
 
+}
 
+bool check_subset(std::vector<int> set, std::vector<int> subset)
+{
+	// This function check whether a input set of labels is a subset of the m_currentLabels
+	return ( std::includes(set.begin(), set.end(), subset.begin(), subset.end()) );	
 }

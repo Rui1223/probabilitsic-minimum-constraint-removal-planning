@@ -81,20 +81,12 @@ int main(int argc, char** argv)
 				pmcr_solver.greedy_search();
 				time_G += t.elapsed();
 				solution_G += pmcr_solver.getCurrentSurvival();
-				// std::cout << "----------start the growingTree search-------------\n";
-				// GrowingTreeSolver_t growingtree_solver(g, start, goal);
-				// t.reset();
-				// growingtree_solver.GrowingTreeSearch();
-				// time_Gr += t.elapsed();
-				// solution_Gr += (1 - growingtree_solver.getCurrentWeight());
 			}
 			// calculate the average time and survivability
 			time_G /= nExperiments;	
 			solution_G /= nExperiments;
 			time_F /= nExperiments;
-			solution_F /= nExperiments;
-			// time_Gr /= nExperiments;
-			// solution_Gr /= nExperiments;			
+			solution_F /= nExperiments;	
 			// write your results into the file
 			file_1 << lc << " " << time_G << " " << solution_G << " " 
 					<< time_F << " " << solution_F << "\n";

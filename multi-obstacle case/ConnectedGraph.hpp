@@ -35,12 +35,11 @@ class ConnectedGraph_t
 	int m_nobstacles;
 	int m_nTotallabels;
 
-	// specify neighbors (edges) and labels of the edge 
+	// specify neighbors (edges) and labels, and edge cost of the graph
 	std::vector<std::vector<int>> m_nodeNeighbors;
 	std::vector<std::vector<std::vector<int>>> m_edgeLabels;
+	std::vector<std::vector<int>> m_edgeCosts;
 
-	// the probability that a label is assigned to an edge
-	double m_probPerLabel;
 	// the density which meansures how densely the graph is labeled
 	double m_labelCoverage;
 	std::vector<std::vector<bool>> m_marked;
@@ -117,6 +116,7 @@ public:
 	std::vector<int> getNodeNeighbors(int id) { return m_nodeNeighbors[id]; }
 	std::vector<int> getEdgeLabels(int id1, int id2) 
 														{ return m_edgeLabels[id1][id2]; }
+	int getEdgeCost(int id1, int id2) { return m_edgeCosts[id1][id2]; }
 	std::map<int, std::pair<int, double>> getLabelWeights() { return m_labelWeights; }
 	std::pair<int, double> getLabelWeights(int label_idx) { return m_labelWeights[label_idx]; }
 
