@@ -35,9 +35,9 @@ int main(int argc, char** argv)
 	// nObstacles = 20,50,100,150,200,250,300
 	// nPoses = 100, 250, 500, 750, 1000, 1250, 1500
 	///////////////////////////////////////////////////////////////////////////////////
-	std::vector<int> nObstacles{20, 25, 30, 35, 40, 45, 50};
+	std::vector<int> nObstacles{20, 25, 30, 35, 40};
 	int nPosesPerObs = 5;
-	std::vector<int> nPoses{100, 125, 150, 175, 200, 225, 250};
+	std::vector<int> nPoses{100, 125, 150, 175, 200};
 
 	// write into a txt file
 	std::ofstream file_3(file_dir3);

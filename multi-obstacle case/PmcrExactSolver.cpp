@@ -127,26 +127,26 @@ void PmcrExactSolver_t::exact_search(ConnectedGraph_t &g)
 			{
 				if (!check_superset(neighbor, neighborLabels))
 				{
-					std::cout << "counter:" << counter1++ << "\n";
-					// print neighborLabels
-					std::cout << "<";
-					for (auto const &nl : neighborLabels)
-					{
-						std::cout << nl << ",";
-					}
-					std::cout << ">\n";
-					std::cout << "--------------\n";
-					// print m_record[neighbor]
-					for (auto const &labelset: m_recordSet[neighbor])
-					{
-						std::cout << "<";
-						for (auto const &l : labelset)
-						{
-							std::cout << l << " ";
-						}
-						std::cout << ">\n";
-					}
-					std::cout << "\n";			
+					// std::cout << "counter:" << counter1++ << "\n";
+					// // print neighborLabels
+					// std::cout << "<";
+					// for (auto const &nl : neighborLabels)
+					// {
+					// 	std::cout << nl << ",";
+					// }
+					// std::cout << ">\n";
+					// std::cout << "--------------\n";
+					// // print m_record[neighbor]
+					// for (auto const &labelset: m_recordSet[neighbor])
+					// {
+					// 	std::cout << "<";
+					// 	for (auto const &l : labelset)
+					// 	{
+					// 		std::cout << l << " ";
+					// 	}
+					// 	std::cout << ">\n";
+					// }
+					// std::cout << "\n";			
 					// You reach the same node again with a different label set (not a superset)
 					m_open.push(new PmcrNode_t(neighbor, 
 						current->getG() + g.getEdgeCost(current->getID(), neighbor), 
