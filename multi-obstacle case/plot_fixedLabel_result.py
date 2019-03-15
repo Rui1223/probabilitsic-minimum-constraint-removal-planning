@@ -35,7 +35,7 @@ if __name__ == '__main__':
 	plt.xlabel("#labels/poses")
 	plt.xlim((1, 23))
 	plt.ylabel("Computation time(s)")
-	# plt.ylim((0, 10))
+	#plt.ylim((0, 14))
 	plt.yscale('log')
 
 	##############################################################################	

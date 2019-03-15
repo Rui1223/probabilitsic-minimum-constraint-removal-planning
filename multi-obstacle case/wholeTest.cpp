@@ -4,7 +4,7 @@
 // #include "LabeledGraph.hpp"
 #include "ConnectedGraph.hpp"
 #include "PmcrGreedySolver.hpp"
-#include "FixedLabelSolver.hpp"
+#include "PmcrExactSolver.hpp"
 #include "Timer.hpp"
 
 #include <iostream>
@@ -35,9 +35,9 @@ int main(int argc, char** argv)
 	// nObstacles = 20,50,100,150,200,250,300
 	// nPoses = 100, 250, 500, 750, 1000, 1250, 1500
 	///////////////////////////////////////////////////////////////////////////////////
-	std::vector<int> nObstacles{20, 50, 100, 150, 200, 250, 300}
+	std::vector<int> nObstacles{20, 25, 30, 35, 40, 45, 50};
 	int nPosesPerObs = 5;
-	std::vector<int> nPoses{100, 250, 500, 750, 1000, 1250, 1500};
+	std::vector<int> nPoses{100, 125, 150, 175, 200, 225, 250};
 
 	// write into a txt file
 	std::ofstream file_3(file_dir3);
@@ -53,12 +53,12 @@ int main(int argc, char** argv)
 			double solution_E = 0.0;
 			// double time_Gr = 0.0;
 			// double solution_Gr = 0.0;
-			std::vector<int> nl_PerObs(nP/nPosesPerObs, nPosesPerObs);
+			std::vector<int> nP_PerObs(nP/nPosesPerObs, nPosesPerObs);
 			for (int i=0; i < nExperiments; i++)
 			{
 				std::cout << "***************" << nP << ":" << i << "**************\n\n";
 				// generate a graph
-				ConnectedGraph_t g(g_row, g_col, nPosesPerObs);
+				ConnectedGraph_t g(g_row, g_col, nP_PerObs);
 				//g.write_graph();//
 
 				std::cout << "********************************************* \n";

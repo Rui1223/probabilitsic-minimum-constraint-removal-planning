@@ -1,21 +1,26 @@
-#include <iostream>
-#include <fstream>
-#include <cstdlib> // for std::srand()
-#include <ctime>
-#include <string> // std::string, std::to_string
 #include <vector>
+#include <iostream>
+#include <cassert>
+#include <cstdio>
+#include <algorithm>
+#include <limits>
+#include <iomanip>
+#include <fstream>
+#include <string> // std::string, std::to_string
+#include <cstdlib> // std::rand, std::srand
+
+bool check_subset(std::vector<int> set, std::vector<int> subset)
+{
+	// This function check whether a input set of labels is a subset of the m_currentLabels
+	return ( std::includes(set.begin(), set.end(), subset.begin(), subset.end()) );	
+}
 
 int main()
 {
-	std::vector<int> a{1,2,3,4,5};
-	std::vector<int> b;
-	b = a * 2;
+	std::vector<int> a;
+	std::vector<int> b{1};
+	std::cout << check_subset(b, a) << std::endl;
 
-	for (auto const &e: b)
-	{
-		std::cout << e << " ";
-	}
-	std::cout << "\n";
 
 	return 0;
 }

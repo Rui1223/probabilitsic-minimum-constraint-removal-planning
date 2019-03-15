@@ -32,10 +32,6 @@ PmcrExactSolver_t::PmcrExactSolver_t(ConnectedGraph_t &g)
 	m_open.push(new PmcrNode_t(m_start, m_G[m_start], computeH(m_start), {}, nullptr, 
 		g.compute_survival_currentLabels({})));
 	m_path = std::vector<int>();
-	// need a list to record the highest survivability so far for each node
-	// m_highestSurvival = std::vector<double>(g.getnNodes(), -1.0);
-	// m_highestSurvival[m_start] = 1.0;
-
 	// m_expanded = std::vector<bool>(g.getnNodes(), false);
 
 	m_visited = std::vector<bool>(g.getnNodes(), false);
@@ -61,6 +57,7 @@ PmcrExactSolver_t::~PmcrExactSolver_t()
 
 void PmcrExactSolver_t::exact_search(ConnectedGraph_t &g)
 {
+	int counter1 = 0;
 
 	while(!m_open.empty())
 	{
@@ -130,11 +127,31 @@ void PmcrExactSolver_t::exact_search(ConnectedGraph_t &g)
 			{
 				if (!check_superset(neighbor, neighborLabels))
 				{
+					std::cout << "counter:" << counter1++ << "\n";
+					// print neighborLabels
+					std::cout << "<";
+					for (auto const &nl : neighborLabels)
+					{
+						std::cout << nl << ",";
+					}
+					std::cout << ">\n";
+					std::cout << "--------------\n";
+					// print m_record[neighbor]
+					for (auto const &labelset: m_recordSet[neighbor])
+					{
+						std::cout << "<";
+						for (auto const &l : labelset)
+						{
+							std::cout << l << " ";
+						}
+						std::cout << ">\n";
+					}
+					std::cout << "\n";			
 					// You reach the same node again with a different label set (not a superset)
 					m_open.push(new PmcrNode_t(neighbor, 
 						current->getG() + g.getEdgeCost(current->getID(), neighbor), 
 							computeH(neighbor), neighborLabels,	current, neighborSurvival));
-					m_recordSet[neighbor].push_back(neighborLabels);					
+					m_recordSet[neighbor].push_back(neighborLabels);
 				}
 			}
 

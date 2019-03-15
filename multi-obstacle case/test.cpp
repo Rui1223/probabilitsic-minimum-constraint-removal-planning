@@ -16,9 +16,9 @@
 int main(int argc, char** argv)
 {
 	int nExperiments = 1;
-	int row = 50;
-	int col = 50;
-	int nObstacles = 40;
+	int row = 100;
+	int col = 100;
+	int nObstacles = 50;
 	int nPosesPerObs = 5;
 	std::vector<int> nLabelsPerObs(nObstacles, nPosesPerObs);
 	// double density = 0.6;
@@ -53,6 +53,7 @@ int main(int argc, char** argv)
 		std::cout << "Greedy time: " << t1 << " seconds\n\n";
 		pmcr_greedy_solver.write_solution(file_dir2, t1);
 
+
 		std::cout << "**********************************************\n";
 		std::cout << "----------start the exact search-------------\n";
 		t.reset();
@@ -60,16 +61,7 @@ int main(int argc, char** argv)
 		pmcr_exact_solver.exact_search(g);
 		t1 = t.elapsed();
 		std::cout << "exact time: " << t1 << " seconds\n\n";
-		pmcr_exact_solver.write_solution(file_dir3, t1);
-
-		// std::cout << "**************************************************\n";
-		// std::cout << "----------start the fixedLabel search-------------\n";
-		// t.reset();
-		// FixedLabelSolver_t fixedlabel_solver(g);
-		// fixedlabel_solver.fixedLabel_search(g);
-		// t1 = t.elapsed();
-		// std::cout << "FixedLabel time: " << t1 << " seconds\n\n";
-		// fixedlabel_solver.write_solution(file_dir4, t1);
+		pmcr_exact_solver.write_solution(file_dir3, t1);			
 
 	}
 
