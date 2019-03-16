@@ -35,9 +35,9 @@ int main(int argc, char** argv)
 	// nObstacles = 20,50,100,150,200,250,300
 	// nPoses = 100, 250, 500, 750, 1000, 1250, 1500
 	///////////////////////////////////////////////////////////////////////////////////
-	std::vector<int> nObstacles{20, 25, 30, 35, 40};
+	std::vector<int> nObstacles{10, 15, 20, 25, 30};
 	int nPosesPerObs = 5;
-	std::vector<int> nPoses{100, 125, 150, 175, 200};
+	std::vector<int> nPoses{50, 75, 100, 125, 150};
 
 	// write into a txt file
 	std::ofstream file_3(file_dir3);
@@ -94,141 +94,6 @@ int main(int argc, char** argv)
 		file_3.close();		
 	}
 	//////////////////////////////////////////////////////////////////////////////////
-
-
-
-
-
-	// first do experiment on the computation time/survivability vs label coverage //
-	// gridSize = 50*50, g_nlabels = 15
-	// labelCoverage option: 40%, 50%, 60%
-	//////////////////////////////////////////////////////////////////////////////////
-	// std::vector<double> labelCoverage{40, 50, 60};
-
-	// // write into a txt file
-	// std::ofstream file_1(file_dir1);
-
-	// if (file_1.is_open())
-	// {
-	// 	// experiment on each labelCoverage
-	// 	for (auto const &lc : labelCoverage)
-	// 	{
-	// 		double time_G = 0.0;
-	// 		double solution_G = 0.0;
-	// 		double time_F = 0.0;
-	// 		double solution_F = 0.0;
-	// 		// double time_Gr = 0.0;
-	// 		// double solution_Gr = 0.0;
-	// 		for (int i=0; i < nExperiments; i++)
-	// 		{
-	// 			std::cout << "***************" << lc << ":" << i << "**************\n";
-	// 			// generate a graph
-	// 			ConnectedGraph_t g(g_row, g_col, g_nlabelsPerObs, lc/100.0);
-	// 			int start = random_generate_integer(0, g_row*g_col-1);
-	// 			int goal = random_generate_integer(0, g_row*g_col-1);
-	// 			while (start == goal)
-	// 			{
-	// 				start = random_generate_integer(0, g_row*g_col-1);
-	// 				goal = random_generate_integer(0, g_row*g_col-1);
-	// 			}
-	// 			//g.write_graph();//
-
-	// 			std::cout << "----------start the fixedLabel search-------------\n";
-	// 			FixedLabelSolver_t fixedlabel_solver(g, start, goal);
-	// 			t.reset();
-	// 			fixedlabel_solver.fixedLabel_search();
-	// 			time_F += t.elapsed();
-	// 			solution_F += fixedlabel_solver.getCurrentSurvival();
-	// 			std::cout << "----------start the greedy search-------------\n";
-	// 			PmcrGreedySolver_t pmcr_solver(g, start, goal);
-	// 			t.reset();
-	// 			pmcr_solver.greedy_search();
-	// 			time_G += t.elapsed();
-	// 			solution_G += pmcr_solver.getCurrentSurvival();
-	// 		}
-	// 		// calculate the average time and survivability
-	// 		time_G /= nExperiments;	
-	// 		solution_G /= nExperiments;
-	// 		time_F /= nExperiments;
-	// 		solution_F /= nExperiments;	
-	// 		// write your results into the file
-	// 		file_1 << lc << " " << time_G << " " << solution_G << " " 
-	// 				<< time_F << " " << solution_F << "\n";
-	// 	}
-	// 	file_1 << "\n";
-	// 	file_1.close();		
-	// }
-	// //////////////////////////////////////////////////////////////////////////////////
-
-
-	// // second do experiment on the computation time/survivability vs grid size //
-	// // g_nlabels = 15, g_probPerLabel = 0.5
-	// // gridSize option: 35, 50, 100
-	// ///////////////////////////////////////////////////////////////////////////////////
-	// std::vector<int> gridSize{35, 50, 100};
-
-	// // write into a txt file
-	// std::ofstream file_2(file_dir2);
-
-	// if (file_2.is_open())
-	// {
-	// 	// experiment on each gridSize
-	// 	for (auto const &gs : gridSize)
-	// 	{
-	// 		double time_G = 0.0;
-	// 		double solution_G = 0.0;
-	// 		double time_F = 0.0;
-	// 		double solution_F = 0.0;
-	// 		// double time_Gr = 0.0;
-	// 		// double solution_Gr = 0.0;
-	// 		for (int i=0; i < nExperiments; i++)
-	// 		{
-	// 			std::cout << "***************" << gs << ":" << i << "**************\n";
-	// 			// generate a graph
-	// 			ConnectedGraph_t g(gs, gs, g_nlabelsPerObs, g_probPerLabel);
-	// 			int start = random_generate_integer(0, gs*gs-1);
-	// 			int goal = random_generate_integer(0, gs*gs-1);
-	// 			while (start == goal)
-	// 			{
-	// 				start = random_generate_integer(0, gs*gs-1);
-	// 				goal = random_generate_integer(0, gs*gs-1);
-	// 			}
-	// 			//g.write_graph();//
-
-	// 			std::cout << "----------start the fixedLabel search-------------\n";
-	// 			FixedLabelSolver_t fixedlabel_solver(g, start, goal);
-	// 			t.reset();
-	// 			fixedlabel_solver.fixedLabel_search();
-	// 			time_F += t.elapsed();
-	// 			solution_F += fixedlabel_solver.getCurrentSurvival();
-	// 			std::cout << "----------start the greedy search-------------\n";
-	// 			PmcrGreedySolver_t pmcr_solver(g, start, goal);
-	// 			t.reset();
-	// 			pmcr_solver.greedy_search();
-	// 			time_G += t.elapsed();
-	// 			solution_G += pmcr_solver.getCurrentSurvival();
-	// 			// std::cout << "----------start the growingTree search-------------\n";
-	// 			// GrowingTreeSolver_t growingtree_solver(g, start, goal);
-	// 			// t.reset();
-	// 			// growingtree_solver.GrowingTreeSearch();
-	// 			// time_Gr += t.elapsed();
-	// 			// solution_Gr += (1 - growingtree_solver.getCurrentWeight());
-	// 		}
-	// 		// calculate the average time and survivability
-	// 		time_G /= nExperiments;	
-	// 		solution_G /= nExperiments;
-	// 		time_F /= nExperiments;
-	// 		solution_F /= nExperiments;
-	// 		// time_Gr /= nExperiments;
-	// 		// solution_Gr /= nExperiments;
-	// 		// write your results into the file
-	// 		file_2 << gs << " " << time_G << " " << solution_G << " " 
-	// 				<< time_F << " " << solution_F << "\n";		
-	// 	}
-	// 	file_2 << "\n";
-	// 	file_2.close();		
-	// }
-	// //////////////////////////////////////////////////////////////////////////////////
 
 	return 0;
 

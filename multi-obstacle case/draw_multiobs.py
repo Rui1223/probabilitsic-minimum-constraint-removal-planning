@@ -1,4 +1,4 @@
-## This python script will visualize the graph stored in a text file with certain formaat of data
+## This python script will visualize the graph stored in a text file with certain format of data
 
 from __future__ import division
 import sys
@@ -45,8 +45,7 @@ if __name__ == "__main__":
 
 			# color_values = [random.uniform(0, 1) for i in xrange(500)]
 			color_values = np.linspace(0, 1, nobstacles)
-			random.shuffle(color_values);
-
+			#random.shuffle(color_values);
 			color_pool = [scalarMap.to_rgba(color_values[ii]) for ii in xrange(nobstacles)]
 
 			# canvas setting
@@ -60,6 +59,10 @@ if __name__ == "__main__":
 		## The third line specifies the weight for each label and the obstacle it belongs to
 		elif (n_line == 2):
 			label_weights = line ## it's a list
+			# label_weight_dic = dict()
+			# for label_weight in label_weights:
+			# 	label_weight = label_weight.split(':')
+			# 	label_weight_dic[int(label_weight[0])] = int(label_weight[1])
 		elif (n_line == 3):
 			## make this label_belongings a dict
 			label_belongings = dict()
@@ -121,9 +124,10 @@ if __name__ == "__main__":
 			ax.plot([cal_co(v1,col,row)[0], cal_co(v2,col,row)[0]], 
 					[cal_co(v1,col,row)[1], cal_co(v2,col,row)[1]], zorder=1, color='lightgray', linestyle='dashed')
 
-	# plot label weights
+	# # plot label weights
 	# for ii in xrange(len(label_weights)):
-	# 	ax.text(col+3-3, row+3-0.5-0.4*ii, label_weights[ii], fontsize=10)
+	# 	ii_str = str(ii)
+	# 	ax.text(col+3-3, row+3-0.5-0.4*ii, label_weights[ii], color=color_pool[label_belongings[ii_str]], fontsize=10)
 
 	# plot density of graph
 	# ax.text(col+3-3, row+3-0.5-0.4*len(label_weights), "density:", fontsize=10)

@@ -115,7 +115,7 @@ void PmcrGreedySolver_t::greedy_search(ConnectedGraph_t &g)
 									computeH(neighbor), neighborLabels, current, neighborSurvival));
 				continue;
 			}
-			if (neighborSurvival = m_highestSurvival[neighbor])
+			if (neighborSurvival == m_highestSurvival[neighbor])
 			{
 				if (current->getG()+g.getEdgeCost(current->getID(), neighbor) < m_G[neighbor])
 				{

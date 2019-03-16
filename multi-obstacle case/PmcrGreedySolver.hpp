@@ -52,10 +52,11 @@ public:
 	PmcrGreedySolver_t(ConnectedGraph_t &g);
 	~PmcrGreedySolver_t();
 	void greedy_search(ConnectedGraph_t &g);
+
 	void back_track_path();
 	void print_path();
 	std::vector<int> label_union(std::vector<int> s1, std::vector<int> s2);
-	// The functopm to compute the h value of a node(indx) for a given goal
+	// The function to compute the h value of a node(indx) for a given goal
 	int computeH(int indx);
 	//bool check_prune(int neighborID, double weights);
 	void write_solution(std::string file_dir, double t);

@@ -1,4 +1,4 @@
-/*The cpp file do several experiements on greedy ahnd fixedLabel search*/
+/*The cpp file do several experiements on greedy and exact search*/
 /*save graphs and several corresponding solutions, respectively*/
 
 #include "ConnectedGraph.hpp"
@@ -16,9 +16,9 @@
 int main(int argc, char** argv)
 {
 	int nExperiments = 1;
-	int row = 100;
-	int col = 100;
-	int nObstacles = 50;
+	int row = 30;
+	int col = 30;
+	int nObstacles = 20;
 	int nPosesPerObs = 5;
 	std::vector<int> nLabelsPerObs(nObstacles, nPosesPerObs);
 	// double density = 0.6;

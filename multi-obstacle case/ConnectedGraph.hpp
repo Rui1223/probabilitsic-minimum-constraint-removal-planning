@@ -41,7 +41,6 @@ class ConnectedGraph_t
 	std::vector<std::vector<int>> m_edgeCosts;
 
 	// the density which meansures how densely the graph is labeled
-	double m_labelCoverage;
 	std::vector<std::vector<bool>> m_marked;
 	int m_nmarked;
 	int m_nExpansion;
