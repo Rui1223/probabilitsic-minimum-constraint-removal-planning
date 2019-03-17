@@ -43,6 +43,7 @@ class PmcrGreedySolver_t
 	int m_optimalPose;
 	double m_optimalSurvival;
 	std::vector<int> m_optimalLabels;
+	std::vector<int> m_optimalPath;
 
 	std::vector<int> m_currentLabels;
 	double m_currentSurvival;
@@ -78,6 +79,8 @@ public:
 	//getters
 	double getCurrentSurvival() { return m_currentSurvival; }
 	double getHighestSuccess() { return m_highestSuccess; }
+	double getOptimalSurvival() { return m_optimalSurvival; }
+	std::vector<int> getOptimalPath() { return m_optimalPath; }
 };
 
 #endif

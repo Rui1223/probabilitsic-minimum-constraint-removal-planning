@@ -262,6 +262,8 @@ void PmcrGreedySolver_t::back_track_path()
 	std::cout << "\n";
 
 	m_paths.push_back(path_candidate);
+
+	m_optimalPath = m_paths[m_paths.size()-1];
 }
 
 
@@ -296,9 +298,11 @@ void PmcrGreedySolver_t::write_solution(std::string file_dir, double t)
 	std::ofstream file_(file_dir);
 	if (file_.is_open())
 	{
+		// first line
 		file_ << t << " " << m_highestSuccess << " " << m_optimalSurvival
 				<< " " << m_optimalGoal << " " << m_optimalPose << " " << m_paths.size() << "\n";
 
+		// second line
 		if (!m_optimalLabels.empty())
 		{
 			int pp = 0;
@@ -311,14 +315,10 @@ void PmcrGreedySolver_t::write_solution(std::string file_dir, double t)
 		}
 		file_ << "\n";
 
-		// write in all paths
-		for (auto const &p : m_paths)
+		// 3rd line: only write in the optimal path
+		for (auto const &waypoint : m_optimalPath)
 		{
-			for (auto const &waypoint : p)
-			{
-				file_ << waypoint << " ";
-			}
-			file_ << "\n";
+			file_ << waypoint << " ";
 		}
 		file_ << "\n";
 		file_.close();

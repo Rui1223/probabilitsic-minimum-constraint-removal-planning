@@ -57,6 +57,11 @@ class ConnectedGraph_t
 	int m_targetObs;
 	std::vector<int> m_targetPoses;
 
+	// variables uses for execution & replanning
+	std::vector<bool> m_truePoses;
+	int m_trueTarget;
+	int m_trueGoal;
+
 
 
 public:
@@ -92,18 +97,6 @@ public:
 	// function to compute the survivability for a single set of labels
 	double compute_survival_currentLabels(std::vector<int> labels);
 
-	// // function to compute survivability for a power set
-	// std::vector<double> compute_survival();
-
-	// // function to compute a powerset given a set of labels
-	// void cal_powerSet();
-
-	// function to calculate labelMap
-	//void cal_labelMap();
-
-	// function to print labelMap for test purpose so far
-	//void print_labelMap();
-
 	// function to write the graph into a txt file
 	void write_graph(std::string file_dir);
 
@@ -113,6 +106,10 @@ public:
 
 	// function to pick a start
 	void pick_start();
+
+	// groundTruth generation
+	void generate_groundTruth(std::string groundTruth_dir);
+	void write_groundTruth(std::string groundTruth_dir);
 
 	// lots of getters
 	int getnCol() { return m_col; }
@@ -129,11 +126,6 @@ public:
 	std::vector<int> getmGoalSet() { return m_goalSet; }
 	int getmTargetObs() { return m_targetObs; }
 	std::vector<int> getmTargetPoses() { return m_targetPoses; }
-
-	// std::vector<std::pair<std::vector<int>, double>> getLabelMap()
-	// {
-	// 	return m_labelMap;
-	// }
 
 
 	// Destructor

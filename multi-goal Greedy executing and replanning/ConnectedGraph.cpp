@@ -18,6 +18,7 @@ in our problem formulation*/
 #include <queue>
 #include <deque>
 #include <random>
+#include <cerrno>
 
 #include "ConnectedGraph.hpp"
 #include "Timer.hpp"
@@ -408,12 +409,14 @@ void ConnectedGraph_t::write_graph(std::string file_dir)
 	// to write in a text file (ostream)
 	// we need to loop through the neighbor list, and then access to corresponding labels
 	std::ofstream file_(file_dir);
+	//std::cout << file_dir << "\n";
 	if (file_.is_open())
 	{
-		// Write in the 1st line the size and the density of the grid graph
+		//std::cout << "start writing the graph\n";
+		// Write in the 1st line the size, the density of the grid graph & the number of obstacles
 		file_ << m_row << " " << m_col << " " << double(m_nmarked) / m_nEdges
 								 				<< " " << m_nobstacles <<"\n";
-		// Write in the 2nd line label information
+		// Write in the 2nd line label weight information
 		for (int tt=0; tt < m_nTotallabels; tt++)
 		{
 			file_ << tt << ":" << m_labelWeights[tt].second << " ";
@@ -469,8 +472,12 @@ void ConnectedGraph_t::write_graph(std::string file_dir)
 			}
 		}
 		file_.close();
-	} 
-}
+	}
+// 	else
+// 	{
+// 		std::cerr << "Error:" << strerror(errno) << std::endl;
+// 	}
+// }
 
 
 std::vector<double> ConnectedGraph_t::load_weights(int nlabels)
@@ -558,11 +565,112 @@ double ConnectedGraph_t::compute_survival_currentLabels(std::vector<int> current
 	}
 
 	return currentSurvival;
+}
+
+void ConnectedGraph_t::generate_groundTruth(std::string groundTruth_dir)
+{
+	// Every time you try to generate a new ground truth, re-initialize the things have been 
+	// changed since last ground truth
+	m_truePoses = std::vector<bool>(m_nTotallabels, false);
+	double r;
+	int currentPose;
+	// For each obstacle, generate a true instance based on their distributions
+	for (int obs=0; obs < m_nobstacles; obs++)
+	{
+		std::vector<double> sampleProbSpace;
+		double sum_weight = 0;
+		for (int poseID=0; poseID < m_nlabelsPerObs[0]; poseID++)
+		{
+			currentPose = obs*m_nlabelsPerObs[0]+poseID;
+			sum_weight += m_labelWeights[currentPose].second;
+			sampleProbSpace.push_back(sum_weight);
+		}
+		// Now you have already built a sampleProbSpace
+		// Let's sample a number between 0-1 to determine which pose is the true pose
+		r = (double) rand() / (RAND_MAX);
+		for (int ii=0; ii < sampleProbSpace.size(); ii++)
+		{
+			if (r <= sampleProbSpace[ii]) 
+			{ 
+				m_truePoses[obs*m_nlabelsPerObs[0]+ii] = true;
+				break;
+			}
+		}
+	}
+	// At this point, you have already set the true pose for each obstacle
+	// Now we can also figure out what is the true target among the m_targetPoses
+	// and the true goal in the m_goalSet
+	for (int ii=0; ii < m_targetPoses.size(); ii++)
+	{
+		if (m_truePoses[ii] == true)
+		{
+			m_trueTarget = m_targetPoses[ii];
+			m_trueGoal = m_goalSet[ii];
+		}
+	}
+
+	// Now let's write it into a ground truth txt inside ground truth idx folder
+	write_groundTruth(groundTruth_dir);
 
 }
 
+void ConnectedGraph_t::write_groundTruth(std::string groundTruth_dir)
+{
+	// write in a groundTruth idx dir
+	std::ofstream file_gt_(groundTruth_dir);
+	if (file_gt_.is_open())
+	{
+		// write in the 1st line the size of the graph and the number of obstacles
+		file_gt_ << m_row << " " << m_col << " " << m_nobstacles << "\n";
+		// write in the 2nd line the label belongings in terms of obstacles
+		for (int tt=0; tt < m_nTotallabels; tt++)
+		{
+			file_gt_ << tt << " " << m_labelWeights[tt].first << " ";
+		}
+		file_gt_ << "\n";
+		// write in the 3rd line (m_trueTarget, m_start, m_optimalGoal)
+		file_gt_ << m_trueTarget << " " << m_start << " " << m_trueGoal << "\n";
+		// write in the 4rd line (m_truePoses)
+		for (auto const &p : m_truePoses)
+		{
+			file_gt_ << p << " ";
+		}
+		file_gt_ << "\n";
+		// start to write in every edge information (edge & labels)
+		for (int currentNode = 0; currentNode < m_nNodes; currentNode++)
+		{
+			for (auto const &neighbor : m_nodeNeighbors[currentNode])
+			{
+				if (currentNode > neighbor)
+				{
+					continue;
+				}
+				// write in the currentNode ID and neighbor ID
+				file_gt_ << currentNode << " " << neighbor << " ";
+				// then write in the labels
+				if (!m_edgeLabels[currentNode][neighbor].empty())
+				{
+					int pp = 0;
+					while (pp < m_edgeLabels[currentNode][neighbor].size()-1)
+					{
+						file_gt_ << m_edgeLabels[currentNode][neighbor][pp] << ",";
+						pp++;
+					}
+					file_gt_ << m_edgeLabels[currentNode][neighbor][pp];
+				}
+				file_gt_ << "\n";
+
+			}
+		}
+		file_gt_.close();
+	}
+}
+
+
 
 ConnectedGraph_t::~ConnectedGraph_t() {}
+
+
 
 int random_generate_integer(int min, int max)
 {
@@ -577,3 +685,4 @@ void operator/=(std::vector<double> &v, double d)
 		e /= d;
 	}
 }
+

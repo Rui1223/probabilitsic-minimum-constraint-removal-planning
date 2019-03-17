@@ -20,17 +20,16 @@ if __name__ == "__main__":
 	# color_pool = ['green', 'blue', 'purple', 'orange', 'pink', 'olive', 'brown', 
 	# 																'yellow', 'black']
 
-	n = sys.argv[2]
-
-	## write in my text file
-	f = open("./" + sys.argv[1] + "/graph" + str(n) + ".txt", "r")
+	## read in my text file
+	f = open("./graph problem.txt", "r")
 	# start to count the line
 	n_line = 0
 	for line in f:
 		line = line.split()
-		n_line +=1
+		n_line += 1
 
-		## The first line specifies the size & density of the graph
+		## The first line specifies the size, density of the graph
+		## and the number of obstacles
 		if (n_line == 1):
 			row = int(line[0])
 			col = int(line[1])
@@ -54,7 +53,7 @@ if __name__ == "__main__":
 			ax.set_ylim(-2, row+3)
 			plt.gca().set_aspect('equal', adjustable='box')
 
-		## The third line specifies the weight for each label and the obstacle it belongs to
+		## The second line specifies the weight for each label 
 		elif (n_line == 2):
 			label_weights = line ## it's a list
 			# label_weight_dic = dict()
@@ -62,6 +61,8 @@ if __name__ == "__main__":
 			# 	label_weight = label_weight.split(':')
 			# 	label_weight_dic[int(label_weight[0])] = int(label_weight[1])
 			# IPython.embed()
+
+		## the 3rd line specifies the obstacle each label belongs to
 		elif (n_line == 3):
 			## make this label_belongings a dict
 			label_belongings = dict()
@@ -142,7 +143,7 @@ if __name__ == "__main__":
 
 	# ##Now plot the solution for Greedy Algorithm
 	# ##################################################################
-	f_greedy = open("./" + sys.argv[1] + "/GreedySearch_solution" + str(n) + ".txt", "r")
+	f_greedy = open("./GreedySearch_solution.txt", "r")
 	n_line = 0;
 	for line in f_greedy:
 		line = line.split()
@@ -162,110 +163,72 @@ if __name__ == "__main__":
 			else:
 				labels_optimum = line[0]
 		else:
-			# start plotting the paths
-			if (nPaths != 1):
-				# we are plotting suboptimal path
-				path = map(int, line)
-				if (path):
-					counter = 0
-					while (counter != (len(path)-1)):
-						v1 = path[counter]
-						v2 = path[counter+1]
-						ax.plot(cal_co(v1,col,row)[0], cal_co(v1,col,row)[1], "co", zorder=3)
-						ax.plot([cal_co(v1,col,row)[0], cal_co(v2,col,row)[0]], 
-								[cal_co(v1,col,row)[1], cal_co(v2,col,row)[1]], "c--", zorder=3)
-						counter += 1
-					ax.plot(cal_co(v2,col,row)[0], cal_co(v2,col,row)[1], "co", zorder=3)
-			else:
-				# we are plotting optimal path
-				path = map(int, line)
-				if (path):
-					counter = 0
-					while (counter != (len(path)-1)):
-						v1 = path[counter]
-						v2 = path[counter+1]
-						ax.plot(cal_co(v1,col,row)[0], cal_co(v1,col,row)[1], "c*", zorder=4)
-						ax.plot([cal_co(v1,col,row)[0], cal_co(v2,col,row)[0]], 
-								[cal_co(v1,col,row)[1], cal_co(v2,col,row)[1]], "c--", zorder=4)
-						counter += 1
-					ax.plot(cal_co(v2,col,row)[0], cal_co(v2,col,row)[1], "c*", zorder=4)
+			# we are plotting optimal path
+			path = map(int, line)
+			if (path):
+				counter = 0
+				while (counter != (len(path)-1)):
+					v1 = path[counter]
+					v2 = path[counter+1]
+					ax.plot(cal_co(v1,col,row)[0], cal_co(v1,col,row)[1], "c*", zorder=4)
+					ax.plot([cal_co(v1,col,row)[0], cal_co(v2,col,row)[0]], 
+							[cal_co(v1,col,row)[1], cal_co(v2,col,row)[1]], "c--", zorder=4)
+					counter += 1
+				ax.plot(cal_co(v2,col,row)[0], cal_co(v2,col,row)[1], "c*", zorder=4)
 
-					# plot labels
-					ax.text(col+3-3, -2+4.0, "G Time:"+solution_time, color="c", fontsize=10)
-					ax.text(col+3-3, -2+3.5, "G OptPose:"+pose_optimum, color="c", fontsize=10)
-					ax.text(col+3-3, -2+3.0, "G Success:"+success_optimum, color="c", fontsize=10)
-					ax.text(col+3-3, -2+2.5, "G Survival:"+survival_optimum, color="c", fontsize=10)
-					ax.text(col+3-3, -2+2.0, "G Labels:"+labels_optimum, color="c", fontsize=10)
+				# plot labels
+				ax.text(col+3-3, -2+4.0, "G Time:"+solution_time, color="c", fontsize=10)
+				ax.text(col+3-3, -2+3.5, "G OptPose:"+pose_optimum, color="c", fontsize=10)
+				ax.text(col+3-3, -2+3.0, "G Success:"+success_optimum, color="c", fontsize=10)
+				ax.text(col+3-3, -2+2.5, "G Survival:"+survival_optimum, color="c", fontsize=10)
+				ax.text(col+3-3, -2+2.0, "G Labels:"+labels_optimum, color="c", fontsize=10)
 
-					## highlight the goal
-					ax.text(cal_co(goal_optimum,col,row)[0]-0.2, cal_co(goal_optimum,col,row)[1]+0.05, 
-							"goal", color="fuchsia", fontweight='bold', fontsize=8)
+				## highlight the goal
+				ax.text(cal_co(goal_optimum,col,row)[0]-0.2, cal_co(goal_optimum,col,row)[1]+0.05, 
+						"goal", color="fuchsia", fontweight='bold', fontsize=8)
+############################################################################################################
 
-			nPaths -= 1;
+
+			# # start plotting the paths
+			# if (nPaths != 1):
+			# 	# we are plotting suboptimal path
+			# 	path = map(int, line)
+			# 	if (path):
+			# 		counter = 0
+			# 		while (counter != (len(path)-1)):
+			# 			v1 = path[counter]
+			# 			v2 = path[counter+1]
+			# 			ax.plot(cal_co(v1,col,row)[0], cal_co(v1,col,row)[1], "co", zorder=3)
+			# 			ax.plot([cal_co(v1,col,row)[0], cal_co(v2,col,row)[0]], 
+			# 					[cal_co(v1,col,row)[1], cal_co(v2,col,row)[1]], "c--", zorder=3)
+			# 			counter += 1
+			# 		ax.plot(cal_co(v2,col,row)[0], cal_co(v2,col,row)[1], "co", zorder=3)
+			# else:
+			# 	# we are plotting optimal path
+			# 	path = map(int, line)
+			# 	if (path):
+			# 		counter = 0
+			# 		while (counter != (len(path)-1)):
+			# 			v1 = path[counter]
+			# 			v2 = path[counter+1]
+			# 			ax.plot(cal_co(v1,col,row)[0], cal_co(v1,col,row)[1], "c*", zorder=4)
+			# 			ax.plot([cal_co(v1,col,row)[0], cal_co(v2,col,row)[0]], 
+			# 					[cal_co(v1,col,row)[1], cal_co(v2,col,row)[1]], "c--", zorder=4)
+			# 			counter += 1
+			# 		ax.plot(cal_co(v2,col,row)[0], cal_co(v2,col,row)[1], "c*", zorder=4)
+
+			# 		# plot labels
+			# 		ax.text(col+3-3, -2+4.0, "G Time:"+solution_time, color="c", fontsize=10)
+			# 		ax.text(col+3-3, -2+3.5, "G OptPose:"+pose_optimum, color="c", fontsize=10)
+			# 		ax.text(col+3-3, -2+3.0, "G Success:"+success_optimum, color="c", fontsize=10)
+			# 		ax.text(col+3-3, -2+2.5, "G Survival:"+survival_optimum, color="c", fontsize=10)
+			# 		ax.text(col+3-3, -2+2.0, "G Labels:"+labels_optimum, color="c", fontsize=10)
+
+			# 		## highlight the goal
+			# 		ax.text(cal_co(goal_optimum,col,row)[0]-0.2, cal_co(goal_optimum,col,row)[1]+0.05, 
+			# 				"goal", color="fuchsia", fontweight='bold', fontsize=8)
+
+			# nPaths -= 1;
 
 
 	plt.show()
-
-	
-	# ##Now plot the solution for FixedLabel Algorithm
-	# ##################################################################
-	# f_fixedLabel = open("./" + sys.argv[1] + "/FixedLabel_solution" + str(n) + ".txt", "r")
-	# n_line = 0;
-	# for line in f_fixedLabel:
-	# 	line = line.split()
-	# 	n_line += 1
-	# 	if (n_line == 1):
-	# 		solution_time = line[0]
-	# 		success_optimum = line[1]
-	# 		survival_optimum = line[2]
-	# 		goal_optimum = line[3]
-	# 		goal_optimum = int(goal_optimum)
-	# 		pose_optimum = line[4]
-	# 		nPaths = int(line[5])
-	# 	# line 2 stores the labels
-	# 	elif (n_line == 2):
-	# 		if len(line) == 0:
-	# 			labels_optimum = " "
-	# 		else:
-	# 			labels_optimum = line[0]
-	# 	else:
-	# 		# start plotting the paths
-	# 		if (nPaths != 1):
-	# 			# we are plotting suboptimal path
-	# 			path = map(int, line)
-	# 			if (path):
-	# 				counter = 0
-	# 				while (counter != (len(path)-1)):
-	# 					v1 = path[counter]
-	# 					v2 = path[counter+1]
-	# 					ax.plot(cal_co(v1,col,row)[0], cal_co(v1,col,row)[1], "ro")
-	# 					ax.plot([cal_co(v1,col,row)[0], cal_co(v2,col,row)[0]], 
-	# 							[cal_co(v1,col,row)[1], cal_co(v2,col,row)[1]], "r--")
-	# 					counter += 1
-	# 				ax.plot(cal_co(v2,col,row)[0], cal_co(v2,col,row)[1], "ro")
-	# 		else:
-	# 			# we are plotting optimal path
-	# 			path = map(int, line)
-	# 			if (path):
-	# 				counter = 0
-	# 				while (counter != (len(path)-1)):
-	# 					v1 = path[counter]
-	# 					v2 = path[counter+1]
-	# 					ax.plot(cal_co(v1,col,row)[0], cal_co(v1,col,row)[1], "r*")
-	# 					ax.plot([cal_co(v1,col,row)[0], cal_co(v2,col,row)[0]], 
-	# 							[cal_co(v1,col,row)[1], cal_co(v2,col,row)[1]], "r--")
-	# 					counter += 1
-	# 				ax.plot(cal_co(v2,col,row)[0], cal_co(v2,col,row)[1], "r*")
-
-	# 				# plot labels
-	# 				ax.text(col+3-3, -2+6.5, "F Time:"+solution_time, color="r", fontsize=10)
-	# 				ax.text(col+3-3, -2+6.0, "F OptPose:"+pose_optimum, color="r", fontsize=10)
-	# 				ax.text(col+3-3, -2+5.5, "F Success:"+success_optimum, color="r", fontsize=10)
-	# 				ax.text(col+3-3, -2+5.0, "F Survival:"+survival_optimum, color="r", fontsize=10)
-	# 				ax.text(col+3-3, -2+4.5, "F Labels:"+labels_optimum, color="r", fontsize=10)
-
-	# 				## highlight the goal
-	# 				ax.text(cal_co(goal_optimum,col,row)[0]-0.2, cal_co(goal_optimum,col,row)[1]+0.05, 
-	# 						"goal", color="fuchsia", fontweight='bold', fontsize=8)
-
-	# 		nPaths -= 1;

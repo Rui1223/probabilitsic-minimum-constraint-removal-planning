@@ -9,12 +9,13 @@
 #include <string> // std::string, std::to_string
 #include <vector>
 
-int main(int argc, char** argv)
+int main()
 {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	std::srand(std::time(0));
 
 	// The file where you want to store your statistics
-	std::string StatisticFolder_dir("statistics_ExecutionReplanning") // name: statistics_ExecutionReplanning
+	std::string StatisticFolder_dir("statistics_ExecutionReplanning"); // name: statistics_ExecutionReplanning
 
 	// Default settings
 	// int d_gridSize = 50; (user later)
@@ -32,9 +33,9 @@ int main(int argc, char** argv)
 	// std::vector<double> x_distrVar{3.0};
 
 	// The measurement we care about in the experiments
-	double y_time;
-	int y_nReplan; 
-	int y_pathLength; // Manhattan distance (int)
+	double y_time_Greedy;
+	int y_nReplan_Greedy; 
+	int y_pathLength_Greedy; // Manhattan distance (int)
 
 	// Other parameters we may want to set before the experiments
 	// int nProblems = 100; // number of problems we would like to work on for each single statistics (use later)
@@ -44,7 +45,6 @@ int main(int argc, char** argv)
 
 	// Timer to calculate the time
 	Timer t_greedy;
-	std::srand(std::time(0));
 	// Timer t_Astar;
 	// Timer t_MaxSurvival;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -61,57 +61,86 @@ int main(int argc, char** argv)
 	// y_pathLength at that certain x_Obstacles
 
 	// specify the txt file to store the statistics for Experiment 1
-	std::string Exp1_stat_dir = "./" + StatisticFolder_dir + "Exp1_nObstacles/nObstacles_performance.txt";
-	std::string Exp1_problem_dir = "./" + StatisticFolder_dir + "Exp1_nObstacles/Problem";
+	std::string Exp1_stat_txt = "./" + StatisticFolder_dir + "/nObstacles/nObstacles_performance.txt";
 	// write into a txt file
-	std::ofstream file_Exp1(Exp1_stat_dir); // an ofstream object
-	// counter the problems we have worked
+	std::ofstream file_Exp1_stat(Exp1_stat_txt); // an ofstream object
+	// counter the problems we are working on
 	int current_problem_idx;
+	// counter the ground truth we are working on
+	int current_groundTruth_idx;
 
-	if (file_Exp1.is_open())
+	// experiment on each x_nObstacles
+	for (auto const &nObs : x_nObstacles)
 	{
-		// experiment on each x_nObstacles
-		for (auto const &nObs : x_Obstacles)
+		std::string Exp1_nObs_param_dir = "./" + StatisticFolder_dir + "/nObstacles/nObstacle=" + std::to_string(nObs);
+		y_time_Greedy = 0.0;
+		y_nReplan_Greedy = 0;
+		y_pathLength_Greedy = 0;
+		// y_time_Astar = 0.0;
+		// y_nReplan_Astar = 0;
+		// y_pathLength_Astar = 0;
+		// y_time_MaxSurvival = 0.0;
+		// y_nReplan_MaxSurvival = 0;
+		// y_pathLength_MaxSurvival = 0;
+
+		current_problem_idx = 1;
+		// specify the #poses each obstacle has. It is an input to construct a graph problem
+		std::vector<int> posesEachObs(nObs, d_nPosesPerObs);
+		// for each setting, do 100 problems
+		while(current_problem_idx <= nProblems)
 		{
-			y_time_Greedy = 0.0;
-			y_nReplan_Greedy = 0;
-			y_pathLength_Greedy = 0;
-			// y_time_Astar = 0.0;
-			// y_nReplan_Astar = 0;
-			// y_pathLength_Astar = 0;
-			// y_time_MaxSurvival = 0.0;
-			// y_nReplan_MaxSurvival = 0;
-			// y_pathLength_MaxSurvival = 0;
+			std::cout << "******problem: " << current_problem_idx << " for x_nObstacles: " << nObs << "******\n";
+			// create current graph problem folder & txt
+			std::string Exp1_problem_dir = Exp1_nObs_param_dir + "/problem " + std::to_string(current_problem_idx);
+			std::string Exp1_graph_problem_txt = Exp1_problem_dir + "/graph problem.txt";
+			std::string Exp1_graph_problem_Gsolution_txt = Exp1_problem_dir + "/GreedySerach_solution.txt";
+			// generate a graph problem
+			ConnectedGraph_t g(d_gridSize, d_gridSize, posesEachObs);
+			// save it for future visualization
+			g.write_graph(Exp1_graph_problem_txt);
 
-			current_problem_idx = 1;
-			// specify the #poses each obstacle has. It is an input to construct a graph problem
-			std::vector<int> posesEachObs(nObs, d_nPosesPerObs)
-			// for each setting, do 100 problems
+			// solve the problem using our algorithm (multi-goal Greedy)
+			// Will add other methods (A* planner, MaxSurvival planner) later for comparison
+			// The things we care is just the OPTIMAL PATH
+			std::cout << "*****************************************************\n";
+			std::cout << "--------------start the greedy search----------------\n";
+			t_greedy.reset();
+			PmcrGreedySolver_t gsolver(g);
+			gsolver.greedy_search(g);
+			// The things we care about from the algorithm is just the OPTIMAL PATH
+			// Before we execute the path, we want to make sure it is a high-survival path 
+			// (i.e. if the survivability is 0, then there is no meaning of executing that path)
+			// So let's say if the survivability is below 20% for this problem, discard this problem
+			if (gsolver.getOptimalSurvival() <= 0.2) { continue; }
+			// Otherwise, this is a good problem we should work on
+			// 1. record the time
+			// 2. get the optimal path we are going to execute
+			y_time_Greedy += t_greedy.elapsed();
+			std::vector<int> optimalPath_Greedy = gsolver.getOptimalPath();
+			gsolver.write_solution(Exp1_graph_problem_Gsolution_txt, y_time_Greedy);
+
+			// Now we will test whether the solution from our algorithm is effective or not
+			// which means we have to test it in a real scene, which is the ground truth.
+			// Since the scene carries uncertainty, we will have to generate a ground truth
+			// based on obstacles distribution (source of uncertainty). In order to make the scene
+			// following the true distribution, we will generate 100 ground truth per problem and
+			// calculate everything (time, #replan & path length) and take the average.
+			// Let's do it!
+			current_groundTruth_idx = 1;
+			while (current_groundTruth_idx <= nGroundTruth)
 			{
-				while(current_problem_idx != 100)
-				{
-					std::cout << "******problem: " << current_problem_idx << "for x_nObstacles: " << nObs << "******\n";
-					// generate a graph problem
-					ConnectedGraph_t g(d_gridSize, d_gridSize, posesEachObs);
-					// save it for future visualization
-					g.write_graph(Exp1_problem_dir+str(current_problem_idx)+"graphProblem");
+				std::cout << "******ground truth: " << current_groundTruth_idx << " for problem: " 
+																	<< current_problem_idx << "******\n";
+				// create current ground truth folder  & txt file
+				std::string Exp1_groundTruth_dir = Exp1_problem_dir + "/ground truth " + std::to_string(current_groundTruth_idx);													
+				std::string Exp1_groundTruth_txt = Exp1_groundTruth_dir + "/groundTruth.txt";
 
-					// solve the problem using our algorithm (multi-goal Greedy)
-					// Will add other methods (A* planner, MaxSurvival planner) later for comparison
-					// The things we care is just the OPTIMAL PATH
-					std::cout << "*****************************************************\n";
-					std::cout << "--------------start the greedy search----------------\n";
-					t_greedy.reset()
-					PmcrGreedySolver_t pmcr_greedy_solver(g);
-					pmcr_greedy_solver.greedy_search(g);
-					// The things we care about from the algorithm is just the OPTIMAL PATH
-					// Before we execute the path, we want to make sure it is a high-survival path 
-					// (i.e. if the survivability is 0, then there is no meaning of executing that path)
-					// So let's say if the survivability is below 20% for this problem
+				g.generate_groundTruth(Exp1_groundTruth_txt);
+				current_groundTruth_idx++;
 
-
-				}
 			}
+
+			current_problem_idx++;
 		}
 	}
 
