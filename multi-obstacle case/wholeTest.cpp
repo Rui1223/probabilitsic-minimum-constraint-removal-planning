@@ -18,11 +18,11 @@ int main(int argc, char** argv)
 {
 	Timer t;
 	std::srand(std::time(0));
-	int nExperiments = 20;
+	int nExperiments = 30;
 
 	// default setting
-	int g_row = 100;
-	int g_col = 100;
+	int g_row = 50;
+	int g_col = 50;
 
 	std::string folder_dir(argv[1]);
 	// std::string file_dir1 = "./" + folder_dir + "/labelCoverage_performance.txt";
@@ -35,9 +35,9 @@ int main(int argc, char** argv)
 	// nObstacles = 20,50,100,150,200,250,300
 	// nPoses = 100, 250, 500, 750, 1000, 1250, 1500
 	///////////////////////////////////////////////////////////////////////////////////
-	std::vector<int> nObstacles{10, 15, 20, 25, 30};
+	std::vector<int> nObstacles{23,24};
 	int nPosesPerObs = 5;
-	std::vector<int> nPoses{50, 75, 100, 125, 150};
+	std::vector<int> nPoses{115,120};
 
 	// write into a txt file
 	std::ofstream file_3(file_dir3);

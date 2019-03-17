@@ -3,7 +3,6 @@
 
 #include "ConnectedGraph.hpp"
 #include "PmcrGreedySolver.hpp"
-#include "FixedLabelSolver.hpp"
 #include "PmcrExactSolver.hpp"
 #include "Timer.hpp"
 
@@ -16,9 +15,9 @@
 int main(int argc, char** argv)
 {
 	int nExperiments = 1;
-	int row = 30;
-	int col = 30;
-	int nObstacles = 20;
+	int row = 50;
+	int col = 50;
+	int nObstacles = 30;
 	int nPosesPerObs = 5;
 	std::vector<int> nLabelsPerObs(nObstacles, nPosesPerObs);
 	// double density = 0.6;
