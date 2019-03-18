@@ -17,11 +17,8 @@ def cal_co(indx, col, row):
 	return [x, y]
 
 if __name__ == "__main__":
-
-	
-
 	## read in my text file
-	f = open("./groundTruth.txt", "r")
+	f = open("./statistics_ExecutionReplanning/nObstacles/nObstacles=3/problem 1/ground truth 1/groundTruth.txt", "r")
 	# start to count the line
 	n_line = 0;
 	for line in f:
@@ -32,7 +29,7 @@ if __name__ == "__main__":
 		if (n_line == 1):
 			row = int(line[0])
 			col = int(line[1])
-			nobstacles = int(line[3])
+			nobstacles = int(line[2])
 			# set colormap
 			gist_ncar = cm = plt.get_cmap('gist_ncar')
 			cNorm  = colors.Normalize(vmin=0, vmax=1)
@@ -70,9 +67,11 @@ if __name__ == "__main__":
 			ax.text(cal_co(trueGoal,col,row)[0]-0.2, cal_co(trueGoal,col,row)[1]+0.05, 
 				"goal", fontweight='bold', fontsize=8, zorder=3)
 
-		## 4th line contains all the true obstacles
-		truePoses = map(int, line)
-
+		## 4, 5th line contains all the true obstacles
+		elif (n_line == 4):
+			truePoses = map(int, line)
+		elif (n_line == 5):
+			trueObs = line
 		else:
 			## starting lines storing edges and labels
 			v1 = line[0];
@@ -92,12 +91,13 @@ if __name__ == "__main__":
 								label, fontsize=8, rotation=90, zorder=2)
 						else:
 							##only print the label which is a TRUE pose
-							if (truePoses[int(label)] == 1)
+							if (truePoses[int(label)] == 1):
 								ax.text(cal_co(v1,col,row)[0]-0.06, 
 									(cal_co(v1,col,row)[1]+cal_co(v2,col,row)[1])/2+incr, 
 									label, color=color_pool[label_belongings[label]],
 															fontsize=8, rotation=90, zorder=2)
 						incr += 0.2
+
 				else:
 					## horizontal line
 					incr = 0
@@ -108,7 +108,7 @@ if __name__ == "__main__":
 								cal_co(v1,col,row)[1]+0.01, label, fontsize=8, zorder=2)
 						else:
 							##only print the label which is a TRUE pose
-							if (truePoses[int(label)] == 1)
+							if (truePoses[int(label)] == 1):
 								ax.text(min(cal_co(v1,col,row)[0], cal_co(v2,col,row)[0]) 
 									+ 1.0/(len(labels)+1) + incr, 
 									cal_co(v1,col,row)[1]+0.01, label,
@@ -120,12 +120,15 @@ if __name__ == "__main__":
 					[cal_co(v1,col,row)[1], cal_co(v2,col,row)[1]], zorder=1, color='lightgray', linestyle='dashed')
 
 	# add text to indicate the true target
-	ax.text(col+3-3, row+3-0.5-0.4*0, "density:"+trueTarget, fontsize=10)
+	ax.text(col+3-3, row+3-0.5-0.4*0, "trueTarget:"+trueTarget, fontsize=10)
+	# add text to indicate the true obstacles
+	ax.text(col+3-3, row+3-0.5-0.4*1, "truePoses:", fontsize=10)
+	ax.text(col+3-3, row+3-0.5-0.4*2, trueObs, fontsize=10)
 
 	
 	## also plot the solution for Greedy Algorithm as an illustration
 	################################################################################
-	f_greedy = open("./../GreedySearch_solution.txt", "r")
+	f_greedy = open("./statistics_ExecutionReplanning/nObstacles/nObstacles=3/problem 1/GreedySearch_solution.txt", "r")
 	n_line = 0;
 	for line in f_greedy:
 		line = line.split()
@@ -164,5 +167,7 @@ if __name__ == "__main__":
 				ax.text(col+3-3, -2+3.5, "G OptPose:"+pose_optimum, color="c", fontsize=10)
 				ax.text(col+3-3, -2+3.0, "G Success:"+success_optimum, color="c", fontsize=10)
 				ax.text(col+3-3, -2+2.5, "G Survival:"+survival_optimum, color="c", fontsize=10)
-				ax.text(col+3-3, -2+2.0, "G Labels:"+labels_optimum, color="c", fontsize=10)	
+				ax.text(col+3-3, -2+2.0, "G Labels:"+labels_optimum, color="c", fontsize=10)
 
+
+	plt.show()

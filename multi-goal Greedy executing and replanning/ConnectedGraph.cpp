@@ -477,7 +477,7 @@ void ConnectedGraph_t::write_graph(std::string file_dir)
 // 	{
 // 		std::cerr << "Error:" << strerror(errno) << std::endl;
 // 	}
-// }
+}
 
 
 std::vector<double> ConnectedGraph_t::load_weights(int nlabels)
@@ -572,6 +572,7 @@ void ConnectedGraph_t::generate_groundTruth(std::string groundTruth_dir)
 	// Every time you try to generate a new ground truth, re-initialize the things have been 
 	// changed since last ground truth
 	m_truePoses = std::vector<bool>(m_nTotallabels, false);
+	m_trueObs = std::vector<int>();
 	double r;
 	int currentPose;
 	// For each obstacle, generate a true instance based on their distributions
@@ -593,6 +594,7 @@ void ConnectedGraph_t::generate_groundTruth(std::string groundTruth_dir)
 			if (r <= sampleProbSpace[ii]) 
 			{ 
 				m_truePoses[obs*m_nlabelsPerObs[0]+ii] = true;
+				m_trueObs.push_back(obs*m_nlabelsPerObs[0]+ii);
 				break;
 			}
 		}
@@ -602,7 +604,7 @@ void ConnectedGraph_t::generate_groundTruth(std::string groundTruth_dir)
 	// and the true goal in the m_goalSet
 	for (int ii=0; ii < m_targetPoses.size(); ii++)
 	{
-		if (m_truePoses[ii] == true)
+		if (m_truePoses[m_targetPoses[ii]] == true)
 		{
 			m_trueTarget = m_targetPoses[ii];
 			m_trueGoal = m_goalSet[ii];
@@ -630,8 +632,14 @@ void ConnectedGraph_t::write_groundTruth(std::string groundTruth_dir)
 		file_gt_ << "\n";
 		// write in the 3rd line (m_trueTarget, m_start, m_optimalGoal)
 		file_gt_ << m_trueTarget << " " << m_start << " " << m_trueGoal << "\n";
-		// write in the 4rd line (m_truePoses)
+		// write in the 4th line (m_truePoses)
 		for (auto const &p : m_truePoses)
+		{
+			file_gt_ << p << " ";
+		}
+		file_gt_ << "\n";
+		// write in the 5th line (m_trueObs)
+		for (auto const &p : m_trueObs)
 		{
 			file_gt_ << p << " ";
 		}

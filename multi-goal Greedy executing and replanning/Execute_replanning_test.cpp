@@ -9,14 +9,18 @@
 #include <string> // std::string, std::to_string
 #include <vector>
 
+#include <bits/stdc++.h>  
+#include <sys/stat.h> 
+#include <sys/types.h> 
+
 int main()
 {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	std::srand(std::time(0));
 
 	// The file where you want to store your statistics
-	std::string StatisticFolder_dir("statistics_ExecutionReplanning"); // name: statistics_ExecutionReplanning
-
+	std::string StatisticFolder_dir("./statistics_ExecutionReplanning"); // name: statistics_ExecutionReplanning
+	mkdir(StatisticFolder_dir.c_str(), 0777);
 	// Default settings
 	// int d_gridSize = 50; (user later)
 	int d_gridSize = 10;
@@ -41,7 +45,7 @@ int main()
 	// int nProblems = 100; // number of problems we would like to work on for each single statistics (use later)
 	int nProblems = 1;
 	// int nGroundTruth = 100; // number of group truth (true scene) we would like to generate for EACH problem (later)
-	int nGroundTruth = 2;
+	int nGroundTruth = 3;
 
 	// Timer to calculate the time
 	Timer t_greedy;
@@ -60,8 +64,11 @@ int main()
 	// For each x_nObstacles, we will do 100 problems and take the average y_time, y_nReplan &
 	// y_pathLength at that certain x_Obstacles
 
+	// create a folder under the master-folder statistics_ExecutionReplanning
+	std::string nObstacles_dir = StatisticFolder_dir + "/nObstacles";
+	mkdir(nObstacles_dir.c_str(), 0777);
 	// specify the txt file to store the statistics for Experiment 1
-	std::string Exp1_stat_txt = "./" + StatisticFolder_dir + "/nObstacles/nObstacles_performance.txt";
+	std::string Exp1_stat_txt = nObstacles_dir + "/nObstacles_performance.txt";
 	// write into a txt file
 	std::ofstream file_Exp1_stat(Exp1_stat_txt); // an ofstream object
 	// counter the problems we are working on
@@ -72,7 +79,8 @@ int main()
 	// experiment on each x_nObstacles
 	for (auto const &nObs : x_nObstacles)
 	{
-		std::string Exp1_nObs_param_dir = "./" + StatisticFolder_dir + "/nObstacles/nObstacle=" + std::to_string(nObs);
+		std::string Exp1_nObs_param_dir = nObstacles_dir + "/nObstacles=" + std::to_string(nObs);
+		mkdir(Exp1_nObs_param_dir.c_str(), 0777);
 		y_time_Greedy = 0.0;
 		y_nReplan_Greedy = 0;
 		y_pathLength_Greedy = 0;
@@ -92,8 +100,9 @@ int main()
 			std::cout << "******problem: " << current_problem_idx << " for x_nObstacles: " << nObs << "******\n";
 			// create current graph problem folder & txt
 			std::string Exp1_problem_dir = Exp1_nObs_param_dir + "/problem " + std::to_string(current_problem_idx);
+			mkdir(Exp1_problem_dir.c_str(), 0777);
 			std::string Exp1_graph_problem_txt = Exp1_problem_dir + "/graph problem.txt";
-			std::string Exp1_graph_problem_Gsolution_txt = Exp1_problem_dir + "/GreedySerach_solution.txt";
+			std::string Exp1_graph_problem_Gsolution_txt = Exp1_problem_dir + "/GreedySearch_solution.txt";
 			// generate a graph problem
 			ConnectedGraph_t g(d_gridSize, d_gridSize, posesEachObs);
 			// save it for future visualization
@@ -132,7 +141,8 @@ int main()
 				std::cout << "******ground truth: " << current_groundTruth_idx << " for problem: " 
 																	<< current_problem_idx << "******\n";
 				// create current ground truth folder  & txt file
-				std::string Exp1_groundTruth_dir = Exp1_problem_dir + "/ground truth " + std::to_string(current_groundTruth_idx);													
+				std::string Exp1_groundTruth_dir = Exp1_problem_dir + "/ground truth " + std::to_string(current_groundTruth_idx);
+				mkdir(Exp1_groundTruth_dir.c_str(), 0777);											
 				std::string Exp1_groundTruth_txt = Exp1_groundTruth_dir + "/groundTruth.txt";
 
 				g.generate_groundTruth(Exp1_groundTruth_txt);

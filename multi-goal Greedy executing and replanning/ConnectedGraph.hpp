@@ -59,6 +59,7 @@ class ConnectedGraph_t
 
 	// variables uses for execution & replanning
 	std::vector<bool> m_truePoses;
+	std::vector<int> m_trueObs;
 	int m_trueTarget;
 	int m_trueGoal;
 

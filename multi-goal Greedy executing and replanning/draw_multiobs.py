@@ -21,7 +21,7 @@ if __name__ == "__main__":
 	# 																'yellow', 'black']
 
 	## read in my text file
-	f = open("./graph problem.txt", "r")
+	f = open("./statistics_ExecutionReplanning/nObstacles/nObstacles=3/problem 1/graph problem.txt", "r")
 	# start to count the line
 	n_line = 0
 	for line in f:
@@ -143,7 +143,7 @@ if __name__ == "__main__":
 
 	# ##Now plot the solution for Greedy Algorithm
 	# ##################################################################
-	f_greedy = open("./GreedySearch_solution.txt", "r")
+	f_greedy = open("./statistics_ExecutionReplanning/nObstacles/nObstacles=3/problem 1/GreedySearch_solution.txt", "r")
 	n_line = 0;
 	for line in f_greedy:
 		line = line.split()
