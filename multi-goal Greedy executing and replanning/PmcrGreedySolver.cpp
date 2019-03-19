@@ -24,10 +24,11 @@ PmcrGreedySolver_t::PmcrGreedySolver_t(ConnectedGraph_t &g)
 	tt.reset();
 	// std::cout << "Time to load the graph for Gsolver: " << tt.elapsed() << " seconds\n\n";
 	m_start = g.getmStart();
-	m_goalSet = g.getmGoalSet();
+	m_goalSetD = g.getmGoalSet();
 	m_col = g.getnCol();
 	m_targetObs = g.getmTargetObs();
-	m_targetPoses = g.getmTargetPoses();
+	m_targetPosesD = g.getmTargetPoses();
+	m_labelWeights = g.getLabelWeights();
 
 	// essential elements for greedy search
 	m_G = std::vector<int>(g.getnNodes(), std::numeric_limits<int>::max());
@@ -59,6 +60,9 @@ PmcrGreedySolver_t::~PmcrGreedySolver_t()
 
 void PmcrGreedySolver_t::greedy_search(ConnectedGraph_t &g)
 {
+	m_goalSet = m_goalSetD;
+	m_targetPoses = m_targetPosesD;
+
 	int goal_idx;
 	std::vector<int>::iterator it;
 	
@@ -323,6 +327,54 @@ void PmcrGreedySolver_t::write_solution(std::string file_dir, double t)
 		file_ << "\n";
 		file_.close();
 	}
-
-
 }
+
+void PmcrGreedySolver_t::updateLabelWeights(int label, bool mode)
+{
+	int temp_obs;
+
+	if (mode == true)
+	{
+		// You know the pose is a true pose/label
+		m_labelWeights[label].second = 1.0;
+		// Then change the weights of other labels which share the same obstacle
+		// with this label to be 0.0
+		temp_obs = m_labelWeights[label].first;
+		for (int cl=temp_obs*m_nlabelsPerObs[0]; cl<(temp_obs+1)*m_nlabelsPerObs[0]; cl++)
+		{
+			if (cl != label) { m_labelWeights[cl].second = 0.0; }
+		}
+		// If the obstacle the label belongs to is a target obstacle
+		if (temp_obs == m_targetObs)
+		{
+			// prune m_goalSetD & m_targetPosesD
+			for (int dd=0; dd < m_targetPosesD.size(); dd++)
+			{
+				if (m_targetPosesD[dd] == label)
+				{
+					m_targetPosesD = std::vector<int>(1, label);
+					m_goalSetD = std::vector<int>(1, m_goalSetD[dd]);
+				}
+			}
+		}
+	}
+	else
+	{
+		// You know the pose is a fake pose/label
+		// The change the weight of the label to be 0.0 and meanwhile assign the origin weight
+		// of the this label to other labels sharing the same obstacle with this label according
+		// to their distribution
+		temp_obs = m_labelWeights[label].first;
+		for (int cl=temp_obs*m_nlabelsPerObs[0]; cl<(temp_obs+1)*m_nlabelsPerObs[0]; cl++)
+		{
+			if (cl != label)
+			{
+				m_labelWeights[cl].second = 
+					m_labelWeights[cl].second + 
+						m_labelWeights[label].second * m_labelWeights[cl].second / (1 - m_labelWeights[label].second);
+			}
+		}
+		// Don't forget to set the weight for current fake label to be 0.0;
+		m_labelWeights[label].second = 0.0;
+	}
+} 

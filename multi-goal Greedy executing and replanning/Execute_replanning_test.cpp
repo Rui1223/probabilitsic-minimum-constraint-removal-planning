@@ -1,6 +1,7 @@
 #include "ConnectedGraph.hpp"
 #include "PmcrGreedySolver.hpp"
 #include "Timer.hpp"
+#include "ExecuteReplanner.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -17,6 +18,7 @@ int main()
 {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	std::srand(std::time(0));
+	double temp_t;
 
 	// The file where you want to store your statistics
 	std::string StatisticFolder_dir("./statistics_ExecutionReplanning"); // name: statistics_ExecutionReplanning
@@ -45,7 +47,7 @@ int main()
 	// int nProblems = 100; // number of problems we would like to work on for each single statistics (use later)
 	int nProblems = 1;
 	// int nGroundTruth = 100; // number of group truth (true scene) we would like to generate for EACH problem (later)
-	int nGroundTruth = 3;
+	int nGroundTruth = 1;
 
 	// Timer to calculate the time
 	Timer t_greedy;
@@ -116,15 +118,22 @@ int main()
 			t_greedy.reset();
 			PmcrGreedySolver_t gsolver(g);
 			gsolver.greedy_search(g);
+			temp_t = t_greedy.elapsed();
+
 			// The things we care about from the algorithm is just the OPTIMAL PATH
 			// Before we execute the path, we want to make sure it is a high-survival path 
 			// (i.e. if the survivability is 0, then there is no meaning of executing that path)
-			// So let's say if the survivability is below 20% for this problem, discard this problem
-			if (gsolver.getOptimalSurvival() <= 0.2) { continue; }
+			// So let's say if the survivability is below 70% for this problem, discard this problem
+			if (gsolver.getOptimalSurvival() <= 0.7) 
+			{
+				std::cout << "The optimum survivability is: " << gsolver.getOptimalSurvival()
+					<< ". Not a quite feasible problem to solve. Start a new problem.\n";
+				continue; 
+			}
 			// Otherwise, this is a good problem we should work on
 			// 1. record the time
 			// 2. get the optimal path we are going to execute
-			y_time_Greedy += t_greedy.elapsed();
+			y_time_Greedy += temp_t;
 			std::vector<int> optimalPath_Greedy = gsolver.getOptimalPath();
 			gsolver.write_solution(Exp1_graph_problem_Gsolution_txt, y_time_Greedy);
 
@@ -141,12 +150,26 @@ int main()
 				std::cout << "******ground truth: " << current_groundTruth_idx << " for problem: " 
 																	<< current_problem_idx << "******\n";
 				// create current ground truth folder  & txt file
-				std::string Exp1_groundTruth_dir = Exp1_problem_dir + "/ground truth " + std::to_string(current_groundTruth_idx);
+				std::string Exp1_groundTruth_dir = Exp1_problem_dir + "/ground truth " 
+														+ std::to_string(current_groundTruth_idx);
 				mkdir(Exp1_groundTruth_dir.c_str(), 0777);											
 				std::string Exp1_groundTruth_txt = Exp1_groundTruth_dir + "/groundTruth.txt";
 
 				g.generate_groundTruth(Exp1_groundTruth_txt);
 				current_groundTruth_idx++;
+
+				t_greedy.reset();
+				// Execute the path on the ground truth you generate
+				ExecuteReplanner_t GreedyExecutor(g, optimalPath_Greedy);
+				std::vector<int> currentPath_Greedy = optimalPath_Greedy;
+				while (GreedyExecutor.execute(currentPath_Greedy))
+				{
+					PmcrGreedySolver_t gsolver(g);
+					gsolver.greedy_search(g);
+					currentPath_Greedy = gsolver.getOptimalPath();
+
+				}
+
 
 			}
 

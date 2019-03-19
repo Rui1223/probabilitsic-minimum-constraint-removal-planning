@@ -608,6 +608,7 @@ void ConnectedGraph_t::generate_groundTruth(std::string groundTruth_dir)
 		{
 			m_trueTarget = m_targetPoses[ii];
 			m_trueGoal = m_goalSet[ii];
+			break;
 		}
 	}
 
@@ -674,6 +675,42 @@ void ConnectedGraph_t::write_groundTruth(std::string groundTruth_dir)
 	}
 }
 
+void ConnectedGraph_t::updateLabelWeights(int label, bool mode)
+{
+	int temp_obs;
+
+	if (mode == true)
+	{
+		// You know the pose is a true pose/label
+		m_labelWeights[label].second = 1.0;
+		// Then change the weights of other labels which share the same obstacle
+		// with this label to be 0.0
+		temp_obs = m_labelWeights[label].first;
+		for (int cl=temp_obs*m_nlabelsPerObs[0]; cl<(temp_obs+1)*m_nlabelsPerObs[0]; cl++)
+		{
+			if (cl != label) { m_labelWeights[cl].second = 0.0; }
+		}
+	}
+	else
+	{
+		// You know the pose is a fake pose/label
+		// The change the weight of the label to be 0.0 and meanwhile assign the origin weight
+		// of the this label to other labels sharing the same obstacle with this label according
+		// to their distribution
+		temp_obs = m_labelWeights[label].first;
+		for (int cl=temp_obs*m_nlabelsPerObs[0]; cl<(temp_obs+1)*m_nlabelsPerObs[0]; cl++)
+		{
+			if (cl != label)
+			{
+				m_labelWeights[cl].second = 
+					m_labelWeights[cl].second + 
+						m_labelWeights[label].second * m_labelWeights[cl].second / (1 - m_labelWeights[label].second);
+			}
+		}
+		// Don't forget to set the weight for current fake label to be 0.0;
+		m_labelWeights[label].second = 0.0;
+	}
+} 
 
 
 ConnectedGraph_t::~ConnectedGraph_t() {}

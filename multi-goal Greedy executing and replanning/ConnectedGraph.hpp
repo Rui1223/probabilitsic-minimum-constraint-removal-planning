@@ -57,7 +57,7 @@ class ConnectedGraph_t
 	int m_targetObs;
 	std::vector<int> m_targetPoses;
 
-	// variables uses for execution & replanning
+	// variables used for groundtruth (and execution & replanning)
 	std::vector<bool> m_truePoses;
 	std::vector<int> m_trueObs;
 	int m_trueTarget;
@@ -128,6 +128,8 @@ public:
 	int getmTargetObs() { return m_targetObs; }
 	std::vector<int> getmTargetPoses() { return m_targetPoses; }
 
+	bool getTruePoses(int indx) { return m_truePoses[indx]; }
+	int getTrueGoal() { return m_trueGoal; }
 
 	// Destructor
 	~ConnectedGraph_t();
