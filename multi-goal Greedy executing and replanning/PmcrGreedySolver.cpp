@@ -31,12 +31,14 @@ PmcrGreedySolver_t::PmcrGreedySolver_t(ConnectedGraph_t &g, int start, std::vect
 	m_col = g.getnCol();
 	m_targetObs = g.getmTargetObs();
 	m_nlabelsPerObs = g.getnLabelsPerObs();
+	m_nObstacles = g.getnObstacles();
 
 	// essential elements for greedy search
 	m_G = std::vector<int>(g.getnNodes(), std::numeric_limits<int>::max());
 	m_G[m_start] = 0;	
 	m_open.push(new PmcrNode_t(m_start, m_G[m_start], computeH(m_start), {}, nullptr, 
-		g.compute_survival_currentLabels({})));
+		compute_survival_currentLabels({})));
+
 	m_paths = std::vector<std::vector<int>>();
 	// need a list to record the highest survivability so far for each node
 	m_highestSurvival = std::vector<double>(g.getnNodes(), -1.0);
@@ -47,6 +49,8 @@ PmcrGreedySolver_t::PmcrGreedySolver_t(ConnectedGraph_t &g, int start, std::vect
 	m_MaxSurvival = 1.0;
 	m_highestSuccess = 0.0;
 	m_lowestReachability = m_highestSuccess*1.0 / m_MaxSurvival;
+
+	m_solvable = true;
 }
 
 PmcrGreedySolver_t::~PmcrGreedySolver_t()
@@ -108,7 +112,7 @@ void PmcrGreedySolver_t::greedy_search(ConnectedGraph_t &g)
 			std::vector<int> neighborLabels = 
 				label_union(current->getLabels(), 
 					g.getEdgeLabels(current->getID(), neighbor));
-			double neighborSurvival = g.compute_survival_currentLabels(neighborLabels);
+			double neighborSurvival = compute_survival_currentLabels(neighborLabels);
 
 			// check whether we need to prune this neighbor (based on survivability)
 			// If the neighbor has higher survivability, update the highest survivability
@@ -160,7 +164,7 @@ void PmcrGreedySolver_t::greedy_search(ConnectedGraph_t &g)
 			std::cout << "It's a valid goal\n";
 			// update m_highestSuccess & m_lowestReachability
 			m_highestSuccess = 
-				m_currentSurvival * g.getLabelWeights(m_targetPoses[goal_idx]).second * 1.0;
+				m_currentSurvival * m_labelWeights[m_targetPoses[goal_idx]].second * 1.0;
 			m_lowestReachability = m_highestSuccess*1.0 / m_MaxSurvival;
 			// print the success rate, survivability & labels for the found path
 			std::cout << "Success rate of the path: " << m_highestSuccess << "\n";
@@ -191,6 +195,16 @@ void PmcrGreedySolver_t::greedy_search(ConnectedGraph_t &g)
 	}
 	// You are reaching here because there is no remaining goals
 	std::cout << "We have found all possible goals!\n";
+	// Three situations here
+	//(1) find a feasible path (survivability != 0)
+	//(2) find a doomed path (survivability == 0)
+	//(3) (all goals are not qualified, return no path in m_paths)
+	if (m_optimalSurvival == 0.0 or m_optimalPath.empty())
+	{
+		m_solvable = false;
+		std::cout << "The ground truth is not solvable!\n";
+	}
+
 	return;
 }
 
@@ -199,7 +213,7 @@ void PmcrGreedySolver_t::prune_goalSet(ConnectedGraph_t &g)
 	int deletions = 0;
 	for (int gg=0; gg < (m_goalSet.size()+deletions); gg++)
 	{
-		if (g.getLabelWeights(m_targetPoses[gg-deletions]).second < m_lowestReachability)
+		if (m_labelWeights[m_targetPoses[gg-deletions]].second < m_lowestReachability)
 		{
 			m_goalSet.erase(m_goalSet.begin() + gg - deletions);
 			m_targetPoses.erase(m_targetPoses.begin() + gg - deletions);
@@ -330,4 +344,20 @@ void PmcrGreedySolver_t::write_solution(std::string file_dir, double t)
 		file_ << "\n";
 		file_.close();
 	}
+}
+
+double PmcrGreedySolver_t::compute_survival_currentLabels(std::vector<int> currentLabels)
+{
+	double currentSurvival = 1.0;
+	std::vector<double> CollisionPerObs(m_nObstacles, 0.0);
+	for (auto const &label : currentLabels)
+	{
+		CollisionPerObs[m_labelWeights[label].first] += m_labelWeights[label].second;
+	}
+	for (auto const &collision_prob : CollisionPerObs)
+	{
+		currentSurvival *= (1 - collision_prob); 
+	}
+
+	return currentSurvival;
 }

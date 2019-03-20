@@ -32,7 +32,7 @@ bool sortbysec_connectedGraph(const std::pair<std::vector<int>, double> &p1,
 	return (p1.second < p2.second);
 }
 
-ConnectedGraph_t::ConnectedGraph_t(int row, int col, std::vector<int> nlabelsPerObs)
+ConnectedGraph_t::ConnectedGraph_t(int row, int col, std::vector<int> nlabelsPerObs, double obsDistrVar)
 {
 	Timer tt;
 	tt.reset();
@@ -45,6 +45,7 @@ ConnectedGraph_t::ConnectedGraph_t(int row, int col, std::vector<int> nlabelsPer
 	m_nNodes = m_row * m_col;
 	m_nEdges = (m_col-1)*m_row + (m_row-1)*m_col;
 	//std::cout << "m_nEdges: " << m_nEdges << std::endl;
+	m_obsDistrVar = obsDistrVar;
 	
 	// label information
 	m_nlabelsPerObs = nlabelsPerObs;
@@ -57,7 +58,7 @@ ConnectedGraph_t::ConnectedGraph_t(int row, int col, std::vector<int> nlabelsPer
 
 	// m_nExpansion = round(m_nEdges * density *1.0 / m_nTotallabels) *1.5;
 	// m_nExpansion = round(m_nEdges * density *1.0 / m_nTotallabels * 2);
-	m_nExpansion = round(m_nEdges*1.0 / (3*1.0*m_nlabelsPerObs[0]));
+	m_nExpansion = round(m_nEdges*1.0 / (40*1.0*m_nlabelsPerObs[0]));
 	std::cout << "n_expansion: " << m_nExpansion << "\n";
 	// std::cout << "Expected density: " << density << "\n";
 	m_nmarked = 0;
@@ -486,7 +487,7 @@ std::vector<double> ConnectedGraph_t::load_weights(int nlabels)
 	std::mt19937 gen{rd()};
 	double r = 0.0;
 
-	std::normal_distribution<> d{5.0,5.0};
+	std::normal_distribution<> d{5.0, m_obsDistrVar};
 
 	std::vector<double> temp_weights; 
 

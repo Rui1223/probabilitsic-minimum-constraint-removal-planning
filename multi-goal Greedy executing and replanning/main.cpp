@@ -47,12 +47,12 @@ test_t::~test_t()
 
 int main()
 {
-	int ii;
-	while (ii != 5)
-	{
-		test_t t1(ii, ii*2);
-		ii++;
-	}
+	std::vector<int> path;
+	path = std::vector<int>();
+	std::cout << path.empty() << "\n";
+	path.push_back(1);
+
+	std::cout << path.empty() << "\n";
 
 
 	return 0;

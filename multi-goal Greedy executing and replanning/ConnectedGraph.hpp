@@ -63,12 +63,12 @@ class ConnectedGraph_t
 	int m_trueTarget;
 	int m_trueGoal;
 
-
+	double m_obsDistrVar;
 
 public:
 	// Constructor
 	ConnectedGraph_t() {}
-	ConnectedGraph_t(int row, int col, std::vector<int> nlabelsPerObs);
+	ConnectedGraph_t(int row, int col, std::vector<int> nlabelsPerObs, double obsDistrVar);
 
 	// function to load a graph (manually generate a graph)
 	void load_graph();

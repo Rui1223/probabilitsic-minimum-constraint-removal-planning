@@ -13,27 +13,28 @@ class GreedyExecuteReplanner_t
 	double m_ExecutionTime;
 	int m_pathLength;
 	std::vector<int> m_ExecutedPath; // record the actual executed path
-	bool m_needReplan; // indicate whether we need to replan
+	//bool m_needReplan; // indicate whether we need to replan
 	bool m_isDoomed; // check whether the ground truth is doomed
 
 	int m_nlabelsPerObs;
-	int targetObs;
+	int m_targetObs;
 
 	int m_start;
 	std::vector<int> m_goalSetD;
-	std::vector<int> m_targetPoseD;
+	std::vector<int> m_targetPosesD;
 	std::map<int, std::pair<int, double>> m_labelWeights;
+	std::vector<int> m_path;
 
 
 public:
 	// Constructor
 	GreedyExecuteReplanner_t() {}
-	GreedyExecuteReplanner_t(ConnectedGraph_t &g, PmcrGreedySolver_t originalGsolver);
+	GreedyExecuteReplanner_t(ConnectedGraph_t &g, std::vector<int> currentPath);
 
 	// function to execute a given input path
-	bool execute(ConnectedGraph_t &g, PmcrGreedySolver_t &gsolver, std::vector<int> &path);
+	bool execute(ConnectedGraph_t &g);
 	// The function to update the map giving the transition labels
-	bool updateMap(ConnectedGraph_t &g, PmcrGreedySolver_t &gsolver, std::vector<int> &labels);
+	bool updateMap(ConnectedGraph_t &g, std::vector<int> &labels);
 
 	// getters
 	int getnReplan() { return m_nReplan; }

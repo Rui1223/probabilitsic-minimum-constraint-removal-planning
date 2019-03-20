@@ -33,13 +33,13 @@ class PmcrGreedySolver_t
 {
 	// Input that a greedy solver needs
 	// ConnectedGraph_t m_lgraph; 
-	int m_start; // the id of the start node
 	std::vector<int> m_goalSet; // the ids of all goal nodes
+	std::vector<int> m_targetPoses;
 	int m_col;
+	int m_targetObs; //obs idx for target
 	int m_nlabelsPerObs;
 
-	int m_targetObs; //obs idx for target
-	std::vector<int> m_targetPoses;
+
 
 	int m_optimalGoal;
 	int m_optimalPose;
@@ -64,11 +64,14 @@ class PmcrGreedySolver_t
 	std::vector<double> m_pathSuccess;
 
 	// replanning things
+	int m_start; // the id of the start node
 	std::vector<int> m_goalSetD;
 	std::vector<int> m_targetPosesD;
 	std::map<int, std::pair<int, double>> m_labelWeights;
-	// int m_nObstacles;
+	int m_nObstacles;
 	// std::vector<bool> m_obsDiscover; // record whether an obstacle has been discovered
+
+	bool m_solvable;
 
 public:
 	PmcrGreedySolver_t(ConnectedGraph_t &g, int start, std::vector<int> goalSetD, 
@@ -96,6 +99,10 @@ public:
 	std::vector<int> getGoalSetD() { return m_goalSetD; }
 	std::vector<int> getTargetPoseD() { return m_targetPosesD; }
 	std::map<int, std::pair<int, double>> getLabelWeights() { return m_labelWeights; }
+	bool getIsSolvable() { return m_solvable; }
+
+	// function to compute the survivability for a single set of labels
+	double compute_survival_currentLabels(std::vector<int> labels);
 	
 };
 

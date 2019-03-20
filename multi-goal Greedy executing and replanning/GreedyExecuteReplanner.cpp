@@ -17,77 +17,77 @@ GreedyExecuteReplanner_t::GreedyExecuteReplanner_t(ConnectedGraph_t &g, std::vec
 	// changing during the replanning
 	m_start = g.getmStart();
 	m_goalSetD = g.getmGoalSet();
-	m_targetPoseD = g.getmTargetPoses();
+	m_targetPosesD = g.getmTargetPoses();
 	m_labelWeights = g.getLabelWeights();
+	m_path = currentPath;
 
 	// since the start of the original path is guaranteed to be collision free
 	// directly add it into the m_ExecutedPath
-	m_ExecutedPath.push_back(currentPath[currentPath.size()-1]);
+	m_ExecutedPath.push_back(m_path[m_path.size()-1]);
 
 	t.reset();
-	// first execution
-	m_needReplan = execute(g, currentPath);
+	// // first execution
+	// m_needReplan = execute(g);
 
-	while (m_needReplan and m_nReplan < 20)
-	// {
-	// 	m_nReplan++;
-	// 	std::cout << "#Replan: " << m_nReplan << "\n\n";
-	// 	// create a new gsolver(with updated information) and perform a new planning/search
-	// 	std::cout << "Replan:: start: " << start << "\n";
-	// 	std::cout << "Replan:: goalSetD: \n";
-	// 	std::cout << "<";
-	// 	for (auto const &gs : goalSetD)
-	// 	{
-	// 		std::cout << gs << " ";
-	// 	}
-	// 	std::cout << ">\n";
-	// 	std::cout << "Replan:: targetPoseD: \n";
-	// 	std::cout << "<";
-	// 	for (auto const &tp : targetPoseD)
-	// 	{
-	// 		std::cout << tp << " ";
-	// 	}
-	// 	std::cout << ">\n";
-	// 	for (int ii=0; ii < labelWeights.size(); ii++)
-	// 	{
-	// 		std::cout << ii << ": " << labelWeights[ii].first
-	// 											<< "\t" << labelWeights[ii].second << "\n";
-	// 	}
-	// 	PmcrGreedySolver_t gsolver1(g, start, goalSetD, targetPoseD, labelWeights);
-	// 	gsolver1.greedy_search(g);
+	while (execute(g))
+	{
+		m_nReplan++;
+		std::cout << "\n#Replan: " << m_nReplan << "\n";
+		// create a new gsolver(with updated information) and perform a new planning/search
+		std::cout << "Replan:: start: " << m_start << "\n";
+		std::cout << "Replan:: goalSetD: \n";
+		std::cout << "<";
+		for (auto const &gs : m_goalSetD)
+		{
+			std::cout << gs << " ";
+		}
+		std::cout << ">\n";
+		std::cout << "Replan:: targetPoseD: \n";
+		std::cout << "<";
+		for (auto const &tp : m_targetPosesD)
+		{
+			std::cout << tp << " ";
+		}
+		std::cout << ">\n";
+		for (int ii=0; ii < m_labelWeights.size(); ii++)
+		{
+			std::cout << ii << ": " << m_labelWeights[ii].first
+												<< "\t" << m_labelWeights[ii].second << "\n";
+		}
+		PmcrGreedySolver_t gsolver1(g, m_start, m_goalSetD, m_targetPosesD, m_labelWeights);
+		gsolver1.greedy_search(g);
 
-	// 	// check if the replanning path is a deemed path
-	// 	// if it is, the ground truth should be discard
-	// 	if (gsolver1.getOptimalSurvival() == 0.0) 
-	// 	{
-	// 		m_isDoomed = true;
-	// 		break;
-	// 	}
-	// 	std::vector<int> currentPath = gsolver1.getOptimalPath();
-	// 	m_needReplan = execute(g, gsolver1, currentPath);
+		// check if the ground truth is solvable
+		if (gsolver1.getIsSolvable() == false) 
+		{
+			m_isDoomed = true;
+			break;
+		}
+		else
+		{
+			m_path = gsolver1.getOptimalPath();
+		}
 
-	// 	start = gsolver1.getmStart();
-	// 	goalSetD = gsolver1.getGoalSetD();
-	// 	targetPoseD = gsolver1.getTargetPoseD();
-	// 	labelWeights = gsolver1.getLabelWeights();
-	// }
-	// // You are reaching here either
-	// // (1)The problem is solved (m_needReplan=false)
-	// // (2) It turns out to be a doomed ground truth
-	// std::cout << "Jump out of the replan loop\n";
-	// if (!m_isDoomed)
-	// {
-	// 	m_ExecutionTime = t.elapsed();
-	// 	m_pathLength = m_ExecutedPath.size();
-	// }
-	// std::cout << "Finishing replanning\n";
+	}
+	// You are reaching here either
+	// (1)The problem is solved (m_needReplan=false)
+	// (2) It turns out to be a doomed ground truth
+	std::cout << "Jump out of the replan loop\n";
+	if (!m_isDoomed)
+	{
+		m_ExecutionTime = t.elapsed();
+		m_pathLength = m_ExecutedPath.size();
+		std::cout << "The ground truth is not doomed\n";
+	}
+	std::cout << "Finishing replanning\n";
 
 }
 
-bool GreedyExecuteReplanner_t::execute(ConnectedGraph_t &g, std::vector<int> path)
+bool GreedyExecuteReplanner_t::execute(ConnectedGraph_t &g)
 {
 	std::cout << "Start executing the path\n";
 	bool needReplan = false;
+	std::cout << "Initially needReplan: " << needReplan << "\n";
 	// This function will execute any given path
 	// But it is not a one-time path execution. Every time before it moves
 	// it checks whether next move is safe (not hitting true obstacles).
@@ -96,22 +96,23 @@ bool GreedyExecuteReplanner_t::execute(ConnectedGraph_t &g, std::vector<int> pat
 	std::vector<int> currentEdgeLabels;
 	bool isSafe_transition;
 
-	for (int ii = path.size()-1; ii >= 1; ii--)
+	for (int ii = m_path.size()-1; ii >= 1; ii--)
 	{
 		// check the current transition is safe or not
-		currentEdgeLabels = g.getEdgeLabels(path[ii], path[ii-1]);
+		currentEdgeLabels = g.getEdgeLabels(m_path[ii], m_path[ii-1]);
 		isSafe_transition = updateMap(g, currentEdgeLabels);
 		if (isSafe_transition)
 		{
 			// It's a collision free transition, move!
-			m_ExecutedPath.push_back(path[ii-1]);
+			m_ExecutedPath.push_back(m_path[ii-1]);
 		}
 		else
 		{
 			// You are encountering a true obstacle, need to replan the path
 			// Before you do that, update the start location as the place you stop
-			updateStart(path[ii]);
+			updateStart(m_path[ii]);
 			needReplan = true;
+			std::cout << "Encountering true obstacles!\n";
 			std::cout << "Need Replan: " << needReplan << "\n";
 			return needReplan;
 		}
@@ -119,17 +120,17 @@ bool GreedyExecuteReplanner_t::execute(ConnectedGraph_t &g, std::vector<int> pat
 	// You are reaching here since you finish the path without collision
 	// But it doesn't neccessarily mean you don't need replan
 	// If you reach a goal which is not a true goal, you still need to replan
-	std::cout << "reaching the destination: " << path[0] << "\n";
+	std::cout << "reaching the destination: " << m_path[0] << "\n";
 	std::cout << "The true goal is: " << g.getTrueGoal() << "\n";
-	if (path[0] != g.getTrueGoal())
+	if (m_path[0] != g.getTrueGoal())
 	{
 		std::cout << "Safely reaching. But it is not a true goal.\n";
-		updateStart(path[0]);
+		updateStart(m_path[0]);
 		// since it is not the true goal, we also know that pose it affiliates to
 		// is not a true pose
 		for (int pp = 0; pp < m_goalSetD.size(); pp++)
 		{
-			if (m_goalSetD[pp] == path[0])
+			if (m_goalSetD[pp] == m_path[0])
 			{
 				updateLabelWeights(m_targetPosesD[pp], false);
 				break;
