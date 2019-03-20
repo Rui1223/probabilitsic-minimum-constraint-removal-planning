@@ -1,7 +1,7 @@
 #include "ConnectedGraph.hpp"
 #include "PmcrGreedySolver.hpp"
 #include "Timer.hpp"
-#include "ExecuteReplanner.hpp"
+#include "GreedyExecuteReplanner.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -47,7 +47,7 @@ int main()
 	// int nProblems = 100; // number of problems we would like to work on for each single statistics (use later)
 	int nProblems = 1;
 	// int nGroundTruth = 100; // number of group truth (true scene) we would like to generate for EACH problem (later)
-	int nGroundTruth = 1;
+	int nGroundTruth = 2;
 
 	// Timer to calculate the time
 	Timer t_greedy;
@@ -64,7 +64,7 @@ int main()
 
 ///////////// Experiment 1: x_nObstacles vs (y_time, y_nReplan, y_pathLength)  ---3 figures ////////////////
 	// For each x_nObstacles, we will do 100 problems and take the average y_time, y_nReplan &
-	// y_pathLength at that certain x_Obstacles
+	// y_pathLength at that certain x_nObstacles
 
 	// create a folder under the master-folder statistics_ExecutionReplanning
 	std::string nObstacles_dir = StatisticFolder_dir + "/nObstacles";
@@ -116,10 +116,10 @@ int main()
 			std::cout << "*****************************************************\n";
 			std::cout << "--------------start the greedy search----------------\n";
 			t_greedy.reset();
-			PmcrGreedySolver_t gsolver(g);
+			PmcrGreedySolver_t gsolver(g, g.getmStart(), g.getmGoalSet(), 
+											g.getmTargetPoses(), g.getLabelWeights());
 			gsolver.greedy_search(g);
 			temp_t = t_greedy.elapsed();
-
 			// The things we care about from the algorithm is just the OPTIMAL PATH
 			// Before we execute the path, we want to make sure it is a high-survival path 
 			// (i.e. if the survivability is 0, then there is no meaning of executing that path)
@@ -134,7 +134,6 @@ int main()
 			// 1. record the time
 			// 2. get the optimal path we are going to execute
 			y_time_Greedy += temp_t;
-			std::vector<int> optimalPath_Greedy = gsolver.getOptimalPath();
 			gsolver.write_solution(Exp1_graph_problem_Gsolution_txt, y_time_Greedy);
 
 			// Now we will test whether the solution from our algorithm is effective or not
@@ -155,27 +154,35 @@ int main()
 				mkdir(Exp1_groundTruth_dir.c_str(), 0777);											
 				std::string Exp1_groundTruth_txt = Exp1_groundTruth_dir + "/groundTruth.txt";
 
+				// generate ground truth
 				g.generate_groundTruth(Exp1_groundTruth_txt);
-				current_groundTruth_idx++;
-
-				t_greedy.reset();
 				// Execute the path on the ground truth you generate
-				ExecuteReplanner_t GreedyExecutor(g, optimalPath_Greedy);
-				std::vector<int> currentPath_Greedy = optimalPath_Greedy;
-				while (GreedyExecutor.execute(currentPath_Greedy))
+				GreedyExecuteReplanner_t GExeReplanner(g, gsolver);
+				// At this point you either
+				// (1) finish execution & replan & find the goal
+				// (2) the ground truth is doomed
+				std::cout << "check whether the ground truth is doomed or not.\n";
+				if (GExeReplanner.getIsDoomed()) {continue;}
+				else
 				{
-					PmcrGreedySolver_t gsolver(g);
-					gsolver.greedy_search(g);
-					currentPath_Greedy = gsolver.getOptimalPath();
+					std::cout << "Writing in the statistics\n";
+					y_time_Greedy += GExeReplanner.getExecutionTime();
+					y_nReplan_Greedy += GExeReplanner.getnReplan();
+					y_pathLength_Greedy += GExeReplanner.getPathLength();
+					current_groundTruth_idx++;
+					std::cout << "Finishing writing the statistics\n";
 
 				}
-
+				std::cout << "Start creating a new ground truth\n";
 
 			}
 
 			current_problem_idx++;
+			std::cout << "start creating a new problem\n";
 		}
+		std::cout << "Finish all problems. Now let's switch to another parameter\n";
 	}
+	std::cout << "Finish all the parameters\n";
 
 	
 	return 0;

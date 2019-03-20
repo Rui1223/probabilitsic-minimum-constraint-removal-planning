@@ -16,12 +16,44 @@
 #include <deque>
 #include <random>
 
+class test_t
+{
+	int m_h;
+	int m_g;
+	int m_f;
+
+public:
+	test_t(int h, int g);
+	~test_t();
+	int geth() { return m_h; }
+	int getf() { return m_f; }
+	void setf(int f) { m_f = f; }
+	void printf() {std::cout << m_f << "\n";}
+};
+
+test_t::test_t(int h, int g)
+{
+	m_h = h;
+	m_g = g;
+}
+
+test_t::~test_t()
+{
+	std::cout << "Destructor for test_t object " 
+			<< m_h << " " << m_g << " is called.\n";
+}
+
+
+
 int main()
 {
-	for (int ii=0; ii < 100; ii++)
+	int ii;
+	while (ii != 5)
 	{
-		std::cout << (5 <= 6) << "\n";
+		test_t t1(ii, ii*2);
+		ii++;
 	}
+
 
 	return 0;
 }

@@ -18,7 +18,7 @@ def cal_co(indx, col, row):
 
 if __name__ == "__main__":
 	## read in my text file
-	f = open("./statistics_ExecutionReplanning/nObstacles/nObstacles=3/problem 1/ground truth 1/groundTruth.txt", "r")
+	f = open("./statistics_ExecutionReplanning/nObstacles/nObstacles=3/problem 1/ground truth 2/groundTruth.txt", "r")
 	# start to count the line
 	n_line = 0;
 	for line in f:

@@ -115,7 +115,9 @@ public:
 	// lots of getters
 	int getnCol() { return m_col; }
 	int getnNodes() { return m_nNodes; }
-	int getnTotallabels() { return m_nTotallabels; } 
+	int getnTotallabels() { return m_nTotallabels; }
+	int getnObstacles() { return m_nobstacles; }
+	int getnLabelsPerObs() { return m_nlabelsPerObs[0]; }
 	std::vector<int> getNodeNeighbors(int id) { return m_nodeNeighbors[id]; }
 	std::vector<int> getEdgeLabels(int id1, int id2) 
 														{ return m_edgeLabels[id1][id2]; }

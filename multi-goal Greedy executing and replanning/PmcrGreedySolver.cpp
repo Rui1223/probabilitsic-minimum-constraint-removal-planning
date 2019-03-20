@@ -18,17 +18,19 @@
 // random generator function:
 int myrandom (int i) { return std::rand()%i; }
 
-PmcrGreedySolver_t::PmcrGreedySolver_t(ConnectedGraph_t &g)
+PmcrGreedySolver_t::PmcrGreedySolver_t(ConnectedGraph_t &g, int start, std::vector<int> goalSetD, 
+	std::vector<int> targetPosesD, std::map<int, std::pair<int, double>> labelWeights)
 {
-	Timer tt;
-	tt.reset();
-	// std::cout << "Time to load the graph for Gsolver: " << tt.elapsed() << " seconds\n\n";
-	m_start = g.getmStart();
-	m_goalSetD = g.getmGoalSet();
+	// first initialize the things you update from the last replanning
+	m_start = start;
+	m_goalSetD = goalSetD;
+	m_targetPosesD = targetPosesD;
+	m_labelWeights = labelWeights;
+
+	// these two parameters never change. Just get it from the graph problem
 	m_col = g.getnCol();
 	m_targetObs = g.getmTargetObs();
-	m_targetPosesD = g.getmTargetPoses();
-	m_labelWeights = g.getLabelWeights();
+	m_nlabelsPerObs = g.getnLabelsPerObs();
 
 	// essential elements for greedy search
 	m_G = std::vector<int>(g.getnNodes(), std::numeric_limits<int>::max());
@@ -56,6 +58,7 @@ PmcrGreedySolver_t::~PmcrGreedySolver_t()
 		m_open.pop();
 	}
 	for (auto &e : m_closed) { delete e; }
+	std::cout << "Destroy a GreedySolver.\n";
 }
 
 void PmcrGreedySolver_t::greedy_search(ConnectedGraph_t &g)
@@ -340,7 +343,7 @@ void PmcrGreedySolver_t::updateLabelWeights(int label, bool mode)
 		// Then change the weights of other labels which share the same obstacle
 		// with this label to be 0.0
 		temp_obs = m_labelWeights[label].first;
-		for (int cl=temp_obs*m_nlabelsPerObs[0]; cl<(temp_obs+1)*m_nlabelsPerObs[0]; cl++)
+		for (int cl=temp_obs*m_nlabelsPerObs; cl<(temp_obs+1)*m_nlabelsPerObs; cl++)
 		{
 			if (cl != label) { m_labelWeights[cl].second = 0.0; }
 		}
@@ -365,7 +368,7 @@ void PmcrGreedySolver_t::updateLabelWeights(int label, bool mode)
 		// of the this label to other labels sharing the same obstacle with this label according
 		// to their distribution
 		temp_obs = m_labelWeights[label].first;
-		for (int cl=temp_obs*m_nlabelsPerObs[0]; cl<(temp_obs+1)*m_nlabelsPerObs[0]; cl++)
+		for (int cl=temp_obs*m_nlabelsPerObs; cl<(temp_obs+1)*m_nlabelsPerObs; cl++)
 		{
 			if (cl != label)
 			{
@@ -376,5 +379,20 @@ void PmcrGreedySolver_t::updateLabelWeights(int label, bool mode)
 		}
 		// Don't forget to set the weight for current fake label to be 0.0;
 		m_labelWeights[label].second = 0.0;
+		// If the obstacle the label belongs to is a target obstacle
+		if (temp_obs == m_targetObs)
+		{
+			// prune m_goalSetD & m_targetPosesD
+			for (int dd=0; dd < m_targetPosesD.size(); dd++)
+			{
+				if (m_targetPosesD[dd] == label)
+				{
+					// prune that label from m_targetPosesD
+					m_targetPosesD.erase(m_targetPosesD.begin()+dd);
+					// prune the corresponding goal from m_goalSetD as well
+					m_goalSetD.erase(m_goalSetD.begin()+dd);
+				}
+			}
+		}
 	}
 } 
