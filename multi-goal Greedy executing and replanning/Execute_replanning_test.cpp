@@ -47,7 +47,7 @@ int main()
 	// int nProblems = 100; // number of problems we would like to work on for each single statistics (use later)
 	int nProblems = 1;
 	// int nGroundTruth = 100; // number of group truth (true scene) we would like to generate for EACH problem (later)
-	int nGroundTruth = 2;
+	int nGroundTruth = 1;
 
 	// Timer to calculate the time
 	Timer t_greedy;
@@ -157,7 +157,7 @@ int main()
 				// generate ground truth
 				g.generate_groundTruth(Exp1_groundTruth_txt);
 				// Execute the path on the ground truth you generate
-				GreedyExecuteReplanner_t GExeReplanner(g, gsolver);
+				GreedyExecuteReplanner_t GExeReplanner(g, gsolver.getOptimalPath());
 				// At this point you either
 				// (1) finish execution & replan & find the goal
 				// (2) the ground truth is doomed
@@ -169,10 +169,10 @@ int main()
 					y_time_Greedy += GExeReplanner.getExecutionTime();
 					y_nReplan_Greedy += GExeReplanner.getnReplan();
 					y_pathLength_Greedy += GExeReplanner.getPathLength();
-					current_groundTruth_idx++;
 					std::cout << "Finishing writing the statistics\n";
 
 				}
+				current_groundTruth_idx++;
 				std::cout << "Start creating a new ground truth\n";
 
 			}

@@ -96,11 +96,7 @@ public:
 	std::vector<int> getGoalSetD() { return m_goalSetD; }
 	std::vector<int> getTargetPoseD() { return m_targetPosesD; }
 	std::map<int, std::pair<int, double>> getLabelWeights() { return m_labelWeights; }
-
-	// update the labelWeights after execute the path
-	void updateLabelWeights(int label, bool mode);
-	// update start in order to replan
-	void updateStart(int start) { m_start = start; }
+	
 };
 
 #endif

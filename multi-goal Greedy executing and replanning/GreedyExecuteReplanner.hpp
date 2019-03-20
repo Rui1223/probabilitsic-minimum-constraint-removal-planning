@@ -16,6 +16,15 @@ class GreedyExecuteReplanner_t
 	bool m_needReplan; // indicate whether we need to replan
 	bool m_isDoomed; // check whether the ground truth is doomed
 
+	int m_nlabelsPerObs;
+	int targetObs;
+
+	int m_start;
+	std::vector<int> m_goalSetD;
+	std::vector<int> m_targetPoseD;
+	std::map<int, std::pair<int, double>> m_labelWeights;
+
+
 public:
 	// Constructor
 	GreedyExecuteReplanner_t() {}
@@ -32,6 +41,14 @@ public:
 	int getPathLength() { return m_pathLength; }
 	std::vector<int> getExecutedPath() { return m_ExecutedPath; }
 	bool getIsDoomed() { return m_isDoomed; }
+
+	double getLabelWeight(int indx) { return m_labelWeights[indx].second; }
+
+
+	// update the labelWeights after execute the path
+	void updateLabelWeights(int label, bool mode);
+	// update start in order to replan
+	void updateStart(int start) { m_start = start; }
 
 	// Destrcutor
 	~GreedyExecuteReplanner_t();

@@ -676,7 +676,10 @@ void ConnectedGraph_t::write_groundTruth(std::string groundTruth_dir)
 }
 
 
-ConnectedGraph_t::~ConnectedGraph_t() {}
+ConnectedGraph_t::~ConnectedGraph_t()
+{
+	std::cout << "destroy the graph\n";
+}
 
 
 
