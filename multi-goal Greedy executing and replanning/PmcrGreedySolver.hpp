@@ -38,7 +38,7 @@ class PmcrGreedySolver_t
 	int m_col;
 	int m_targetObs; //obs idx for target
 	int m_nlabelsPerObs;
-
+	int m_nObstacles;
 
 
 	int m_optimalGoal;
@@ -68,7 +68,6 @@ class PmcrGreedySolver_t
 	std::vector<int> m_goalSetD;
 	std::vector<int> m_targetPosesD;
 	std::map<int, std::pair<int, double>> m_labelWeights;
-	int m_nObstacles;
 	// std::vector<bool> m_obsDiscover; // record whether an obstacle has been discovered
 
 	bool m_solvable;

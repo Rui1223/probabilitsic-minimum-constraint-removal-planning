@@ -40,6 +40,10 @@ int main()
 	int nProblems = 100;
 	// number of group truth (true scene) we would like to generate for EACH problem
 	int nGroundTruth = 100;
+	// counter the problems we are working on
+	int current_problem_idx;
+	// counter the ground truth we are working on
+	int current_groundTruth_idx;
 
 	// Timer to calculate the time
 	Timer t_greedy;
@@ -65,10 +69,6 @@ int main()
 	std::string Exp1_stat_txt = nObstacles_dir + "/nObstacles_performance.txt";
 	// write into a txt file
 	std::ofstream file_Exp1_stat(Exp1_stat_txt); // an ofstream object
-	// counter the problems we are working on
-	int current_problem_idx;
-	// counter the ground truth we are working on
-	int current_groundTruth_idx;
 
 	// experiment on each x_nObstacles
 	for (auto const &nObs : x_nObstacles)
@@ -106,8 +106,7 @@ int main()
 			// solve the problem using our algorithm (multi-goal Greedy)
 			// Will add other methods (A* planner, MaxSurvival planner) later for comparison
 			// The things we care is just the OPTIMAL PATH
-			std::cout << "*****************************************************\n";
-			std::cout << "--------------start the greedy search----------------\n";
+			std::cout << "\n--------------start the MaximumSuccess Greedy Search----------------\n";
 			t_greedy.reset();
 			PmcrGreedySolver_t gsolver(g, g.getmStart(), g.getmGoalSet(), 
 											g.getmTargetPoses(), g.getLabelWeights());
@@ -116,8 +115,8 @@ int main()
 			// The things we care about from the algorithm is just the OPTIMAL PATH
 			// Before we execute the path, we want to make sure it is a high-survival path 
 			// (i.e. if the survivability is 0, then there is no meaning of executing that path)
-			// So let's say if the survivability is below 70% for this problem, discard this problem
-			if (gsolver.getOptimalSurvival() <= 0.7 or gsolver.getIsSolvable() == false) 
+			// So let's say if the survivability is below 40% for this problem, discard this problem
+			if (gsolver.getOptimalSurvival() <= 0.4 or gsolver.getIsSolvable() == false) 
 			{
 				std::cout << "The optimum survivability is: " << gsolver.getOptimalSurvival()
 					<< ". Not a quite feasible problem to solve. Start a new problem.\n";
@@ -200,10 +199,6 @@ int main()
 	std::string Exp2_stat_txt = nPosesPerObs_dir + "/nPosesPerObs_performance.txt";
 	// write into a txt file
 	std::ofstream file_Exp2_stat(Exp2_stat_txt); // an ofstream object
-	// counter the problems we are working on
-	int current_problem_idx;
-	// counter the ground truth we are working on
-	int current_groundTruth_idx;
 
 	// experiment on each x_nPosesPerObs
 	for (auto const &nPPO : x_nPosesPerObs)
@@ -241,8 +236,7 @@ int main()
 			// solve the problem using our algorithm (multi-goal Greedy)
 			// Will add other methods (A* planner, MaxSurvival planner) later for comparison
 			// The things we care is just the OPTIMAL PATH
-			std::cout << "*****************************************************\n";
-			std::cout << "--------------start the greedy search----------------\n";
+			std::cout << "\n--------------start the MaximumSuccess Greedy Search----------------\n";
 			t_greedy.reset();
 			PmcrGreedySolver_t gsolver(g, g.getmStart(), g.getmGoalSet(), 
 											g.getmTargetPoses(), g.getLabelWeights());
@@ -252,7 +246,7 @@ int main()
 			// Before we execute the path, we want to make sure it is a high-survival path 
 			// (i.e. if the survivability is 0, then there is no meaning of executing that path)
 			// So let's say if the survivability is below 70% for this problem, discard this problem
-			if (gsolver.getOptimalSurvival() <= 0.7 or gsolver.getIsSolvable() == false) 
+			if (gsolver.getOptimalSurvival() <= 0.4 or gsolver.getIsSolvable() == false) 
 			{
 				std::cout << "The optimum survivability is: " << gsolver.getOptimalSurvival()
 					<< ". Not a quite feasible problem to solve. Start a new problem.\n";
@@ -333,10 +327,6 @@ int main()
 	std::string Exp3_stat_txt = distrVar_dir + "/distrVar_performance.txt";
 	// write into a txt file
 	std::ofstream file_Exp3_stat(Exp3_stat_txt); // an ofstream object
-	// counter the problems we are working on
-	int current_problem_idx;
-	// counter the ground truth we are working on
-	int current_groundTruth_idx;
 
 	// experiment on each x_nPosesPerObs
 	for (auto const &distrV : x_distrVar)
@@ -374,8 +364,7 @@ int main()
 			// solve the problem using our algorithm (multi-goal Greedy)
 			// Will add other methods (A* planner, MaxSurvival planner) later for comparison
 			// The things we care is just the OPTIMAL PATH
-			std::cout << "*****************************************************\n";
-			std::cout << "--------------start the greedy search----------------\n";
+			std::cout << "\n--------------start the MaximumSuccess Greedy Search----------------\n";
 			t_greedy.reset();
 			PmcrGreedySolver_t gsolver(g, g.getmStart(), g.getmGoalSet(), 
 											g.getmTargetPoses(), g.getLabelWeights());
@@ -385,7 +374,7 @@ int main()
 			// Before we execute the path, we want to make sure it is a high-survival path 
 			// (i.e. if the survivability is 0, then there is no meaning of executing that path)
 			// So let's say if the survivability is below 70% for this problem, discard this problem
-			if (gsolver.getOptimalSurvival() <= 0.7 or gsolver.getIsSolvable() == false) 
+			if (gsolver.getOptimalSurvival() <= 0.4 or gsolver.getIsSolvable() == false) 
 			{
 				std::cout << "The optimum survivability is: " << gsolver.getOptimalSurvival()
 					<< ". Not a quite feasible problem to solve. Start a new problem.\n";

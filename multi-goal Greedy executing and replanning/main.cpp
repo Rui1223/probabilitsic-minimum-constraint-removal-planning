@@ -15,6 +15,7 @@
 #include <queue>
 #include <deque>
 #include <random>
+#include <limits>
 
 class test_t
 {
@@ -47,12 +48,10 @@ test_t::~test_t()
 
 int main()
 {
-	std::vector<int> path;
-	path = std::vector<int>();
-	std::cout << path.empty() << "\n";
-	path.push_back(1);
-
-	std::cout << path.empty() << "\n";
+	float a = std::numeric_limits<float>::infinity();
+	int b =3;
+	float c = a + b;
+	std::cout << c << "\n";
 
 
 	return 0;

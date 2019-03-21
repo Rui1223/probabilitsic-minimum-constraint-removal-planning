@@ -32,28 +32,28 @@ GreedyExecuteReplanner_t::GreedyExecuteReplanner_t(ConnectedGraph_t &g, std::vec
 	while (execute(g))
 	{
 		m_nReplan++;
-		std::cout << "\n#Replan: " << m_nReplan << "\n";
+		// std::cout << "\n#Replan: " << m_nReplan << "\n";
 		// create a new gsolver(with updated information) and perform a new planning/search
-		std::cout << "Replan:: start: " << m_start << "\n";
-		std::cout << "Replan:: goalSetD: \n";
-		std::cout << "<";
-		for (auto const &gs : m_goalSetD)
-		{
-			std::cout << gs << " ";
-		}
-		std::cout << ">\n";
-		std::cout << "Replan:: targetPoseD: \n";
-		std::cout << "<";
-		for (auto const &tp : m_targetPosesD)
-		{
-			std::cout << tp << " ";
-		}
-		std::cout << ">\n";
-		for (int ii=0; ii < m_labelWeights.size(); ii++)
-		{
-			std::cout << ii << ": " << m_labelWeights[ii].first
-												<< "\t" << m_labelWeights[ii].second << "\n";
-		}
+		// std::cout << "Replan:: start: " << m_start << "\n";
+		// std::cout << "Replan:: goalSetD: \n";
+		// std::cout << "<";
+		// for (auto const &gs : m_goalSetD)
+		// {
+		// 	std::cout << gs << " ";
+		// }
+		// std::cout << ">\n";
+		// std::cout << "Replan:: targetPoseD: \n";
+		// std::cout << "<";
+		// for (auto const &tp : m_targetPosesD)
+		// {
+		// 	std::cout << tp << " ";
+		// }
+		// std::cout << ">\n";
+		// for (int ii=0; ii < m_labelWeights.size(); ii++)
+		// {
+		// 	std::cout << ii << ": " << m_labelWeights[ii].first
+		// 										<< "\t" << m_labelWeights[ii].second << "\n";
+		// }
 		PmcrGreedySolver_t gsolver1(g, m_start, m_goalSetD, m_targetPosesD, m_labelWeights);
 		gsolver1.greedy_search(g);
 
@@ -72,22 +72,22 @@ GreedyExecuteReplanner_t::GreedyExecuteReplanner_t(ConnectedGraph_t &g, std::vec
 	// You are reaching here either
 	// (1)The problem is solved (m_needReplan=false)
 	// (2) It turns out to be a doomed ground truth
-	std::cout << "Jump out of the replan loop\n";
+	// std::cout << "Jump out of the replan loop\n";
 	if (!m_isDoomed)
 	{
 		m_ExecutionTime = t.elapsed();
 		m_pathLength = m_ExecutedPath.size();
-		std::cout << "The ground truth is not doomed\n";
+		// std::cout << "The ground truth is not doomed\n";
 	}
-	std::cout << "Finishing replanning\n";
+	// std::cout << "Finishing replanning\n";
 
 }
 
 bool GreedyExecuteReplanner_t::execute(ConnectedGraph_t &g)
 {
-	std::cout << "Start executing the path\n";
+	// std::cout << "Start executing the path\n";
 	bool needReplan = false;
-	std::cout << "Initially needReplan: " << needReplan << "\n";
+	// std::cout << "Initially needReplan: " << needReplan << "\n";
 	// This function will execute any given path
 	// But it is not a one-time path execution. Every time before it moves
 	// it checks whether next move is safe (not hitting true obstacles).
@@ -112,19 +112,19 @@ bool GreedyExecuteReplanner_t::execute(ConnectedGraph_t &g)
 			// Before you do that, update the start location as the place you stop
 			updateStart(m_path[ii]);
 			needReplan = true;
-			std::cout << "Encountering true obstacles!\n";
-			std::cout << "Need Replan: " << needReplan << "\n";
+			// std::cout << "Encountering true obstacles!\n";
+			// std::cout << "Need Replan: " << needReplan << "\n";
 			return needReplan;
 		}
 	}
 	// You are reaching here since you finish the path without collision
 	// But it doesn't neccessarily mean you don't need replan
 	// If you reach a goal which is not a true goal, you still need to replan
-	std::cout << "reaching the destination: " << m_path[0] << "\n";
-	std::cout << "The true goal is: " << g.getTrueGoal() << "\n";
+	// std::cout << "reaching the destination: " << m_path[0] << "\n";
+	// std::cout << "The true goal is: " << g.getTrueGoal() << "\n";
 	if (m_path[0] != g.getTrueGoal())
 	{
-		std::cout << "Safely reaching. But it is not a true goal.\n";
+		// std::cout << "Safely reaching. But it is not a true goal.\n";
 		updateStart(m_path[0]);
 		// since it is not the true goal, we also know that pose it affiliates to
 		// is not a true pose
@@ -137,7 +137,7 @@ bool GreedyExecuteReplanner_t::execute(ConnectedGraph_t &g)
 			}
 		}
 		needReplan = true;
-		std::cout << "Need Replan: " << needReplan << "\n";
+		// std::cout << "Need Replan: " << needReplan << "\n";
 	}
 
 	return needReplan;
@@ -232,7 +232,4 @@ void GreedyExecuteReplanner_t::updateLabelWeights(int label, bool mode)
 	}
 } 
 
-GreedyExecuteReplanner_t::~GreedyExecuteReplanner_t() 
-{
-	std::cout << "Destroy the replanner.\n";
-}
+GreedyExecuteReplanner_t::~GreedyExecuteReplanner_t() {}

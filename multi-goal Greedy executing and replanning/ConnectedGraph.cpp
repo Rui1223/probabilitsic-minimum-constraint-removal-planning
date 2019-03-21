@@ -36,7 +36,7 @@ ConnectedGraph_t::ConnectedGraph_t(int row, int col, std::vector<int> nlabelsPer
 {
 	Timer tt;
 	tt.reset();
-	printf("--------------------------------------------------\n");
+	printf("-----------generate a graph problem-----------------\n");
 	// specify the size of the graph
 	assert(row > 0);
 	assert(col > 0);
@@ -58,7 +58,7 @@ ConnectedGraph_t::ConnectedGraph_t(int row, int col, std::vector<int> nlabelsPer
 
 	// m_nExpansion = round(m_nEdges * density *1.0 / m_nTotallabels) *1.5;
 	// m_nExpansion = round(m_nEdges * density *1.0 / m_nTotallabels * 2);
-	m_nExpansion = round(m_nEdges*1.0 / (40*1.0*m_nlabelsPerObs[0]));
+	m_nExpansion = round(m_nEdges*1.0 / (5*1.0*m_nlabelsPerObs[0]));
 	std::cout << "n_expansion: " << m_nExpansion << "\n";
 	// std::cout << "Expected density: " << density << "\n";
 	m_nmarked = 0;
@@ -75,7 +75,6 @@ ConnectedGraph_t::ConnectedGraph_t(int row, int col, std::vector<int> nlabelsPer
 
 	std::cout << "Time to build and label the graph: " << tt.elapsed() << " seconds\n";
 
-	printf("--------------------------------------------------\n");
 	printf("--------------------------------------------------\n\n");
 }
 
@@ -208,7 +207,7 @@ void ConnectedGraph_t::label_graph()
 
 	// pick the target object
 	m_targetObs = random_generate_integer(0, m_nobstacles-1);
-	std::cout << "Target Obstalce: " << m_targetObs << "\n";
+	// std::cout << "Target Obstalce: " << m_targetObs << "\n";
 
 	// figure out target poses based on the target obstalces
 	int temp_counter = 0;
@@ -677,10 +676,7 @@ void ConnectedGraph_t::write_groundTruth(std::string groundTruth_dir)
 }
 
 
-ConnectedGraph_t::~ConnectedGraph_t()
-{
-	std::cout << "destroy the graph\n";
-}
+ConnectedGraph_t::~ConnectedGraph_t() {}
 
 
 

@@ -27,7 +27,7 @@ PmcrGreedySolver_t::PmcrGreedySolver_t(ConnectedGraph_t &g, int start, std::vect
 	m_targetPosesD = targetPosesD;
 	m_labelWeights = labelWeights;
 
-	// these two parameters never change. Just get it from the graph problem
+	// these parameters never change. Just get it from the graph problem
 	m_col = g.getnCol();
 	m_targetObs = g.getmTargetObs();
 	m_nlabelsPerObs = g.getnLabelsPerObs();
@@ -62,7 +62,6 @@ PmcrGreedySolver_t::~PmcrGreedySolver_t()
 		m_open.pop();
 	}
 	for (auto &e : m_closed) { delete e; }
-	std::cout << "Destroy a GreedySolver.\n";
 }
 
 void PmcrGreedySolver_t::greedy_search(ConnectedGraph_t &g)
@@ -143,11 +142,11 @@ void PmcrGreedySolver_t::greedy_search(ConnectedGraph_t &g)
 		// reach the goal
 		if ( it != m_goalSet.end() )
 		{
-			std::cout << "Encounter a goal\n";
+			// std::cout << "Encounter a goal\n";
 			goal_idx = std::distance(m_goalSet.begin(), it);
 			// print the goal & its corresponding target pose
-			std::cout << "Goal: " << current->getID() << "\n";
-			std::cout << "Target Pose: " << m_targetPoses[goal_idx] << "\n";
+			// std::cout << "Goal: " << current->getID() << "\n";
+			// std::cout << "Target Pose: " << m_targetPoses[goal_idx] << "\n";
 			// check if the labels the path from start to current carries contains the label of the
 			// goal you are reaching. If it is, it fails. (Since you cannot reach the goal without
 			// colliding it.)
@@ -155,26 +154,26 @@ void PmcrGreedySolver_t::greedy_search(ConnectedGraph_t &g)
 																			!= m_currentLabels.end() )
 			{
 				// directly prune the goal
-				std::cout << "has to reach the goal while colliding with that goal pose,prune.\n\n";
+				// std::cout << "has to reach the goal while colliding with that goal pose,prune.\n\n";
 				m_goalSet.erase(it);
 				m_targetPoses.erase(m_targetPoses.begin()+goal_idx);
 				continue;
 			}
 			// Otherwise it is a valid goal and let's back track of the path
-			std::cout << "It's a valid goal\n";
+			// std::cout << "It's a valid goal\n";
 			// update m_highestSuccess & m_lowestReachability
 			m_highestSuccess = 
 				m_currentSurvival * m_labelWeights[m_targetPoses[goal_idx]].second * 1.0;
 			m_lowestReachability = m_highestSuccess*1.0 / m_MaxSurvival;
 			// print the success rate, survivability & labels for the found path
-			std::cout << "Success rate of the path: " << m_highestSuccess << "\n";
-			std::cout << "Survivability of the path: " << m_currentSurvival << "\n";
-			std::cout << "Labels of the path: " << "<";
-			for (auto const &e : m_currentLabels)
-			{
-				std::cout << e << " ";
-			}
-			std::cout << ">\n";
+			// std::cout << "Success rate of the path: " << m_highestSuccess << "\n";
+			// std::cout << "Survivability of the path: " << m_currentSurvival << "\n";
+			// std::cout << "Labels of the path: " << "<";
+			// for (auto const &e : m_currentLabels)
+			// {
+			// 	std::cout << e << " ";
+			// }
+			// std::cout << ">\n";
 
 			// should return a path here
 			back_track_path();
