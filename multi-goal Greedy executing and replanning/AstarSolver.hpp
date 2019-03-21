@@ -72,6 +72,8 @@ public:
 
 	// getters
 	int getmStart() { return m_start; }
+	bool getIsSolvable() { return m_solvable; }
+	std::vector<int> getmPath() { return m_path; }
 
 };
 

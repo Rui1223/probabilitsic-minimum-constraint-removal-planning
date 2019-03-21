@@ -58,7 +58,7 @@ ConnectedGraph_t::ConnectedGraph_t(int row, int col, std::vector<int> nlabelsPer
 
 	// m_nExpansion = round(m_nEdges * density *1.0 / m_nTotallabels) *1.5;
 	// m_nExpansion = round(m_nEdges * density *1.0 / m_nTotallabels * 2);
-	m_nExpansion = round(m_nEdges*1.0 / (5*1.0*m_nlabelsPerObs[0]));
+	m_nExpansion = round(m_nEdges*1.0 / (40*1.0*m_nlabelsPerObs[0]));
 	std::cout << "n_expansion: " << m_nExpansion << "\n";
 	// std::cout << "Expected density: " << density << "\n";
 	m_nmarked = 0;
