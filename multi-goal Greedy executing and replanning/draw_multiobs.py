@@ -21,7 +21,7 @@ if __name__ == "__main__":
 	# 																'yellow', 'black']
 
 	## read in my text file
-	f = open("./statistics_ExecutionReplanning/nObstacles/nObstacles=3/problem 1/graph problem.txt", "r")
+	f = open("./statistics_ExecutionReplanning/nObstacles/nObstacles=5/problem 1/graph problem.txt", "r")
 	# start to count the line
 	n_line = 0
 	for line in f:
@@ -141,9 +141,9 @@ if __name__ == "__main__":
 	ax.text(col+3-3, row+3-0.5-0.4*(len(label_weights)+3), targetPoses, fontsize=10)
 
 
-	# ##Now plot the solution for Greedy Algorithm
-	# ##################################################################
-	f_greedy = open("./statistics_ExecutionReplanning/nObstacles/nObstacles=3/problem 1/GreedySearch_solution.txt", "r")
+	##Now plot the solution for Greedy Algorithm
+	##################################################################
+	f_greedy = open("./statistics_ExecutionReplanning/nObstacles/nObstacles=5/problem 1/GreedySearch_solution.txt", "r")
 	n_line = 0;
 	for line in f_greedy:
 		line = line.split()
@@ -170,11 +170,11 @@ if __name__ == "__main__":
 				while (counter != (len(path)-1)):
 					v1 = path[counter]
 					v2 = path[counter+1]
-					ax.plot(cal_co(v1,col,row)[0], cal_co(v1,col,row)[1], "c*", zorder=4)
+					ax.plot(cal_co(v1,col,row)[0], cal_co(v1,col,row)[1], "co", zorder=4)
 					ax.plot([cal_co(v1,col,row)[0], cal_co(v2,col,row)[0]], 
 							[cal_co(v1,col,row)[1], cal_co(v2,col,row)[1]], "c--", zorder=4)
 					counter += 1
-				ax.plot(cal_co(v2,col,row)[0], cal_co(v2,col,row)[1], "c*", zorder=4)
+				ax.plot(cal_co(v2,col,row)[0], cal_co(v2,col,row)[1], "co", zorder=4)
 
 				# plot labels
 				ax.text(col+3-3, -2+4.0, "G Time:"+solution_time, color="c", fontsize=10)
@@ -189,46 +189,71 @@ if __name__ == "__main__":
 ############################################################################################################
 
 
-			# # start plotting the paths
-			# if (nPaths != 1):
-			# 	# we are plotting suboptimal path
-			# 	path = map(int, line)
-			# 	if (path):
-			# 		counter = 0
-			# 		while (counter != (len(path)-1)):
-			# 			v1 = path[counter]
-			# 			v2 = path[counter+1]
-			# 			ax.plot(cal_co(v1,col,row)[0], cal_co(v1,col,row)[1], "co", zorder=3)
-			# 			ax.plot([cal_co(v1,col,row)[0], cal_co(v2,col,row)[0]], 
-			# 					[cal_co(v1,col,row)[1], cal_co(v2,col,row)[1]], "c--", zorder=3)
-			# 			counter += 1
-			# 		ax.plot(cal_co(v2,col,row)[0], cal_co(v2,col,row)[1], "co", zorder=3)
-			# else:
-			# 	# we are plotting optimal path
-			# 	path = map(int, line)
-			# 	if (path):
-			# 		counter = 0
-			# 		while (counter != (len(path)-1)):
-			# 			v1 = path[counter]
-			# 			v2 = path[counter+1]
-			# 			ax.plot(cal_co(v1,col,row)[0], cal_co(v1,col,row)[1], "c*", zorder=4)
-			# 			ax.plot([cal_co(v1,col,row)[0], cal_co(v2,col,row)[0]], 
-			# 					[cal_co(v1,col,row)[1], cal_co(v2,col,row)[1]], "c--", zorder=4)
-			# 			counter += 1
-			# 		ax.plot(cal_co(v2,col,row)[0], cal_co(v2,col,row)[1], "c*", zorder=4)
+	##Now plot the solution for Astar Algorithm
+	##################################################################
+	f_astar = open("./statistics_ExecutionReplanning/nObstacles/nObstacles=5/problem 1/AstarSearch_solution.txt", "r")
+	n_line = 0;
+	for line in f_astar:
+		line = line.split()
+		n_line += 1
+		if (n_line == 1):
+			solution_time = line[0]
+		else:
+			# we are plotting optimal path
+			path = map(int, line)
+			if (path):
+				counter = 0
+				while (counter != (len(path)-1)):
+					v1 = path[counter]
+					v2 = path[counter+1]
+					ax.plot(cal_co(v1,col,row)[0], cal_co(v1,col,row)[1], "b*", zorder=4)
+					ax.plot([cal_co(v1,col,row)[0], cal_co(v2,col,row)[0]], 
+							[cal_co(v1,col,row)[1], cal_co(v2,col,row)[1]], "b--", zorder=4)
+					counter += 1
+				ax.plot(cal_co(v2,col,row)[0], cal_co(v2,col,row)[1], "b*", zorder=4)
 
-			# 		# plot labels
-			# 		ax.text(col+3-3, -2+4.0, "G Time:"+solution_time, color="c", fontsize=10)
-			# 		ax.text(col+3-3, -2+3.5, "G OptPose:"+pose_optimum, color="c", fontsize=10)
-			# 		ax.text(col+3-3, -2+3.0, "G Success:"+success_optimum, color="c", fontsize=10)
-			# 		ax.text(col+3-3, -2+2.5, "G Survival:"+survival_optimum, color="c", fontsize=10)
-			# 		ax.text(col+3-3, -2+2.0, "G Labels:"+labels_optimum, color="c", fontsize=10)
+				# plot labels
+				ax.text(col+3-3, -2+4.5, "A Time:"+solution_time, color="b", fontsize=10)
 
-			# 		## highlight the goal
-			# 		ax.text(cal_co(goal_optimum,col,row)[0]-0.2, cal_co(goal_optimum,col,row)[1]+0.05, 
-			# 				"goal", color="fuchsia", fontweight='bold', fontsize=8)
+############################################################################################################
 
-			# nPaths -= 1;
 
+
+	##Now plot the solution for MaxSurvival Algorithm
+	##################################################################
+	f_maxSurvival = open("./statistics_ExecutionReplanning/nObstacles/nObstacles=5/problem 1/MaxSurvivalSearch_solution.txt", "r")
+	n_line = 0;
+	for line in f_maxSurvival:
+		line = line.split()
+		n_line += 1
+		if (n_line == 1):
+			solution_time = line[0]
+			solution_survival = line[1]
+		# line 2 stores the labels
+		elif (n_line == 2):
+			if len(line) == 0:
+				solution_labels = " "
+			else:
+				solution_labels = line[0]
+		else:
+			# we are plotting optimal path
+			path = map(int, line)
+			if (path):
+				counter = 0
+				while (counter != (len(path)-1)):
+					v1 = path[counter]
+					v2 = path[counter+1]
+					ax.plot(cal_co(v1,col,row)[0], cal_co(v1,col,row)[1], "ys", zorder=4)
+					ax.plot([cal_co(v1,col,row)[0], cal_co(v2,col,row)[0]], 
+							[cal_co(v1,col,row)[1], cal_co(v2,col,row)[1]], "y--", zorder=4)
+					counter += 1
+				ax.plot(cal_co(v2,col,row)[0], cal_co(v2,col,row)[1], "ys", zorder=4)
+
+				# plot labels
+				ax.text(col+3-3, -2+6.0, "M Time:"+solution_time, color="y", fontsize=10)
+				ax.text(col+3-3, -2+5.5, "M Survival:"+solution_survival, color="y", fontsize=10)
+				ax.text(col+3-3, -2+5.0, "M Labels:"+solution_labels, color="y", fontsize=10)
+
+############################################################################################################
 
 	plt.show()

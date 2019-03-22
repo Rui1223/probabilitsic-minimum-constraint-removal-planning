@@ -139,15 +139,22 @@ if __name__ == "__main__":
 	ax.text(col+3-3, row+3-0.5-0.4*(len(label_weights)+3), targetPoses, fontsize=10)
 
 
-	# ##Now plot the solution for Astar Algorithm
-	# ##################################################################
-	f_astar = open("./ConnectedGraph/AstarSearch_solution0.txt", "r")
+	##Now plot the solution for Astar Algorithm
+	##################################################################
+	f_maxsurvival = open("./ConnectedGraph/MaxSurvivalSearch_solution0.txt", "r")
 	n_line = 0;
-	for line in f_astar:
+	for line in f_maxsurvival:
 		line = line.split()
 		n_line += 1
 		if (n_line == 1):
 			solution_time = line[0]
+			solution_survival = line[1]
+		elif (n_line == 2):
+			# all labels
+			if len(line) == 0:
+				solution_labels = " "
+			else:
+				solution_labels = line[0]
 		else:
 			# we are plotting optimal path
 			path = map(int, line)
@@ -162,7 +169,35 @@ if __name__ == "__main__":
 					counter += 1
 				ax.plot(cal_co(v2,col,row)[0], cal_co(v2,col,row)[1], "c*", zorder=4)
 
-				# plot time
-				ax.text(col+3-3, -2+4.0, "G Time:"+solution_time, color="c", fontsize=10)
+			# text
+			ax.text(col+3-3, -2+4.0, "MaxSurvival Time: "+solution_time, color="c", fontsize=10)
+			ax.text(col+3-3, -2+3.5, "survival: "+solution_survival, color="c", fontsize=10)
+			ax.text(col+3-3, -2+3.0, "Labels: "+solution_labels, color="c", fontsize=10)
+
+	# ##Now plot the solution for Astar Algorithm
+	# ##################################################################
+	# f_astar = open("./ConnectedGraph/AstarSearch_solution0.txt", "r")
+	# n_line = 0;
+	# for line in f_astar:
+	# 	line = line.split()
+	# 	n_line += 1
+	# 	if (n_line == 1):
+	# 		solution_time = line[0]
+	# 	else:
+	# 		# we are plotting optimal path
+	# 		path = map(int, line)
+	# 		if (path):
+	# 			counter = 0
+	# 			while (counter != (len(path)-1)):
+	# 				v1 = path[counter]
+	# 				v2 = path[counter+1]
+	# 				ax.plot(cal_co(v1,col,row)[0], cal_co(v1,col,row)[1], "c*", zorder=4)
+	# 				ax.plot([cal_co(v1,col,row)[0], cal_co(v2,col,row)[0]], 
+	# 						[cal_co(v1,col,row)[1], cal_co(v2,col,row)[1]], "c--", zorder=4)
+	# 				counter += 1
+	# 			ax.plot(cal_co(v2,col,row)[0], cal_co(v2,col,row)[1], "c*", zorder=4)
+
+	# 			# plot time
+	# 			ax.text(col+3-3, -2+4.0, "G Time:"+solution_time, color="c", fontsize=10)
 
 	plt.show()

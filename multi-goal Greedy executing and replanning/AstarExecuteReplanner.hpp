@@ -12,8 +12,10 @@ class AstarExecuteReplanner_t
 	int m_nReplan;
 	double m_ExecutionTime;
 	int m_pathLength;
+	double m_pathUtilityRate;
 	std::vector<int> m_ExecutedPath; // record the actual executed path
 	bool m_isDoomed; // check whether the ground truth is doomed
+	double m_resetTime; // reset time for each replan
 
 	int m_nlabelsPerObs;
 	int m_targetObs;
@@ -39,6 +41,7 @@ public:
 	double getExecutionTime() { return m_ExecutionTime; }
 	int getPathLength() { return m_pathLength; }
 	std::vector<int> getExecutedPath() { return m_ExecutedPath; }
+	double getPathUtilityRate() { return m_pathUtilityRate; }
 	bool getIsDoomed() { return m_isDoomed; }
 
 	double getLabelWeight(int indx) { return m_labelWeights[indx].second; }

@@ -58,7 +58,7 @@ ConnectedGraph_t::ConnectedGraph_t(int row, int col, std::vector<int> nlabelsPer
 
 	// m_nExpansion = round(m_nEdges * density *1.0 / m_nTotallabels) *1.5;
 	// m_nExpansion = round(m_nEdges * density *1.0 / m_nTotallabels * 2);
-	m_nExpansion = round(m_nEdges*1.0 / (40*1.0*m_nlabelsPerObs[0]));
+	m_nExpansion = round(m_nEdges*1.0 / (65*1.0*m_nlabelsPerObs[0]));
 	std::cout << "n_expansion: " << m_nExpansion << "\n";
 	// std::cout << "Expected density: " << density << "\n";
 	m_nmarked = 0;
@@ -66,10 +66,9 @@ ConnectedGraph_t::ConnectedGraph_t(int row, int col, std::vector<int> nlabelsPer
 	// given #labels per obstacle, assign weight to each label
 	// so that we end up knowing which obs a label belongs to and its corresponding weight 
 	assign_weight_per_label();
-	//cal_labelMap();
-	//print_labelMap();
+	// std::cout << "Finish assigning weight.\n";
 
-	// construct the graph 
+	// construct the graph
 	load_graph();
 	//print_graph();
 
@@ -148,6 +147,7 @@ void ConnectedGraph_t::load_graph()
 		currentID++; // start working on the next node
 	}
 
+	// std::cout << "Finish specifying the neighbors and edge costs\n";
 	label_graph();
 	std::cout << "Acutal density: " << double(m_nmarked) / m_nEdges << "\n";
 	pick_start();
@@ -202,8 +202,8 @@ void ConnectedGraph_t::label_graph()
 	int trial;
 	int temp_nlabels;
 	std::pair<int, int> BF_start_loc;
-	double dist_threshold1 = 2*obs_r;
-	double dist_threshold2 = 2*obs_r;
+	double dist_threshold1 = 3*obs_r;
+	double dist_threshold2 = 3*obs_r;
 
 	// pick the target object
 	m_targetObs = random_generate_integer(0, m_nobstacles-1);
@@ -392,6 +392,7 @@ void ConnectedGraph_t::pick_start()
 			if (m_edgeLabels[m_start][neighbor].empty())// collison free
 			{
 				NoCollision = true;
+				// std::cout << "find a collision-free start!\n";
 				break;
 			}
 		}

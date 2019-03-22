@@ -275,10 +275,10 @@ void PmcrGreedySolver_t::back_track_path()
 	path_candidate.push_back(current->getID());
 
 	// print the current path
-	for (auto const &waypoint : path_candidate)
-	{
-		std::cout << waypoint << " ";
-	}
+	// for (auto const &waypoint : path_candidate)
+	// {
+	// 	std::cout << waypoint << " ";
+	// }
 	std::cout << "\n";
 
 	m_paths.push_back(path_candidate);

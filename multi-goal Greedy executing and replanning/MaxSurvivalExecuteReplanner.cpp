@@ -1,7 +1,7 @@
-#include "AstarExecuteReplanner.hpp"
+#include "MaxSurvivalExecuteReplanner.hpp"
 #include "Timer.hpp"
 
-AstarExecuteReplanner_t::AstarExecuteReplanner_t(ConnectedGraph_t &g, std::vector<int> currentPath)
+MaxSurvivalExecuteReplanner_t::MaxSurvivalExecuteReplanner_t(ConnectedGraph_t &g, std::vector<int> currentPath)
 {
 	Timer t;
 	int totalPlannedPathLength = 0;
@@ -55,18 +55,18 @@ AstarExecuteReplanner_t::AstarExecuteReplanner_t(ConnectedGraph_t &g, std::vecto
 		// 	std::cout << ii << ": " << m_labelWeights[ii].first
 		// 										<< "\t" << m_labelWeights[ii].second << "\n";
 		// }
-		AstarSolver_t asolver1(g, m_start, m_goalSetD, m_targetPosesD, m_labelWeights);
-		asolver1.Astar_search(g);
+		MaxSurvivalSolver_t msolver1(g, m_start, m_goalSetD, m_targetPosesD, m_labelWeights);
+		msolver1.MaxSurvival_search(g);
 
 		// check if the ground truth is solvable
-		if (asolver1.getIsSolvable() == false)
+		if (msolver1.getIsSolvable() == false)
 		{
 			m_isDoomed = true;
 			break;
 		}
 		else
 		{
-			m_path = asolver1.getmPath();
+			m_path = msolver1.getmPath();
 			totalPlannedPathLength += (m_path.size() - 1);
 		}
 
@@ -98,7 +98,7 @@ AstarExecuteReplanner_t::AstarExecuteReplanner_t(ConnectedGraph_t &g, std::vecto
 
 }
 
-bool AstarExecuteReplanner_t::execute(ConnectedGraph_t &g)
+bool MaxSurvivalExecuteReplanner_t::execute(ConnectedGraph_t &g)
 {
 	// std::cout << "Start executing the path\n";
 	bool needReplan = false;
@@ -158,7 +158,7 @@ bool AstarExecuteReplanner_t::execute(ConnectedGraph_t &g)
 	return needReplan;
 }
 
-bool AstarExecuteReplanner_t::updateMap(ConnectedGraph_t &g, std::vector<int> &labels)
+bool MaxSurvivalExecuteReplanner_t::updateMap(ConnectedGraph_t &g, std::vector<int> &labels)
 {
 	bool isSafe = true;
 	// check each label
@@ -181,7 +181,7 @@ bool AstarExecuteReplanner_t::updateMap(ConnectedGraph_t &g, std::vector<int> &l
 	return isSafe;
 }
 
-void AstarExecuteReplanner_t::updateLabelWeights(int label, bool mode)
+void MaxSurvivalExecuteReplanner_t::updateLabelWeights(int label, bool mode)
 {
 	int temp_obs;
 
@@ -246,4 +246,4 @@ void AstarExecuteReplanner_t::updateLabelWeights(int label, bool mode)
 	}
 }
 
-AstarExecuteReplanner_t::~AstarExecuteReplanner_t() {}
+MaxSurvivalExecuteReplanner_t::~MaxSurvivalExecuteReplanner_t() {}

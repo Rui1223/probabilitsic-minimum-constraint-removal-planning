@@ -48,10 +48,11 @@ test_t::~test_t()
 
 int main()
 {
-	float a = std::numeric_limits<float>::infinity();
-	int b =3;
-	float c = a + b;
-	std::cout << c << "\n";
+	double a = 1*1.0 / 1;
+	std::cout << a << "\n";
+
+	double b = a*1.0 / 1 / 2;
+	std::cout << b << "\n";
 
 
 	return 0;

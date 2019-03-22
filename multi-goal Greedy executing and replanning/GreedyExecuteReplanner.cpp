@@ -4,10 +4,12 @@
 GreedyExecuteReplanner_t::GreedyExecuteReplanner_t(ConnectedGraph_t &g, std::vector<int> currentPath)
 {
 	Timer t;
+	int totalPlannedPathLength = 0;
 	m_nReplan = 0;
 	m_ExecutionTime = 0.0;
 	m_pathLength = 0;
 	m_isDoomed = false;
+	m_resetTime = 0.2;
 
 	// initially the 6 variables are the same as the graph problem
 	// never change during the replanning
@@ -20,6 +22,7 @@ GreedyExecuteReplanner_t::GreedyExecuteReplanner_t(ConnectedGraph_t &g, std::vec
 	m_targetPosesD = g.getmTargetPoses();
 	m_labelWeights = g.getLabelWeights();
 	m_path = currentPath;
+	totalPlannedPathLength += (m_path.size() - 1);
 
 	// since the start of the original path is guaranteed to be collision free
 	// directly add it into the m_ExecutedPath
@@ -33,7 +36,7 @@ GreedyExecuteReplanner_t::GreedyExecuteReplanner_t(ConnectedGraph_t &g, std::vec
 	{
 		m_nReplan++;
 		// std::cout << "\n#Replan: " << m_nReplan << "\n";
-		// create a new gsolver(with updated information) and perform a new planning/search
+		// // create a new gsolver(with updated information) and perform a new planning/search
 		// std::cout << "Replan:: start: " << m_start << "\n";
 		// std::cout << "Replan:: goalSetD: \n";
 		// std::cout << "<";
@@ -66,6 +69,7 @@ GreedyExecuteReplanner_t::GreedyExecuteReplanner_t(ConnectedGraph_t &g, std::vec
 		else
 		{
 			m_path = gsolver1.getOptimalPath();
+			totalPlannedPathLength += (m_path.size() - 1);
 		}
 
 	}
@@ -75,11 +79,24 @@ GreedyExecuteReplanner_t::GreedyExecuteReplanner_t(ConnectedGraph_t &g, std::vec
 	// std::cout << "Jump out of the replan loop\n";
 	if (!m_isDoomed)
 	{
-		m_ExecutionTime = t.elapsed();
-		m_pathLength = m_ExecutedPath.size();
+		m_ExecutionTime = t.elapsed() + m_resetTime * m_nReplan;
+		m_pathLength = m_ExecutedPath.size() - 1;
+		m_pathUtilityRate = m_pathLength*1.0 / totalPlannedPathLength;
+		// std::cout << "m_pathUtilityRate: " << m_pathUtilityRate << "\n";
 		// std::cout << "The ground truth is not doomed\n";
+		// std::cout << "Finishing replanning\n";
 	}
-	// std::cout << "Finishing replanning\n";
+	else
+	{
+		// std::cout << "The ground truth is doomed. Quit replanning.\n";
+	}
+
+	// std::cout << "Executed Path length: " << m_pathLength << "\t"; 
+	// for (auto const &wp : m_ExecutedPath)
+	// {
+	// 	std::cout << wp << " ";
+	// }
+	// std::cout << "\n";
 
 }
 
