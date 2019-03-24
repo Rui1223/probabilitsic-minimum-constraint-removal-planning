@@ -64,6 +64,7 @@ class ConnectedGraph_t
 	int m_trueGoal;
 
 	double m_obsDistrVar;
+	double m_entropy;
 
 public:
 	// Constructor
@@ -124,6 +125,7 @@ public:
 	int getEdgeCost(int id1, int id2) { return m_edgeCosts[id1][id2]; }
 	std::map<int, std::pair<int, double>> getLabelWeights() { return m_labelWeights; }
 	std::pair<int, double> getLabelWeights(int label_idx) { return m_labelWeights[label_idx]; }
+	double getEntropy() { return m_entropy; }
 	
 	int getmStart() { return m_start; }
 	std::vector<int> getmGoalSet() { return m_goalSet; }

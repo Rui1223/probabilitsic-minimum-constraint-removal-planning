@@ -38,18 +38,18 @@ int main()
 	double d_distrVar = 3.0;
 
 	// Parameter we play with
-	std::vector<int> x_nObstacles{10, 20, 30, 40, 50, 60}; // use later
-	// std::vector<int> x_nObstacles{60};
-	std::vector<int> x_nPosesPerObs{2, 3, 5, 7, 8 ,9}; // use later
-	// std::vector<int> x_nPosesPerObs{10};
-	std::vector<double> x_distrVar{0.5, 1.0, 2.0, 3.0, 4.0, 5.0}; // use later 
-	// std::vector<double> x_distrVar{10.0};
+	// std::vector<int> x_nObstacles{10, 20, 30, 40, 50, 60}; // use later
+	std::vector<int> x_nObstacles{60};
+	// std::vector<int> x_nPosesPerObs{2, 3, 5, 7, 8 ,9}; // use later
+	std::vector<int> x_nPosesPerObs{7};
+	std::vector<double> x_distrVar{0.0, 1.0, 3.0, 4.0, 5.0, 10.0, 100.0}; // use later 
+	// std::vector<double> x_distrVar{0.0};
 
 	// Other parameters we may want to set before the experiments
 	// number of problems we would like to work on for each single statistics
-	int nProblems = 100;
+	int nProblems = 30;
 	// number of group truth (true scene) we would like to generate for EACH problem
-	int nGroundTruth = 100;
+	int nGroundTruth = 1;
 	// counter the problems we are working on
 	int current_problem_idx;
 	// counter the ground truth we are working on
@@ -453,6 +453,8 @@ int main()
 		int y_pathLength_MaxSurvival = 0;
 		double y_pathUtilityRate_MaxSurvival = 0.0;
 
+		double currentEntropy = 0.0;
+
 		current_problem_idx = 1;
 		// specify the #poses each obstacle has. It is an input to construct a graph problem
 		std::vector<int> posesEachObs(d_nObstacles, d_nPosesPerObs);
@@ -471,6 +473,7 @@ int main()
 			ConnectedGraph_t g(d_gridSize, d_gridSize, posesEachObs, distrV);
 			// save it for future visualization
 			g.write_graph(Exp3_graph_problem_txt);
+			currentEntropy += g.getEntropy();
 
 			// solve the problem using our algorithm (multi-goal Greedy, A* planner, MaxSurvival planner)
 			// The things we care is just the OPTIMAL PATH
@@ -580,11 +583,12 @@ int main()
 		double y_average_nReplan_M = y_nReplan_MaxSurvival*1.0 / nProblems / nGroundTruth;
 		double y_average_pathLength_M = y_pathLength_MaxSurvival*1.0 / nProblems / nGroundTruth;
 		double y_average_pathUtilityRate_M = y_pathUtilityRate_MaxSurvival*1.0 / nProblems / nGroundTruth;
+		currentEntropy = currentEntropy / nProblems;
 
 		if (file_Exp3_stat.is_open())
 		{
 			std::cout << "start writing the statistics\n";
-			file_Exp3_stat << distrV << " " << y_average_time_G << " " << y_average_nReplan_G << " "
+			file_Exp3_stat << currentEntropy << " " << y_average_time_G << " " << y_average_nReplan_G << " "
 				<< y_average_pathLength_G <<  " " << y_average_pathUtilityRate_G << " " << y_average_time_A 
 				<< " " << y_average_nReplan_A << " " << y_average_pathLength_A << " " << y_average_pathUtilityRate_A
 				<< " " << y_average_time_M << " " << y_average_nReplan_M << " " << y_average_pathLength_M 

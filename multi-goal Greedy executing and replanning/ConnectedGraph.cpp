@@ -46,6 +46,7 @@ ConnectedGraph_t::ConnectedGraph_t(int row, int col, std::vector<int> nlabelsPer
 	m_nEdges = (m_col-1)*m_row + (m_row-1)*m_col;
 	//std::cout << "m_nEdges: " << m_nEdges << std::endl;
 	m_obsDistrVar = obsDistrVar;
+	m_entropy = 0.0;
 	
 	// label information
 	m_nlabelsPerObs = nlabelsPerObs;
@@ -483,24 +484,53 @@ void ConnectedGraph_t::write_graph(std::string file_dir)
 
 std::vector<double> ConnectedGraph_t::load_weights(int nlabels)
 {
-	std::random_device rd{};
-	std::mt19937 gen{rd()};
-	double r = 0.0;
-
-	std::normal_distribution<> d{5.0, m_obsDistrVar};
-
-	std::vector<double> temp_weights; 
-
-	for (int kk = 0; kk < nlabels; kk++)
+	// two special case consider //
+	// variance = 0.0 (all potential poses have equal weight, maximum entropy received)
+	if (m_obsDistrVar == 0.0)
 	{
-		double temp = d(gen);
-		while (temp <= 0) { temp = d(gen); }
-		temp_weights.push_back(temp);
-		r += temp;
+		std::vector<double> temp_weights(nlabels, 1.0/nlabels);
+		return temp_weights;	
 	}
-	// normalize
-	temp_weights /= r;
-	return temp_weights;
+	// variance = 100.0 (one pose becomes SUPER likely candidate, deterministic problem)
+	// minimum entropy received
+	else if (m_obsDistrVar == 100.0)
+	{
+		std::vector<double> temp_weights;
+		for (int kk = 0; kk < nlabels; kk++)
+		{
+			if (kk == 0)
+			{
+				temp_weights.push_back(1.0);
+			}
+			else
+			{
+				temp_weights.push_back(0.0);
+			}
+		}
+		return temp_weights;
+	}
+	else
+	{
+		std::random_device rd{};
+		std::mt19937 gen{rd()};
+		double r = 0.0;
+
+		std::normal_distribution<> d{5.0, m_obsDistrVar};
+
+		std::vector<double> temp_weights; 
+
+		for (int kk = 0; kk < nlabels; kk++)
+		{
+			double temp = d(gen);
+			while (temp <= 0) { temp = d(gen); }
+			temp_weights.push_back(temp);
+			r += temp;
+		}
+		// normalize
+		temp_weights /= r;
+		return temp_weights;		
+	}
+
 }
 
 void ConnectedGraph_t::assign_weight_per_label()
@@ -509,17 +539,22 @@ void ConnectedGraph_t::assign_weight_per_label()
 	int current_label_idx = 0;
 	for (int obs=0; obs < m_nobstacles; obs++)
 	{
+		double entropy_obs = 0.0;
 		///////// for each obstacle /////////
 		// first get #labels the current obstacle has
 		int nlabels = m_nlabelsPerObs[obs];
 		std::vector<double> weightsObs = load_weights(nlabels);
+		// calculate the average entropy among all obstacles
+		// assign the weights we returned to m_labelWeights
 		for (auto const w: weightsObs)
 		{
+			if (w != 0.0) {	entropy_obs += -w * log(w); }
 			m_labelWeights[current_label_idx] = std::pair<int, double>(obs, w);
 			current_label_idx++;
 		}
-
-	} 
+		m_entropy += entropy_obs;
+	}
+	m_entropy = m_entropy / m_nobstacles;
 }
 
 void ConnectedGraph_t::print_graph() 

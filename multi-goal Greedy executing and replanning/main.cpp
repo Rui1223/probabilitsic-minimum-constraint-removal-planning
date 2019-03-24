@@ -48,11 +48,8 @@ test_t::~test_t()
 
 int main()
 {
-	double a = 1*1.0 / 1;
-	std::cout << a << "\n";
-
-	double b = a*1.0 / 1 / 2;
-	std::cout << b << "\n";
+	double tw = 0.2;
+	std::cout << tw * log(tw) << "\n";
 
 
 	return 0;
