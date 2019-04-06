@@ -18,13 +18,13 @@
 // random generator function:
 int myrandom (int i) { return std::rand()%i; }
 
-PmcrGreedySolver_t::PmcrGreedySolver_t(ConnectedGraph_t &g, int start, std::vector<int> goalSetD, 
-	std::vector<int> targetPosesD, std::map<int, std::pair<int, double>> labelWeights)
+PmcrGreedySolver_t::PmcrGreedySolver_t(ConnectedGraph_t &g, int start, std::vector<int> goalSet, 
+	std::vector<int> targetPoses, std::map<int, std::pair<int, double>> labelWeights)
 {
 	// first initialize the things you update from the last replanning
 	m_start = start;
-	m_goalSetD = goalSetD;
-	m_targetPosesD = targetPosesD;
+	m_goalSet = goalSet;
+	m_targetPoses = targetPoses;
 	m_labelWeights = labelWeights;
 
 	// these parameters never change. Just get it from the graph problem
@@ -66,9 +66,6 @@ PmcrGreedySolver_t::~PmcrGreedySolver_t()
 
 void PmcrGreedySolver_t::greedy_search(ConnectedGraph_t &g)
 {
-	m_goalSet = m_goalSetD;
-	m_targetPoses = m_targetPosesD;
-
 	int goal_idx;
 	std::vector<int>::iterator it;
 	

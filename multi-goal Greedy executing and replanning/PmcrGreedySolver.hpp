@@ -33,8 +33,6 @@ class PmcrGreedySolver_t
 {
 	// Input that a greedy solver needs
 	// ConnectedGraph_t m_lgraph; 
-	std::vector<int> m_goalSet; // the ids of all goal nodes
-	std::vector<int> m_targetPoses;
 	int m_col;
 	int m_targetObs; //obs idx for target
 	int m_nlabelsPerObs;
@@ -65,16 +63,15 @@ class PmcrGreedySolver_t
 
 	// replanning things
 	int m_start; // the id of the start node
-	std::vector<int> m_goalSetD;
-	std::vector<int> m_targetPosesD;
 	std::map<int, std::pair<int, double>> m_labelWeights;
-	// std::vector<bool> m_obsDiscover; // record whether an obstacle has been discovered
+	std::vector<int> m_goalSet; // the ids of all goal nodes
+	std::vector<int> m_targetPoses;
 
 	bool m_solvable;
 
 public:
-	PmcrGreedySolver_t(ConnectedGraph_t &g, int start, std::vector<int> goalSetD, 
-			std::vector<int> targetPosesD, std::map<int, std::pair<int, double>> labelWeights);
+	PmcrGreedySolver_t(ConnectedGraph_t &g, int start, std::vector<int> goalSet, 
+			std::vector<int> targetPoses, std::map<int, std::pair<int, double>> labelWeights);
 	~PmcrGreedySolver_t();
 	void greedy_search(ConnectedGraph_t &g);
 
@@ -95,8 +92,8 @@ public:
 	std::vector<int> getOptimalPath() { return m_optimalPath; }
 	double getLabelWeight(int indx) { return m_labelWeights[indx].second; }
 	int getmStart() { return m_start; }
-	std::vector<int> getGoalSetD() { return m_goalSetD; }
-	std::vector<int> getTargetPoseD() { return m_targetPosesD; }
+	std::vector<int> getGoalSet() { return m_goalSet; }
+	std::vector<int> getTargetPose() { return m_targetPoses; }
 	std::map<int, std::pair<int, double>> getLabelWeights() { return m_labelWeights; }
 	bool getIsSolvable() { return m_solvable; }
 

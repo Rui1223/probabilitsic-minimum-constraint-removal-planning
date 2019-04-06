@@ -2,10 +2,12 @@
 #include "PmcrGreedySolver.hpp"
 #include "AstarSolver.hpp"
 #include "MaxSurvivalSolver.hpp"
+#include "MaxLikelihoodSolver.hpp"
 #include "Timer.hpp"
 #include "GreedyExecuteReplanner.hpp"
 #include "AstarExecuteReplanner.hpp"
 #include "MaxSurvivalExecuteReplanner.hpp"
+#include "MaxLikelihoodExecuteReplanner.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -28,28 +30,28 @@ int main()
 	std::string StatisticFolder_dir("./statistics_ExecutionReplanning"); // name: statistics_ExecutionReplanning
 	mkdir(StatisticFolder_dir.c_str(), 0777);
 	// Default settings
-	// int d_gridSize = 50; // will use later for whole experiment
-	int d_gridSize = 50;
-	// int d_nObstacles = 20; // will use later for whole experiment
-	int d_nObstacles = 30;
-	// int d_nPosesPerObs = 5; // will use later for whole experiment
-	int d_nPosesPerObs = 5;
-	// double d_distrVar = 3.0; // variance of the distribution of the obstacle (use later)
-	double d_distrVar = 3.0;
+	int d_gridSize = 50; // will use later for whole experiment
+	// int d_gridSize = 50;
+	int d_nObstacles = 30; // will use later for whole experiment
+	// int d_nObstacles = 30;
+	int d_nPosesPerObs = 5; // will use later for whole experiment
+	// int d_nPosesPerObs = 5;
+	double d_distrVar = 3.0; // variance of the distribution of the obstacle (use later)
+	// double d_distrVar = 3.0;
 
 	// Parameter we play with
-	// std::vector<int> x_nObstacles{10, 20, 30, 40, 50, 60}; // use later
-	std::vector<int> x_nObstacles{60};
-	// std::vector<int> x_nPosesPerObs{2, 3, 5, 7, 8 ,9}; // use later
-	std::vector<int> x_nPosesPerObs{7};
-	std::vector<double> x_distrVar{0.0, 1.0, 3.0, 4.0, 5.0, 10.0, 100.0}; // use later 
-	// std::vector<double> x_distrVar{0.0};
+	std::vector<int> x_nObstacles{10, 20, 30, 40, 50, 60}; // use later
+	// std::vector<int> x_nObstacles{30};
+	std::vector<int> x_nPosesPerObs{2, 3, 5, 7, 8 ,9}; // use later
+	// std::vector<int> x_nPosesPerObs{5};
+	std::vector<double> x_distrVar{0.0, 1.0, 3.0, 5.0, 10.0, 100.0}; // use later 
+	// std::vector<double> x_distrVar{3.0};
 
 	// Other parameters we may want to set before the experiments
 	// number of problems we would like to work on for each single statistics
-	int nProblems = 30;
+	int nProblems = 100;
 	// number of group truth (true scene) we would like to generate for EACH problem
-	int nGroundTruth = 1;
+	int nGroundTruth = 100;
 	// counter the problems we are working on
 	int current_problem_idx;
 	// counter the ground truth we are working on
@@ -59,6 +61,7 @@ int main()
 	Timer t_greedy;
 	Timer t_Astar;
 	Timer t_MaxSurvival;
+	Timer t_MaxLikelihood;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -98,6 +101,10 @@ int main()
 		int y_nReplan_MaxSurvival = 0;
 		int y_pathLength_MaxSurvival = 0;
 		double y_pathUtilityRate_MaxSurvival = 0.0;
+		double y_time_MaxLikelihood = 0.0;
+		int y_nReplan_MaxLikelihood = 0;
+		int y_pathLength_MaxLikelihood = 0;
+		double y_pathUtilityRate_MaxLikelihood = 0.0;
 
 		current_problem_idx = 1;
 		// specify the #poses each obstacle has. It is an input to construct a graph problem
@@ -113,6 +120,7 @@ int main()
 			std::string Exp1_graph_problem_Gsolution_txt = Exp1_problem_dir + "/GreedySearch_solution.txt";
 			std::string Exp1_graph_problem_Asolution_txt = Exp1_problem_dir + "/AstarSearch_solution.txt";
 			std::string Exp1_graph_problem_Msolution_txt = Exp1_problem_dir + "/MaxSurvivalSearch_solution.txt";
+			std::string Exp1_graph_problem_MLsolution_txt = Exp1_problem_dir + "/MaxLikelihoodSearch_solution.txt";
 			// generate a graph problem
 			ConnectedGraph_t g(d_gridSize, d_gridSize, posesEachObs, d_distrVar);
 			// save it for future visualization
@@ -159,6 +167,16 @@ int main()
 			y_time_MaxSurvival += temp_t;
 			msolver.write_solution(Exp1_graph_problem_Msolution_txt, y_time_MaxSurvival);
 
+
+			std::cout << "\n--------------start the MaxLikelihood Search----------------\n";
+			t_MaxLikelihood.reset();
+			MaxLikelihoodSolver_t mlsolver(g, g.getmStart(), g.getmGoalSet(), 
+											g.getmTargetPoses(), g.getLabelWeights());
+			mlsolver.MaxLikelihood_search(g);
+			temp_t = t_MaxLikelihood.elapsed();			
+			y_time_MaxLikelihood += temp_t;
+			mlsolver.write_solution(Exp1_graph_problem_MLsolution_txt, y_time_MaxLikelihood);
+
 			// Now we will test whether the solution from our algorithms are effective or not
 			// which means we have to test it in a real scene, which is the ground truth.
 			// Since the scene carries uncertainty, we will have to generate a ground truth
@@ -204,7 +222,13 @@ int main()
 				y_time_MaxSurvival += MExeReplanner.getExecutionTime();
 				y_nReplan_MaxSurvival += MExeReplanner.getnReplan();
 				y_pathLength_MaxSurvival += MExeReplanner.getPathLength();
-				y_pathUtilityRate_MaxSurvival += MExeReplanner.getPathUtilityRate();			
+				y_pathUtilityRate_MaxSurvival += MExeReplanner.getPathUtilityRate();
+
+				MaxLikelihoodExecuteReplanner_t MLExeReplanner(g, mlsolver.getmPath());
+				y_time_MaxLikelihood += MLExeReplanner.getExecutionTime();
+				y_nReplan_MaxLikelihood += MLExeReplanner.getnReplan();
+				y_pathLength_MaxLikelihood += MLExeReplanner.getPathLength();
+				y_pathUtilityRate_MaxLikelihood += MLExeReplanner.getPathUtilityRate();
 
 				current_groundTruth_idx++;
 				std::cout << "Start creating a new ground truth\n";
@@ -228,6 +252,11 @@ int main()
 		double y_average_nReplan_M = y_nReplan_MaxSurvival*1.0 / nProblems / nGroundTruth;
 		double y_average_pathLength_M = y_pathLength_MaxSurvival*1.0 / nProblems / nGroundTruth;
 		double y_average_pathUtilityRate_M = y_pathUtilityRate_MaxSurvival*1.0 / nProblems / nGroundTruth;
+		double y_average_time_ML = y_time_MaxLikelihood*1.0 / nProblems / nGroundTruth;
+		double y_average_nReplan_ML = y_nReplan_MaxLikelihood*1.0 / nProblems / nGroundTruth;
+		double y_average_pathLength_ML = y_pathLength_MaxLikelihood*1.0 / nProblems / nGroundTruth;
+		double y_average_pathUtilityRate_ML = y_pathUtilityRate_MaxLikelihood*1.0 / nProblems / nGroundTruth;
+
 
 		if (file_Exp1_stat.is_open())
 		{
@@ -236,7 +265,8 @@ int main()
 				<< y_average_pathLength_G <<  " " << y_average_pathUtilityRate_G << " " << y_average_time_A 
 				<< " " << y_average_nReplan_A << " " << y_average_pathLength_A << " " << y_average_pathUtilityRate_A
 				<< " " << y_average_time_M << " " << y_average_nReplan_M << " " << y_average_pathLength_M 
-				<< " " << y_average_pathUtilityRate_M << "\n";
+				<< " " << y_average_pathUtilityRate_M << " " << y_average_time_ML << " " <<  y_average_nReplan_ML
+				<< " " << y_average_pathLength_ML << " " << y_average_pathUtilityRate_ML << "\n";
 		}
 		std::cout << "Finish writing for the current parameter x_nObstacles=" << nObs << "\n";
 		std::cout << "start a new parameter\n";
@@ -276,6 +306,10 @@ int main()
 		int y_nReplan_MaxSurvival = 0;
 		int y_pathLength_MaxSurvival = 0;
 		double y_pathUtilityRate_MaxSurvival = 0.0;
+		double y_time_MaxLikelihood = 0.0;
+		int y_nReplan_MaxLikelihood = 0;
+		int y_pathLength_MaxLikelihood = 0;
+		double y_pathUtilityRate_MaxLikelihood = 0.0;
 
 		current_problem_idx = 1;
 		// specify the #poses each obstacle has. It is an input to construct a graph problem
@@ -291,6 +325,7 @@ int main()
 			std::string Exp2_graph_problem_Gsolution_txt = Exp2_problem_dir + "/GreedySearch_solution.txt";
 			std::string Exp2_graph_problem_Asolution_txt = Exp2_problem_dir + "/AstarSearch_solution.txt";
 			std::string Exp2_graph_problem_Msolution_txt = Exp2_problem_dir + "/MaxSurvivalSearch_solution.txt";
+			std::string Exp2_graph_problem_MLsolution_txt = Exp2_problem_dir + "/MaxLikelihoodSearch_solution.txt";
 			// generate a graph problem
 			ConnectedGraph_t g(d_gridSize, d_gridSize, posesEachObs, d_distrVar);
 			// save it for future visualization
@@ -336,6 +371,15 @@ int main()
 			temp_t = t_MaxSurvival.elapsed();			
 			y_time_MaxSurvival += temp_t;
 			msolver.write_solution(Exp2_graph_problem_Msolution_txt, y_time_MaxSurvival);
+
+			std::cout << "\n--------------start the MaxLikelihood Search----------------\n";
+			t_MaxLikelihood.reset();
+			MaxLikelihoodSolver_t mlsolver(g, g.getmStart(), g.getmGoalSet(), 
+											g.getmTargetPoses(), g.getLabelWeights());
+			mlsolver.MaxLikelihood_search(g);
+			temp_t = t_MaxLikelihood.elapsed();			
+			y_time_MaxLikelihood += temp_t;
+			mlsolver.write_solution(Exp2_graph_problem_MLsolution_txt, y_time_MaxLikelihood);
 
 			// Now we will test whether the solution from our algorithms are effective or not
 			// which means we have to test it in a real scene, which is the ground truth.
@@ -383,6 +427,12 @@ int main()
 				y_nReplan_MaxSurvival += MExeReplanner.getnReplan();
 				y_pathLength_MaxSurvival += MExeReplanner.getPathLength();
 				y_pathUtilityRate_MaxSurvival += MExeReplanner.getPathUtilityRate();
+
+				MaxLikelihoodExecuteReplanner_t MLExeReplanner(g, mlsolver.getmPath());
+				y_time_MaxLikelihood += MLExeReplanner.getExecutionTime();
+				y_nReplan_MaxLikelihood += MLExeReplanner.getnReplan();
+				y_pathLength_MaxLikelihood += MLExeReplanner.getPathLength();
+				y_pathUtilityRate_MaxLikelihood += MLExeReplanner.getPathUtilityRate();
 				
 				current_groundTruth_idx++;
 				std::cout << "Start creating a new ground truth\n";				
@@ -404,6 +454,10 @@ int main()
 		double y_average_nReplan_M = y_nReplan_MaxSurvival*1.0 / nProblems / nGroundTruth;
 		double y_average_pathLength_M = y_pathLength_MaxSurvival*1.0 / nProblems / nGroundTruth;
 		double y_average_pathUtilityRate_M = y_pathUtilityRate_MaxSurvival*1.0 / nProblems / nGroundTruth;
+		double y_average_time_ML = y_time_MaxLikelihood*1.0 / nProblems / nGroundTruth;
+		double y_average_nReplan_ML = y_nReplan_MaxLikelihood*1.0 / nProblems / nGroundTruth;
+		double y_average_pathLength_ML = y_pathLength_MaxLikelihood*1.0 / nProblems / nGroundTruth;
+		double y_average_pathUtilityRate_ML = y_pathUtilityRate_MaxLikelihood*1.0 / nProblems / nGroundTruth;
 
 		if (file_Exp2_stat.is_open())
 		{
@@ -412,7 +466,8 @@ int main()
 				<< y_average_pathLength_G <<  " " << y_average_pathUtilityRate_G << " " << y_average_time_A 
 				<< " " << y_average_nReplan_A << " " << y_average_pathLength_A << " " << y_average_pathUtilityRate_A
 				<< " " << y_average_time_M << " " << y_average_nReplan_M << " " << y_average_pathLength_M 
-				<< " " << y_average_pathUtilityRate_M << "\n";
+				<< " " << y_average_pathUtilityRate_M << " " << y_average_time_ML << " " <<  y_average_nReplan_ML
+				<< " " << y_average_pathLength_ML << " " << y_average_pathUtilityRate_ML << "\n";
 		}
 		std::cout << "Finish writing for the current parameter x_nPosesPerObs=" << nPPO << "\n";
 		std::cout << "start a new parameter\n";
@@ -452,6 +507,10 @@ int main()
 		int y_nReplan_MaxSurvival = 0;
 		int y_pathLength_MaxSurvival = 0;
 		double y_pathUtilityRate_MaxSurvival = 0.0;
+		double y_time_MaxLikelihood = 0.0;
+		int y_nReplan_MaxLikelihood = 0;
+		int y_pathLength_MaxLikelihood = 0;
+		double y_pathUtilityRate_MaxLikelihood = 0.0;
 
 		double currentEntropy = 0.0;
 
@@ -469,6 +528,7 @@ int main()
 			std::string Exp3_graph_problem_Gsolution_txt = Exp3_problem_dir + "/GreedySearch_solution.txt";
 			std::string Exp3_graph_problem_Asolution_txt = Exp3_problem_dir + "/AstarSearch_solution.txt";
 			std::string Exp3_graph_problem_Msolution_txt = Exp3_problem_dir + "/MaxSurvivalSearch_solution.txt";
+			std::string Exp3_graph_problem_MLsolution_txt = Exp3_problem_dir + "/MaxLikelihoodSearch_solution.txt";
 			// generate a graph problem
 			ConnectedGraph_t g(d_gridSize, d_gridSize, posesEachObs, distrV);
 			// save it for future visualization
@@ -514,7 +574,16 @@ int main()
 			msolver.MaxSurvival_search(g);
 			temp_t = t_MaxSurvival.elapsed();			
 			y_time_MaxSurvival += temp_t;
-			msolver.write_solution(Exp3_graph_problem_Msolution_txt, y_time_MaxSurvival);	
+			msolver.write_solution(Exp3_graph_problem_Msolution_txt, y_time_MaxSurvival);
+
+			std::cout << "\n--------------start the MaxLikelihood Search----------------\n";
+			t_MaxLikelihood.reset();
+			MaxLikelihoodSolver_t mlsolver(g, g.getmStart(), g.getmGoalSet(), 
+											g.getmTargetPoses(), g.getLabelWeights());
+			mlsolver.MaxLikelihood_search(g);
+			temp_t = t_MaxLikelihood.elapsed();			
+			y_time_MaxLikelihood += temp_t;
+			mlsolver.write_solution(Exp3_graph_problem_MLsolution_txt, y_time_MaxLikelihood);	
 
 			// Now we will test whether the solution from our algorithms are effective or not
 			// which means we have to test it in a real scene, which is the ground truth.
@@ -563,6 +632,12 @@ int main()
 				y_pathLength_MaxSurvival += MExeReplanner.getPathLength();
 				y_pathUtilityRate_MaxSurvival += MExeReplanner.getPathUtilityRate();
 
+				MaxLikelihoodExecuteReplanner_t MLExeReplanner(g, mlsolver.getmPath());
+				y_time_MaxLikelihood += MLExeReplanner.getExecutionTime();
+				y_nReplan_MaxLikelihood += MLExeReplanner.getnReplan();
+				y_pathLength_MaxLikelihood += MLExeReplanner.getPathLength();
+				y_pathUtilityRate_MaxLikelihood += MLExeReplanner.getPathUtilityRate();
+
 				current_groundTruth_idx++;
 				std::cout << "Start creating a new ground truth\n";				
 			}
@@ -583,6 +658,10 @@ int main()
 		double y_average_nReplan_M = y_nReplan_MaxSurvival*1.0 / nProblems / nGroundTruth;
 		double y_average_pathLength_M = y_pathLength_MaxSurvival*1.0 / nProblems / nGroundTruth;
 		double y_average_pathUtilityRate_M = y_pathUtilityRate_MaxSurvival*1.0 / nProblems / nGroundTruth;
+		double y_average_time_ML = y_time_MaxLikelihood*1.0 / nProblems / nGroundTruth;
+		double y_average_nReplan_ML = y_nReplan_MaxLikelihood*1.0 / nProblems / nGroundTruth;
+		double y_average_pathLength_ML = y_pathLength_MaxLikelihood*1.0 / nProblems / nGroundTruth;
+		double y_average_pathUtilityRate_ML = y_pathUtilityRate_MaxLikelihood*1.0 / nProblems / nGroundTruth;
 		currentEntropy = currentEntropy / nProblems;
 
 		if (file_Exp3_stat.is_open())
@@ -592,7 +671,8 @@ int main()
 				<< y_average_pathLength_G <<  " " << y_average_pathUtilityRate_G << " " << y_average_time_A 
 				<< " " << y_average_nReplan_A << " " << y_average_pathLength_A << " " << y_average_pathUtilityRate_A
 				<< " " << y_average_time_M << " " << y_average_nReplan_M << " " << y_average_pathLength_M 
-				<< " " << y_average_pathUtilityRate_M << "\n";
+				<< " " << y_average_pathUtilityRate_M << " " << y_average_time_ML << " " <<  y_average_nReplan_ML
+				<< " " << y_average_pathLength_ML << " " << y_average_pathUtilityRate_ML << "\n";
 		}
 		std::cout << "Finish writing for the current parameter x_distrVar=" << distrV << "\n";
 		std::cout << "start a new parameter\n";

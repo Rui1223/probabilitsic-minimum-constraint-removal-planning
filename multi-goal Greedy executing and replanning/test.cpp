@@ -1,6 +1,8 @@
 #include "ConnectedGraph.hpp"
 // #include "AstarSolver.hpp"
-#include "MaxSurvivalSolver.hpp"
+// #include "MaxSurvivalSolver.hpp"
+#include "MaxLikelihoodSolver.hpp"
+#include "MaxLikelihoodExecuteReplanner.hpp"
 #include "Timer.hpp"
 
 #include <iostream>
@@ -28,10 +30,12 @@ int main(int argc, char** argv)
 	for (int ii = 0; ii < nExperiments; ii++)
 	{
 		std::string file_dir1 = "./" + folder_dir + "/graph" + std::to_string(ii) + ".txt";
-		std::string file_dir2 = "./" + folder_dir + "/AstarSearch_solution" 
-																+ std::to_string(ii) + ".txt";
-		std::string file_dir3 = "./" + folder_dir + "/MaxSurvivalSearch_solution" 
-																+ std::to_string(ii) + ".txt";
+		// std::string file_dir2 = "./" + folder_dir + "/AstarSearch_solution" 
+		// 														+ std::to_string(ii) + ".txt";
+		// std::string file_dir3 = "./" + folder_dir + "/MaxSurvivalSearch_solution" 
+		// 														+ std::to_string(ii) + ".txt";
+		std::string file_dir4 = "./" + folder_dir + "/MaxLikelihoodSearch_solution" 
+																+ std::to_string(ii) + ".txt";		
 
 		// generate a grpah
 		ConnectedGraph_t g(row, col, nLabelsPerObs, distrVar);
@@ -41,24 +45,22 @@ int main(int argc, char** argv)
 		// work out on solutions
 
 		std::cout << "**********************************************\n";
-		std::cout << "----------start the MaxSurvival search-------------\n";
+		std::cout << "----------start the MaxLikelihood search-------------\n";
 		t.reset();
-		MaxSurvivalSolver_t maxsurvival_solver(g, g.getmStart(), g.getmGoalSet(), 
+		MaxLikelihoodSolver_t mlsolver(g, g.getmStart(), g.getmGoalSet(), 
 											g.getmTargetPoses(), g.getLabelWeights());
-		maxsurvival_solver.MaxSurvival_search(g);
+		mlsolver.MaxLikelihood_search(g);
 		t1 = t.elapsed();
-		std::cout << "MaxSurvival time: " << t1 << " seconds\n\n";
-		maxsurvival_solver.write_solution(file_dir3, t1);
+		std::cout << "MaxLikelihood time: " << t1 << " seconds\n\n";
+		mlsolver.write_solution(file_dir4, t1);
 
-		// std::cout << "**********************************************\n";
-		// std::cout << "----------start the Astar search-------------\n";
-		// t.reset();
-		// AstarSolver_t astar_solver(g, g.getmStart(), g.getmGoalSet(), 
-		// 									g.getmTargetPoses(), g.getLabelWeights());
-		// astar_solver.Astar_search(g);
-		// t1 = t.elapsed();
-		// std::cout << "Astar time: " << t1 << " seconds\n\n";
-		// astar_solver.write_solution(file_dir2, t1);
+
+		// generate ground truth
+		std::string ground_truth_txt = "./" + folder_dir + "/ground truth.txt";
+		g.generate_groundTruth(ground_truth_txt);
+
+		MaxLikelihoodExecuteReplanner_t MLExeReplanner(g, mlsolver.getmPath());
+
 
 	}
 

@@ -11,21 +11,28 @@
 
 #include "ConnectedGraph.hpp"
 // #include "ToyGraph.hpp"
-#include "MaxSurvivalSolver.hpp"
+#include "MaxLikelihoodSolver.hpp"
 #include "PmcrNode.hpp"
 #include "Timer.hpp"
 
 // random generator function:
-int myrandom2 (int i) { return std::rand()%i; }
+int myrandom3 (int i) { return std::rand()%i; }
 
-MaxSurvivalSolver_t::MaxSurvivalSolver_t(ConnectedGraph_t &g, int start, std::vector<int> goalSet, 
+MaxLikelihoodSolver_t::MaxLikelihoodSolver_t(ConnectedGraph_t &g, int start, std::vector<int> goalSet, 
 			std::vector<int> targetPoses, std::map<int, std::pair<int, double>> labelWeights)
 {
-	// first initialize the things you update from the last replanning
 	m_start = start;
 	m_goalSet = goalSet;
 	m_targetPoses = targetPoses;
 	m_labelWeights = labelWeights;
+
+	// print m_labelWeights
+	// std::cout << "original labelweights\n";
+	// for (int kk = 0; kk < m_labelWeights.size(); kk++)
+	// {
+	// 	std::cout << kk << ": " << m_labelWeights[kk].first << "\t" << m_labelWeights[kk].second << "\n"; 
+	// }
+	// std::cout << "\n";
 
 	// these parameters never change. Just get it from the graph problem
 	m_col = g.getnCol();
@@ -44,9 +51,70 @@ MaxSurvivalSolver_t::MaxSurvivalSolver_t(ConnectedGraph_t &g, int start, std::ve
 	m_expanded = std::vector<bool>(g.getnNodes(), false);
 
 	m_solvable = true;
+
+
+	// the feature for maxlikelihood Solver
+	MaximumLikelihood_labelWeights();
+
+// 	std::cout << "updated labelweights\n";
+// 	for (int kk = 0; kk < m_labelWeights.size(); kk++)
+// 	{
+// 		std::cout << kk << ": " << m_labelWeights[kk].first << "\t" << m_labelWeights[kk].second << "\n"; 
+// 	}
+// 	std::cout << "\n";
 }
 
-MaxSurvivalSolver_t::~MaxSurvivalSolver_t()
+void MaxLikelihoodSolver_t::MaximumLikelihood_labelWeights()
+{
+	// The method converts the probabilistic obstacle distribution into the determinstic one
+	// so every time the search is performed on a deterministic distribution of each obstacle
+	// The pose with the highest probability for each obstacle will be chosen to be the true
+	// pose for that obstacle
+	for (int obs = 0; obs < m_nObstacles; obs++)
+	{
+		double temp_highestProb = -1.0;
+		double highestProb_label_idx;
+		for (int pp = 0; pp < m_nlabelsPerObs; pp++)
+		{
+			if (pp == 0)
+			{
+				highestProb_label_idx = obs*m_nlabelsPerObs+pp;
+				temp_highestProb = m_labelWeights[highestProb_label_idx].second;
+				m_labelWeights[highestProb_label_idx].second = 1.0;
+
+			}
+			else
+			{
+				if (m_labelWeights[obs*m_nlabelsPerObs+pp].second > temp_highestProb)
+				{
+					m_labelWeights[highestProb_label_idx].second = 0.0;
+					highestProb_label_idx = obs*m_nlabelsPerObs+pp;
+					temp_highestProb = m_labelWeights[obs*m_nlabelsPerObs+pp].second;
+					m_labelWeights[highestProb_label_idx].second = 1.0;
+				}
+				else
+				{
+					m_labelWeights[obs*m_nlabelsPerObs+pp].second = 0.0;
+				}
+			}
+		}
+	}
+
+}
+
+// void MaxLikelihoodSolver_t::pick_goal()
+// {
+// 	for (int ii = 0; ii < m_targetPoses.size(); ii++)
+// 	{
+// 		if (m_labelWeights[m_targetPoses[ii]].second == 1.0)
+// 		{
+// 			m_goal = m_goalSet[ii];
+// 			break;
+// 		}
+// 	}
+// }
+
+MaxLikelihoodSolver_t::~MaxLikelihoodSolver_t()
 {
 	while (!m_open.empty())
 	{
@@ -57,7 +125,7 @@ MaxSurvivalSolver_t::~MaxSurvivalSolver_t()
 	for (auto &e : m_closed) { delete e; }
 }
 
-void MaxSurvivalSolver_t::MaxSurvival_search(ConnectedGraph_t &g)
+void MaxLikelihoodSolver_t::MaxLikelihood_search(ConnectedGraph_t &g)
 {
 
 	while(!m_open.empty())
@@ -92,12 +160,12 @@ void MaxSurvivalSolver_t::MaxSurvival_search(ConnectedGraph_t &g)
 			std::cout << ">\n";
 			// should return a path here
 			back_track_path();
-			return;
+			return;		
 		}
 		// look at each neighbor of the current node
 		std::vector<int> neighbors = g.getNodeNeighbors(current->getID());
 		// randomly shuffle the neighbors
-		std::random_shuffle( neighbors.begin(), neighbors.end(), myrandom2 );
+		std::random_shuffle( neighbors.begin(), neighbors.end(), myrandom3 );
 		for (auto const &neighbor : neighbors)
 		{
 			if (m_expanded[neighbor] == true) 
@@ -130,19 +198,20 @@ void MaxSurvivalSolver_t::MaxSurvival_search(ConnectedGraph_t &g)
 					m_open.push(new PmcrNode_t(neighbor, m_G[neighbor], computeH(neighbor), neighborLabels, 
 																			current, neighborSurvival));
 				}
-			}
+			}		
 		}
-
 	}
-	// You are reaching here because the m_open is empty and you haven't reached the goal
-	// The ground truth is not solvable
-	m_solvable = false;
-	std::cout << "The ground truth is not solvable!\n";
+	// Check if the path is doomed
+	// If it is, the ground truth is not solvable
+	// 	m_solvable = false;
+	// 	//std::cout << "The goal I am clinging to is unsolvable! prune it.\n";		
+	// }
 
-	return;		
+	return;	
 }
 
-int MaxSurvivalSolver_t::computeH(int indx)
+
+int MaxLikelihoodSolver_t::computeH(int indx)
 {
 	int indx_row = indx / m_col;
 	int indx_col = indx % m_col;
@@ -162,7 +231,8 @@ int MaxSurvivalSolver_t::computeH(int indx)
 	return min_H;
 }
 
-std::vector<int> MaxSurvivalSolver_t::label_union(std::vector<int> s1, std::vector<int> s2)
+
+std::vector<int> MaxLikelihoodSolver_t::label_union(std::vector<int> s1, std::vector<int> s2)
 {
 	// sort the sets first before applying union operation
 	std::sort(s1.begin(), s1.end());
@@ -179,7 +249,8 @@ std::vector<int> MaxSurvivalSolver_t::label_union(std::vector<int> s1, std::vect
 	return v;	
 }
 
-void MaxSurvivalSolver_t::back_track_path()
+
+void MaxLikelihoodSolver_t::back_track_path()
 {	
 	// start from the goal
 	PmcrNode_t *current = m_closed[m_closed.size()-1];
@@ -191,16 +262,15 @@ void MaxSurvivalSolver_t::back_track_path()
 	} 
 	// finally put the start into the path
 	m_path.push_back(current->getID());
-	// std::cout << "path: \n";
-	// for (auto const &waypoint : m_path)
-	// {
-	// 	std::cout << waypoint << " ";
-	// }
-	// std::cout << "\n";
-
+	std::cout << "path: \n";
+	for (auto const &waypoint : m_path)
+	{
+		std::cout << waypoint << " ";
+	}
+	std::cout << "\n";
 }
 
-double MaxSurvivalSolver_t::compute_survival_currentLabels(std::vector<int> currentLabels)
+double MaxLikelihoodSolver_t::compute_survival_currentLabels(std::vector<int> currentLabels)
 {
 	double currentSurvival = 1.0;
 	std::vector<double> CollisionPerObs(m_nObstacles, 0.0);
@@ -216,8 +286,7 @@ double MaxSurvivalSolver_t::compute_survival_currentLabels(std::vector<int> curr
 	return currentSurvival;
 }
 
-
-void MaxSurvivalSolver_t::print_closedList()
+void MaxLikelihoodSolver_t::print_closedList()
 {
 	printf("Check whether there is something in the closed list\n");
 	for (auto &node : m_closed)
@@ -232,7 +301,7 @@ void MaxSurvivalSolver_t::print_closedList()
 	}
 }
 
-void MaxSurvivalSolver_t::write_solution(std::string file_dir, double t)
+void MaxLikelihoodSolver_t::write_solution(std::string file_dir, double t)
 {
 
 	std::ofstream file_(file_dir);

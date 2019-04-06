@@ -1,5 +1,5 @@
-#ifndef MAXSURVIVALSOLVER_H
-#define MAXSURVIVALSOLVER_H
+#ifndef MAXLIKELIHOODSOLVER_H
+#define MAXLIKELIHOODSOLVER_H
 
 #include <queue>
 #include <cstring>
@@ -7,7 +7,7 @@
 #include "ConnectedGraph.hpp"
 #include "PmcrNode.hpp"
 
-struct PmcrNode_comparison1
+struct PmcrNode_comparison_maxLikelihood
 {
 	bool operator()(const PmcrNode_t* a, const PmcrNode_t* b) 
 	{
@@ -25,8 +25,10 @@ struct PmcrNode_comparison1
 	}
 };
 
-class MaxSurvivalSolver_t
+class MaxLikelihoodSolver_t
 {
+	// Input that a greedy solver needs
+	// ConnectedGraph_t m_lgraph; 
 	int m_col;
 	int m_targetObs; //obs idx for target
 	int m_nlabelsPerObs;
@@ -35,9 +37,9 @@ class MaxSurvivalSolver_t
 	std::vector<int> m_currentLabels;
 	double m_currentSurvival;
 	std::vector<double> m_highestSurvival; // keep record of highest survivability for all nodes
-	
+
 	std::vector<int> m_path;
-	std::priority_queue<PmcrNode_t*, std::vector<PmcrNode_t*>, PmcrNode_comparison1> m_open;
+	std::priority_queue<PmcrNode_t*, std::vector<PmcrNode_t*>, PmcrNode_comparison_maxLikelihood> m_open;
 	std::vector<PmcrNode_t*> m_closed;
 	std::vector<bool> m_expanded;
 	std::vector<int> m_G;
@@ -51,19 +53,18 @@ class MaxSurvivalSolver_t
 	bool m_solvable;
 
 public:
-	MaxSurvivalSolver_t(ConnectedGraph_t &g, int start, std::vector<int> goalSet, 
+	MaxLikelihoodSolver_t(ConnectedGraph_t &g, int start, std::vector<int> goalSet, 
 			std::vector<int> targetPoses, std::map<int, std::pair<int, double>> labelWeights);
-	~MaxSurvivalSolver_t();
-	void MaxSurvival_search(ConnectedGraph_t &g);
+	~MaxLikelihoodSolver_t();
+	void MaxLikelihood_search(ConnectedGraph_t &g);
 
 	void back_track_path();
-	std::vector<int> label_union(std::vector<int> s1, std::vector<int> s2);
+	std::vector<int> label_union(std::vector<int> s1, std::vector<int> s2);	
 	// The function to compute the h value of a node(indx) for a given goal
 	int computeH(int indx);
 	void write_solution(std::string file_dir, double t);
 	void print_closedList();
 
-	//getters
 	double getCurrentSurvival() { return m_currentSurvival; }
 	std::vector<int> getmPath() { return m_path; }
 
@@ -73,6 +74,9 @@ public:
 
 	// function to compute the survivability for a single set of labels
 	double compute_survival_currentLabels(std::vector<int> labels);
+
+	void MaximumLikelihood_labelWeights();
+	// void pick_goal();
 
 };
 
