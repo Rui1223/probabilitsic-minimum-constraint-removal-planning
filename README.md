@@ -1,3 +1,2 @@
-# mcr
-This is a repository for my probability mcr research.
-I am taking full efforts on submitting my debut paper for SoCS 2019.
+# probablistic mimimum constraint removal planning problem
+This is a repository for my research on probablistic minimum constraint removal planning.
